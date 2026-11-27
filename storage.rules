@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Fail-closed baseline: uploads and downloads stay disabled until
+    // authenticated ownership, file-size and content-type rules are defined.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
