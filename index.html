@@ -142,6 +142,10 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
 #homeCustomerListings .store-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 #homeCustomerListings .store-item{min-width:0;padding:9px 7px;min-height:95px}
 #adminEditListingModal .field{margin:9px 0}
+
+.home-category-panel{padding:12px;margin-bottom:10px}
+.home-add-product{display:inline-flex;align-items:center;margin-top:7px;padding:6px 10px;border:1px solid var(--line);border-radius:18px;background:#f2f7fa;font-size:11px}
+.home-category-panel .store-empty{padding:13px;font-size:12px}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -562,7 +566,7 @@ function renderHomeCustomerListings(){
  const listings=all.filter(x=>(activeHomeListingCategory==="all"||x.category===activeHomeListingCategory)&&(!q||[x.title,x.description,x.category,x.city].join(" ").toLocaleLowerCase("ar").includes(q)));
  if(!listings.length){root.innerHTML='<div class="panel empty">لا توجد منتجات مطابقة لبحثك حالياً.</div>';return;}
  const groups=activeHomeListingCategory==="all"?["phones","property","vehicles","pets","other"]:[activeHomeListingCategory];
- root.innerHTML=groups.map(key=>{const items=listings.filter(x=>x.category===key);if(!items.length)return "";return '<div class="panel"><div class="rowitem"><strong>'+listingCategoryName(key)+'</strong><span class="muted">'+items.length+' منتج</span></div><div class="store-grid" style="margin-top:10px">'+items.slice(0,8).map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:105px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · '+(x.status==="sold_out"?"نفذت الكمية":x.status==="sold"?"مباع":"متوفر")+'</small></button>').join("")+'</div></div>';}).join("");
+ root.innerHTML=groups.map(key=>{const items=listings.filter(x=>x.category===key);return '<div class="panel home-category-panel"><div class="rowitem"><strong>'+listingCategoryName(key)+'</strong><span class="muted">'+items.length+' منتج</span></div><button class="smalllink home-add-product" type="button" data-home-add-cat="'+key+'">＋ إضافة منتج لهذا القسم</button><div class="store-grid" style="margin-top:10px">'+(items.length?items.slice(0,8).map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:105px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · '+(x.status==="sold_out"?"نفذت الكمية":x.status==="sold"?"مباع":"متوفر")+'</small></button>').join(""):'<div class="store-empty">لا توجد منتجات في هذا القسم بعد.</div>')+'</div></div>';}).join("");
 }
 let selectedProductForPurchase=null;
 function showProductDetails(id){
@@ -628,7 +632,7 @@ document.addEventListener("click",function(e){
  const item=e.target.closest("[data-product-id]");if(item){showProductDetails(item.dataset.productId);return;}
 });
 document.addEventListener("input",function(e){if(e.target&&e.target.id==="storeSearch")renderStore();if(e.target&&e.target.id==="homeListingSearch")renderHomeCustomerListings();});
-document.addEventListener("click",function(e){const b=e.target.closest("[data-home-cat]");if(b){activeHomeListingCategory=b.dataset.homeCat;document.querySelectorAll("[data-home-cat]").forEach(x=>x.classList.toggle("active",x===b));renderHomeCustomerListings();}});
+document.addEventListener("click",function(e){const add=e.target.closest("[data-home-add-cat]");if(add){if(!auth.currentUser){alert("سجّل الدخول أولاً لإضافة منتج.");return;}const category=add.dataset.homeAddCat;$("listingCategory").value=category;showPage("store");setTimeout(()=>{const form=$("productListingForm");if(form)form.scrollIntoView({behavior:"smooth",block:"start"});$("listingTitle").focus({preventScroll:true});},120);return;}const b=e.target.closest("[data-home-cat]");if(b){activeHomeListingCategory=b.dataset.homeCat;document.querySelectorAll("[data-home-cat]").forEach(x=>x.classList.toggle("active",x===b));renderHomeCustomerListings();}});
 $("productListingForm").addEventListener("submit",async function(e){
  e.preventDefault();
  const btn=$("publishListingBtn"),state=$("listingSaveState");
