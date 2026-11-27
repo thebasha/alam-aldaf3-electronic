@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عالم الدفع الإلكتروني</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f4f8;font-family:Arial;color:#172033}
+header{background:#101d36;color:white;padding:22px;text-align:center}
+header h2{margin:5px}
+header p{color:#b9c8e5}
+main{padding:15px;padding-bottom:90px}
+.card{background:white;border-radius:15px;padding:18px;margin:12px 0;box-shadow:0 3px 12px #0001}
+.balance{background:linear-gradient(120deg,#10264c,#087c9b);color:white}
+.amount{font-size:30px;font-weight:bold;margin:12px}
+button{border:0;border-radius:10px;padding:12px;background:#087eaa;color:white;font-size:15px;cursor:pointer}
+input{width:100%;padding:13px;margin:7px 0;border:1px solid #ddd;border-radius:9px;font-size:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.service{text-align:center;padding:18px 5px;background:white;border-radius:13px;cursor:pointer}
+.service b{display:block;margin-top:8px}
+nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:12px 2px;box-shadow:0 -3px 12px #0002}
+nav button{background:white;color:#26344b;font-size:12px;padding:8px 5px}
+nav button.active{color:#0783ad;font-weight:bold}
+.page{display:none}
+.page.active{display:block}
+.small{font-size:13px;color:#777}
+h3{margin-top:5px}
+</style>
+</head>
+<body>
+
+<header>
+<h2>🌐 عالم الدفع الإلكتروني</h2>
+<p>خدمات الشحن والدفع الإلكتروني</p>
+</header>
+
+<main>
+
+<div id="login" class="card">
+<h3>تسجيل الدخول</h3>
+<input id="username" placeholder="اسم المستخدم">
+<input id="password" type="password" placeholder="كلمة المرور">
+<button onclick="login()">دخول</button>
+<button onclick="register()" style="background:#17345b">إنشاء حساب</button>
+<p class="small">أهلاً بك في عالم الدفع الإلكتروني</p>
+</div>
+
+<div id="app" style="display:none">
+
+<section id="home" class="page active">
+<div class="card balance">
+<h3>محفظتي الإلكترونية</h3>
+<div class="amount"><span id="balance">0</span> د.ع</div>
+<p>الرصيد المتاح</p>
+<button onclick="showPage('wallet')">تعبئة المحفظة</button>
+</div>
+<div class="card">
+<h3>مرحباً بك في عالم الدفع الإلكتروني</h3>
+<p>اشحن ألعابك وبرامجك بسهولة وأمان.</p>
+</div>
+<h3>الخدمات الرئيسية</h3>
+<div class="grid">
+<div class="service" onclick="showPage('services')">🎮<b>شحن الألعاب</b></div>
+<div class="service" onclick="showPage('services')">📱<b>شحن البرامج</b></div>
+<div class="service" onclick="showPage('wallet')">💳<b>المحفظة</b></div>
+<div class="service" onclick="showPage('orders')">📋<b>طلباتي</b></div>
+</div>
+</section>
+
+<section id="services" class="page">
+<h3>البرامج والألعاب</h3>
+<div id="products"></div>
+</section>
+
+<section id="wallet" class="page">
+<div class="card balance">
+<h3>رصيد المحفظة</h3>
+<div class="amount"><span id="balance2">0</span> د.ع</div>
+</div>
+<div class="card">
+<h3>طرق تعبئة الرصيد</h3>
+<p>اختر طريقة التعبئة:</p>
+<button onclick="payment('ماستر كارد')">💳 ماستر كارد</button>
+<button onclick="payment('زين كاش')">📱 زين كاش</button>
+<button onclick="payment('سوبر كي')">💳 سوبر كي</button>
+<p class="small">التعبئة الفعلية تحتاج ربط بوابة الدفع وحساب التاجر.</p>
+</div>
+</section>
+
+<section id="orders" class="page">
+<h3>طلباتي</h3>
+<div class="card" id="orderlist">لا توجد طلبات حتى الآن.</div>
+</section>
+
+<section id="account" class="page">
+<div class="card">
+<h3>حسابي</h3>
+<p id="userlabel"></p>
+<p>الدعم الفني: 07733661844</p>
+<button onclick="showPage('admin')">إدارة الأسعار</button>
+<button onclick="logout()" style="background:#b83232">تسجيل الخروج</button>
+</div>
+</section>
+
+<section id="admin" class="page">
+<h3>إدارة الأسعار</h3>
+<div class="card">
+<p>اسم الخدمة</p>
+<input id="newname" placeholder="اسم البرنامج أو اللعبة">
+<p>السعر بالدينار العراقي</p>
+<input id="newprice" type="number" placeholder="السعر">
+<button onclick="addProduct()">إضافة خدمة</button>
+</div>
+</section>
+
+</div>
+</main>
+
+<nav id="nav" style="display:none">
+<button class="active" onclick="showPage('home',this)">🏠 الرئيسية</button>
+<button onclick="showPage('services',this)">🎮 الخدمات</button>
+<button onclick="showPage('wallet',this)">💳 المحفظة</button>
+<button onclick="showPage('orders',this)">📋 طلباتي</button>
+<button onclick="showPage('account',this)">👤 حسابي</button>
+</nav>
+
+<script>
+let balance=0;
+let products=[
+{name:"شحن الألعاب",price:5000},
+{name:"شحن البرامج",price:3000},
+{name:"بطاقات Google Play",price:10000},
+{name:"بطاقات App Store",price:10000}
+];
+let orders=[];
+
+function login(){
+let u=document.getElementById('username').value;
+let p=document.getElementById('password').value;
+if(!u||!p){alert("أدخل اسم المستخدم وكلمة المرور");return}
+localStorage.setItem('user',u);
+start();
+}
+function register(){login()}
+function start(){
+document.getElementById('login').style.display='none';
+document.getElementById('app').style.display='block';
+document.getElementById('nav').style.display='flex';
+document.getElementById('userlabel').innerText="اسم المستخدم: "+localStorage.getItem('user');
+render();
+}
+function logout(){
+localStorage.removeItem('user');
+location.reload();
+}
+function showPage(id,btn){
+document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+if(btn)btn.classList.add('active');
+}
+function render(){
+document.getElementById('balance').innerText=balance.toLocaleString('en');
+document.getElementById('balance2').innerText=balance.toLocaleString('en');
+document.getElementById('products').innerHTML=products.map((p,i)=>`
+<div class="card">
+<h3>${p.name}</h3>
+<p>السعر: ${p.price.toLocaleString('en')} د.ع</p>
+<button onclick="buy(${i})">طلب الشحن</button>
+</div>`).join('');
+document.getElementById('orderlist').innerHTML=orders.length?orders.join('<hr>'):'لا توجد طلبات حتى الآن.';
+}
+function buy(i){
+let p=products[i];
+if(balance<p.price){alert("رصيدك غير كافٍ. يرجى تعبئة المحفظة.");return}
+if(!confirm("تأكيد طلب "+p.name+"؟"))return;
+balance-=p.price;
+orders.push(p.name+" - "+p.price+" د.ع - بانتظار التنفيذ");
+render();
+alert("تم تسجيل الطلب في النموذج التجريبي.");
+}
+function payment(method){
+alert("طريقة التعبئة المختارة: "+method+" . يلزم إكمال الربط مع مزود الدفع.");
+}
+function addProduct(){
+let n=document.getElementById('newname').value;
+let p=Number(document.getElementById('newprice').value);
+if(!n||p<=0){alert("أدخل الاسم والسعر");return}
+products.push({name:n,price:p});
+render();
+alert("تمت إضافة الخدمة في هذه الجلسة.");
+}
+if(localStorage.getItem('user'))start();
+</script>
+</body>
+  </html>
+  
