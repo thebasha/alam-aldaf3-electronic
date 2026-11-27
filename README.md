@@ -23,7 +23,7 @@
 4. ثبّت Firebase CLI على جهاز موثوق وسجّل الدخول: `firebase login`.
 5. اربط المشروع: `firebase use --add` (لا تضع service-account key أو أي سر في المستودع).
 6. انشر القواعد: `firebase deploy --only firestore:rules,storage`.
-7. امنح صلاحية المدير فقط من بيئة موثوقة باستخدام Firebase Admin SDK وCustom Claims (مثل `admin: true`). لا تسمح للعميل بتعيين دوره بنفسه.
+7. لنشر القواعد من الهاتف دون تثبيت CLI محلياً: أضف GitHub Actions Secret باسم `FIREBASE_SERVICE_ACCOUNT` يحتوي JSON لحساب خدمة مخصص للنشر، وأضف Repository Variable باسم `FIREBASE_PROJECT_ID` بقيمة معرّف مشروع Firebase الصحيح، ثم شغّل Actions > Deploy Firebase security rules > Run workflow. لا ترسل ملف الحساب أو مفتاحه في المحادثات ولا تضعه داخل المستودع.\n8. امنح صلاحية المدير فقط من بيئة موثوقة باستخدام Firebase Admin SDK وCustom Claims (مثل `admin: true`). لا تسمح للعميل بتعيين دوره بنفسه.
 
 ## حالة الأمان والجاهزية
 - قواعد Firestore تمنع العميل من تعديل حالة الطلب أو قيمة الطلب أو هوية صاحبه؛ الإدارة الموثوقة فقط يمكنها ذلك.
