@@ -96,11 +96,13 @@
    </div>
    <div class="section-head"><h3 data-i="support">الدعم الفني والتواصل</h3></div>
    <div class="panel">
-    <p><strong>رقم الهاتف:</strong> <a href="tel:07733661844" dir="ltr">07733661844</a></p>
-    <p><strong>فيسبوك:</strong> <a href="https://www.facebook.com/share/1KUSvyqZHv/" target="_blank" rel="noopener noreferrer">صفحتنا على فيسبوك</a></p>
-    <p><strong>واتساب:</strong> <a href="https://wa.me/qr/AQ667FF66V7HF1" target="_blank" rel="noopener noreferrer">تواصل عبر واتساب</a></p>
-    <p><strong>تليغرام:</strong> <a href="https://t.me/H5N8D" target="_blank" rel="noopener noreferrer">@H5N8D</a></p>
-    <p class="muted">للاستفسارات والمساعدة بشأن الطلبات والخدمات، تواصل معنا عبر إحدى القنوات أعلاه.</p>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+     <a href="tel:07733661844" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px 8px;border:1px solid var(--line,#dce5ed);border-radius:14px;text-decoration:none;text-align:center"><span style="font-size:30px">📞</span><strong>اتصال مباشر</strong><small dir="ltr">07733661844</small></a>
+     <a href="https://www.facebook.com/share/1KUSvyqZHv/" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px 8px;border:1px solid var(--line,#dce5ed);border-radius:14px;text-decoration:none;text-align:center"><span style="font-size:30px">📘</span><strong>فيسبوك</strong><small>افتح صفحتنا</small></a>
+     <a href="https://wa.me/qr/AQ667FF66V7HF1" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px 8px;border:1px solid var(--line,#dce5ed);border-radius:14px;text-decoration:none;text-align:center"><span style="font-size:30px">💬</span><strong>واتساب</strong><small>محادثة مباشرة</small></a>
+     <a href="https://t.me/H5N8D" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px 8px;border:1px solid var(--line,#dce5ed);border-radius:14px;text-decoration:none;text-align:center"><span style="font-size:30px">✈️</span><strong>تليغرام</strong><small dir="ltr">@H5N8D</small></a>
+    </div>
+    <p class="muted" style="margin-top:14px">اضغط على أيقونة للتواصل معنا مباشرة.</p>
    </div>
   <div class="section-head"><h3>منطقة الإدارة</h3></div><div class="panel"><p>لوحة الإدارة محمية بصلاحية المدير من Firebase.</p><button class="primary" id="openAdminBtn" type="button">فتح لوحة المدير</button><span id="adminAccessState" class="badge">جارٍ التحقق من الصلاحية</span></div>
  </section>
