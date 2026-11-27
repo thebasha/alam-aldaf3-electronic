@@ -352,7 +352,7 @@ async function ensureUserProfile(user){
   }
  }catch(e){console.warn("User profile sync:",e);}
 }
-async function showApp(){resetInactivityTimer();$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("nav").classList.remove("hidden");applyLang();await loadProfileEditor();await checkAdminAccess();}
+async function showApp(){resetInactivityTimer();$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("nav").classList.remove("hidden");applyLang();await loadProfileEditor();await checkAdminAccess();if(window.startAdMob)window.startAdMob();}
 async function checkAdminAccess(){
  const btn=$("openAdminBtn"),state=$("adminAccessState");
  if(!auth.currentUser){if(btn)btn.classList.add("hidden");return false;}
@@ -428,5 +428,6 @@ $("orderForm").addEventListener("submit",e=>{e.preventDefault();const info=$("ac
 $("sendWalletRequest").addEventListener("click",()=>{const amount=Number($("walletAmount").value),ref=$("walletReference").value.trim();if(!amount||amount<250||!ref){alert(t("required"));return}saveOrder({id:"ALM-"+Date.now(),title:t(walletAction),date:new Date().toLocaleString(lang==="ar"?"ar-IQ":"en-US"),amount:String(amount),info:$("walletMethod").value+" · "+ref,status:"pending"},"wallet");$("walletModal").classList.add("hidden");$("walletModal").style.display="none";$("walletAmount").value="";$("walletReference").value="";alert(t("sent"));showPage("orders");});
 applyLang();auth.onAuthStateChanged(user=>{if(user){sessionStorage.setItem("alam_demo_user",user.uid);ensureUserProfile(user).finally(showApp);}else{sessionStorage.removeItem("alam_demo_user");$("year").textContent=new Date().getFullYear();$("langBtn").textContent=lang==="ar"?"English":"العربية";}});
 </script>
+<script src="./admob.bundle.js"></script>
 </body>
 </html>
