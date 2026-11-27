@@ -637,7 +637,7 @@ document.addEventListener("click",function(e){
  const item=e.target.closest("[data-product-id]");if(item){showProductDetails(item.dataset.productId);return;}
 });
 document.addEventListener("input",function(e){if(e.target&&e.target.id==="storeSearch")renderStore();if(e.target&&e.target.id==="homeListingSearch")renderHomeCustomerListings();});
-document.addEventListener("click",function(e){const add=e.target.closest("[data-home-add-cat]");if(add){if(!auth.currentUser){alert("سجّل الدخول أولاً لإضافة منتج.");return;}const category=add.dataset.homeAddCat;$("listingCategory").value=category;showPage("store");setTimeout(()=>{const form=$("productListingForm");if(form)form.scrollIntoView({behavior:"smooth",block:"start"});$("listingTitle").focus({preventScroll:true});},120);return;}const b=e.target.closest("[data-home-cat]");if(b){activeHomeListingCategory=b.dataset.homeCat;document.querySelectorAll("[data-home-cat]").forEach(x=>x.classList.toggle("active",x===b));renderHomeCustomerListings();}});
+document.addEventListener("click",function(e){const add=e.target.closest("[data-home-add-cat]");if(add){if(!auth.currentUser){alert("سجّل الدخول أولاً لإضافة منتج.");return;}const category=add.dataset.homeAddCat;$("listingCategory").value=category;openPublishPage();return;}const b=e.target.closest("[data-home-cat]");if(b){activeHomeListingCategory=b.dataset.homeCat;document.querySelectorAll("[data-home-cat]").forEach(x=>x.classList.toggle("active",x===b));renderHomeCustomerListings();}});
 $("productListingForm").addEventListener("submit",async function(e){
  e.preventDefault();
  const btn=$("publishListingBtn"),state=$("listingSaveState");
