@@ -81,7 +81,7 @@
   <div class="section-head"><h3>تعديل الملف الشخصي</h3></div>
   <form id="profileForm" class="panel">
    <div class="field"><label for="profileNickname">الاسم المستعار</label><input id="profileNickname" maxlength="60" placeholder="اكتب الاسم الذي يظهر للآخرين"></div>
-   <div class="field"><label for="profileUsername">اسم المستخدم (بدون مسافات)</label><input id="profileUsername" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" placeholder="username" autocomplete="username"></div>
+   <div class="field"><label for="profileUsername">اسم المستخدم (بدون مسافات)</label><input id="profileUsername" maxlength="20" pattern="[A-Za-z0-9_ء-ي٠-٩]{3,20}" placeholder="username أو اسم_مستخدم" autocomplete="username"></div>
    <div class="field"><label for="profileAvatarFile">الصورة الشخصية</label><input id="profileAvatarFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
    <div class="field"><label><input id="hideProfileEmail" type="checkbox" checked> إخفاء البريد الإلكتروني</label></div>
    <div class="field"><label><input id="hideProfilePhone" type="checkbox" checked> إخفاء رقم الهاتف</label></div>
@@ -221,7 +221,7 @@ async function saveProfile(e){
  e.preventDefault();const user=auth.currentUser;if(!user)return;
  const nickname=$("profileNickname").value.trim(),username=$("profileUsername").value.trim().toLowerCase();
  if(!nickname||nickname.length>60){alert("أدخل اسماً مستعاراً من 1 إلى 60 حرفاً.");return;}
- if(!/^[a-z0-9_]{3,20}$/.test(username)){alert("اسم المستخدم يجب أن يكون 3-20 حرفاً إنجليزياً أو رقماً أو _");return;}
+ if(!/^[a-z0-9_ء-ي٠-٩]{3,20}$/i.test(username)){alert("اسم المستخدم يجب أن يكون من 3 إلى 20 حرفاً، بالعربية أو الإنجليزية أو الأرقام أو _");return;}
  const btn=$("saveProfileBtn");btn.disabled=true;$("profileSaveState").textContent="جارٍ حفظ التعديلات…";
  try{const file=$("profileAvatarFile").files[0];const photoData=file?await compressProfileImage(file):undefined;
   const userRef=db.collection("users").doc(user.uid),newNameRef=db.collection("usernames").doc(username);
