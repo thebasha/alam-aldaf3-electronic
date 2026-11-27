@@ -127,6 +127,18 @@
 <div class="footer">© <span id="year"></span> Alam Electronic Payment</div>
 </div>
 <script>
+/* Navigation is deliberately independent of Firebase so menu taps still work if Firebase loading fails. */
+window.showPage = function(id){
+ document.querySelectorAll(".page").forEach(function(page){page.classList.toggle("active",page.id===id);});
+ document.querySelectorAll("#nav button[data-go]").forEach(function(button){button.classList.toggle("active",button.dataset.go===id);});
+ window.scrollTo(0,0);
+};
+document.addEventListener("click",function(event){
+ const button=event.target.closest("#nav button[data-go]");
+ if(button){event.preventDefault();window.showPage(button.dataset.go);}
+});
+</script>
+<script>
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIPPRYE863NAWlIZId4mOgsSd9UiR1bAE",
