@@ -40,11 +40,11 @@
   <div class="balance">
    <div class="balance-head"><span class="balance-label" data-i="walletBalance">رصيد المحفظة</span><span class="pill">IQD</span></div>
    <div class="amount"><span id="balance">0</span> <span data-i="iqd">د.ع</span></div>
-   <button class="primary" data-go="wallet" data-i="addFunds">طلب تعبئة الرصيد</button>
+   <button class="primary" data-go="wallet" data-i="addFunds" type="button" onclick="showPage('wallet')">طلب تعبئة الرصيد</button>
   </div>
   <div class="section-head"><h3 data-i="mainServices">الخدمات الرئيسية</h3><span class="muted" data-i="chooseService">اختر الخدمة</span></div>
   <div class="grid" id="homeServices"></div>
-  <div class="section-head"><h3 data-i="recentOrders">آخر الطلبات</h3><button class="smalllink" data-go="orders" data-i="viewAll">عرض الكل</button></div>
+  <div class="section-head"><h3 data-i="recentOrders">آخر الطلبات</h3><button class="smalllink" data-go="orders" data-i="viewAll" type="button" onclick="showPage('orders')">عرض الكل</button></div>
   <div id="recentList" class="list"></div>
  </section>
  <section id="services" class="page">
@@ -52,7 +52,7 @@
   <div class="grid" id="allServices"></div>
  </section>
  <section id="serviceDetail" class="page">
-  <button class="smalllink" data-go="services">← <span data-i="back">رجوع</span></button>
+  <button class="smalllink" data-go="services" type="button" onclick="showPage('services')">← <span data-i="back">رجوع</span></button>
   <div class="panel">
    <div class="service-icon" id="detailIcon">📱</div><h2 id="detailTitle"></h2><p id="detailDesc" class="muted"></p>
    <div class="notice" data-i="serviceNotice">سيتم تسجيل طلبك للمراجعة. لا يتم تنفيذ الدفع أو الشحن تلقائياً في هذه النسخة.</div>
@@ -118,11 +118,11 @@
  <button class="primary full" id="sendWalletRequest" data-i="sendRequest">إرسال الطلب</button></div>
 </div>
 <nav id="nav" class="nav hidden"><div class="navinner">
- <button class="active" data-go="home"><span>⌂</span><b data-i="home">الرئيسية</b></button>
+ <button class="active" data-go="home" type="button" onclick="showPage('home')"><span>⌂</span><b data-i="home">الرئيسية</b></button>
  <button data-go="services"><span>▦</span><b data-i="services">الخدمات</b></button>
  <button data-go="wallet"><span>▣</span><b data-i="wallet">المحفظة</b></button>
  <button data-go="orders"><span>☷</span><b data-i="orders">طلباتي</b></button>
- <button data-go="profile"><span>♙</span><b data-i="profile">حسابي</b></button>
+ <button data-go="profile" type="button" onclick="showPage('profile')"><span>♙</span><b data-i="profile">حسابي</b></button>
 </div></nav>
 <div class="footer">© <span id="year"></span> Alam Electronic Payment</div>
 </div>
