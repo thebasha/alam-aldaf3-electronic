@@ -11,60 +11,66 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == uid;
     }
     function validUserProfile(uid) {
-      return request.resource.data.keys().hasOnly(['uid', 'displayName', 'email', 'phone', 'createdAt', 'nickname', 'username', 'hideEmail', 'hidePhone', 'photoData', 'updatedAt'])
-        && request.resource.data.uid == uid
-        && request.resource.data.displayName is string
-        && request.resource.data.displayName.size() <= 80
-        && (!('nickname' in request.resource.data) || (request.resource.data.nickname is string && request.resource.data.nickname.size() <= 60))
-        && (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.matches('^[a-z0-9_]{3,20}
-        && (!('email' in request.resource.data) || request.resource.data.email is string)
-        && (!('phone' in request.resource.data) || request.resource.data.phone is string)
-        && request.resource.data.createdAt == request.time;
+      return request.resource.data.keys().hasOnly([
+        'uid', 'displayName', 'email', 'phone', 'createdAt',
+        'nickname', 'username', 'hideEmail', 'hidePhone', 'photoData', 'updatedAt'
+      ])
+      && request.resource.data.uid == uid
+      && request.resource.data.displayName is string
+      && request.resource.data.displayName.size() <= 80
+      && (!('email' in request.resource.data) || request.resource.data.email is string)
+      && (!('phone' in request.resource.data) || request.resource.data.phone is string)
+      && (!('nickname' in request.resource.data) || (request.resource.data.nickname is string && request.resource.data.nickname.size() <= 60))
+      && (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.matches('^[a-z0-9_]{3,20}$')))
+      && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
+      && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
+      && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000))
+      && request.resource.data.createdAt == request.time;
     }
     function validOrder() {
       return request.resource.data.keys().hasOnly([
-          'uid', 'serviceId', 'category', 'accountInfo', 'amount', 'notes', 'status', 'createdAt'
-        ])
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.serviceId in [
-          'games', 'apps', 'google', 'apple', 'mobile', 'zain', 'master',
-          'earnings', 'repair', 'phones', 'vehicles', 'property', 'wallet'
-        ]
-        && request.resource.data.accountInfo is string
-        && request.resource.data.accountInfo.size() > 0
-        && request.resource.data.accountInfo.size() <= 120
-        && request.resource.data.notes is string
-        && request.resource.data.notes.size() <= 500
-        && request.resource.data.amount is int
-        && request.resource.data.amount >= 0
-        && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time;
+        'uid', 'serviceId', 'category', 'accountInfo', 'amount', 'notes', 'status', 'createdAt'
+      ])
+      && request.resource.data.uid == request.auth.uid
+      && request.resource.data.serviceId in [
+        'games', 'apps', 'google', 'apple', 'mobile', 'zain', 'master',
+        'earnings', 'repair', 'phones', 'vehicles', 'property', 'wallet'
+      ]
+      && request.resource.data.accountInfo is string
+      && request.resource.data.accountInfo.size() > 0
+      && request.resource.data.accountInfo.size() <= 120
+      && request.resource.data.notes is string
+      && request.resource.data.notes.size() <= 500
+      && request.resource.data.amount is int
+      && request.resource.data.amount >= 0
+      && request.resource.data.status == 'pending'
+      && request.resource.data.createdAt == request.time;
     }
     function validListing() {
       return request.resource.data.keys().hasOnly([
-          'ownerUid', 'section', 'category', 'title', 'description', 'priceIQD',
-          'city', 'contact', 'imagePaths', 'status', 'createdAt', 'updatedAt'
-        ])
-        && request.resource.data.ownerUid == request.auth.uid
-        && request.resource.data.section in ['phones', 'vehicles', 'property']
-        && request.resource.data.category is string
-        && request.resource.data.category.size() <= 60
-        && request.resource.data.title is string
-        && request.resource.data.title.size() > 0
-        && request.resource.data.title.size() <= 100
-        && request.resource.data.description is string
-        && request.resource.data.description.size() <= 1500
-        && request.resource.data.priceIQD is int
-        && request.resource.data.priceIQD >= 0
-        && request.resource.data.city is string
-        && request.resource.data.city.size() <= 80
-        && request.resource.data.contact is string
-        && request.resource.data.contact.size() <= 40
-        && request.resource.data.imagePaths is list
-        && request.resource.data.imagePaths.size() <= 6
-        && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time
-        && request.resource.data.updatedAt == request.time;
+        'ownerUid', 'section', 'category', 'title', 'description', 'priceIQD',
+        'city', 'contact', 'imagePaths', 'status', 'createdAt', 'updatedAt'
+      ])
+      && request.resource.data.ownerUid == request.auth.uid
+      && request.resource.data.section in ['phones', 'vehicles', 'property']
+      && request.resource.data.category is string
+      && request.resource.data.category.size() <= 60
+      && request.resource.data.title is string
+      && request.resource.data.title.size() > 0
+      && request.resource.data.title.size() <= 100
+      && request.resource.data.description is string
+      && request.resource.data.description.size() <= 1500
+      && request.resource.data.priceIQD is int
+      && request.resource.data.priceIQD >= 0
+      && request.resource.data.city is string
+      && request.resource.data.city.size() <= 80
+      && request.resource.data.contact is string
+      && request.resource.data.contact.size() <= 40
+      && request.resource.data.imagePaths is list
+      && request.resource.data.imagePaths.size() <= 6
+      && request.resource.data.status == 'pending'
+      && request.resource.data.createdAt == request.time
+      && request.resource.data.updatedAt == request.time;
     }
 
     match /users/{uid} {
@@ -72,174 +78,14 @@ service cloud.firestore {
       allow read: if owns(uid) || isAdmin();
       allow update: if (owns(uid)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'displayName', 'phone', 'nickname', 'username', 'hideEmail', 'hidePhone', 'photoData', 'updatedAt'
+          'displayName', 'phone', 'nickname', 'username', 'hideEmail',
+          'hidePhone', 'photoData', 'updatedAt'
         ])
         && request.resource.data.displayName is string
         && request.resource.data.displayName.size() <= 80
         && (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.size() <= 40))
         && (!('nickname' in request.resource.data) || (request.resource.data.nickname is string && request.resource.data.nickname.size() <= 60))
-        && (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.matches('^[a-z0-9_]{3,20}
-    }
-
-    match /orders/{orderId} {
-      allow create: if signedIn() && validOrder();
-      allow read: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
-      // Customers cannot change amount, owner, status or transaction state.
-      allow update, delete: if isAdmin();
-    }
-
-    match /listings/{listingId} {
-      allow create: if signedIn() && validListing();
-      allow read: if (isAdmin())
-        || (resource.data.status == 'approved')
-        || (signedIn() && resource.data.ownerUid == request.auth.uid);
-      allow update: if isAdmin()
-        || (signedIn()
-          && resource.data.ownerUid == request.auth.uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-            'category', 'title', 'description', 'priceIQD', 'city', 'contact',
-            'imagePaths', 'updatedAt'
-          ])
-          && request.resource.data.status == resource.data.status
-          && request.resource.data.ownerUid == resource.data.ownerUid
-          && request.resource.data.title is string
-          && request.resource.data.title.size() > 0
-          && request.resource.data.title.size() <= 100
-          && request.resource.data.description is string
-          && request.resource.data.description.size() <= 1500
-          && request.resource.data.priceIQD is int
-          && request.resource.data.priceIQD >= 0
-          && request.resource.data.category is string
-          && request.resource.data.category.size() <= 60
-          && request.resource.data.city is string
-          && request.resource.data.city.size() <= 80
-          && request.resource.data.contact is string
-          && request.resource.data.contact.size() <= 40
-          && request.resource.data.imagePaths is list
-          && request.resource.data.imagePaths.size() <= 6
-          && request.resource.data.updatedAt == request.time);
-      allow delete: if isAdmin()
-        || (signedIn() && resource.data.ownerUid == request.auth.uid
-          && resource.data.status == 'pending');
-    }
-
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-})))
-        && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
-        && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
-        && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000))
-        && (!('email' in request.resource.data) || request.resource.data.email is string)
-        && (!('phone' in request.resource.data) || request.resource.data.phone is string)
-        && request.resource.data.createdAt == request.time;
-    }
-    function validOrder() {
-      return request.resource.data.keys().hasOnly([
-          'uid', 'serviceId', 'category', 'accountInfo', 'amount', 'notes', 'status', 'createdAt'
-        ])
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.serviceId in [
-          'games', 'apps', 'google', 'apple', 'mobile', 'zain', 'master',
-          'earnings', 'repair', 'phones', 'vehicles', 'property', 'wallet'
-        ]
-        && request.resource.data.accountInfo is string
-        && request.resource.data.accountInfo.size() > 0
-        && request.resource.data.accountInfo.size() <= 120
-        && request.resource.data.notes is string
-        && request.resource.data.notes.size() <= 500
-        && request.resource.data.amount is int
-        && request.resource.data.amount >= 0
-        && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time;
-    }
-    function validListing() {
-      return request.resource.data.keys().hasOnly([
-          'ownerUid', 'section', 'category', 'title', 'description', 'priceIQD',
-          'city', 'contact', 'imagePaths', 'status', 'createdAt', 'updatedAt'
-        ])
-        && request.resource.data.ownerUid == request.auth.uid
-        && request.resource.data.section in ['phones', 'vehicles', 'property']
-        && request.resource.data.category is string
-        && request.resource.data.category.size() <= 60
-        && request.resource.data.title is string
-        && request.resource.data.title.size() > 0
-        && request.resource.data.title.size() <= 100
-        && request.resource.data.description is string
-        && request.resource.data.description.size() <= 1500
-        && request.resource.data.priceIQD is int
-        && request.resource.data.priceIQD >= 0
-        && request.resource.data.city is string
-        && request.resource.data.city.size() <= 80
-        && request.resource.data.contact is string
-        && request.resource.data.contact.size() <= 40
-        && request.resource.data.imagePaths is list
-        && request.resource.data.imagePaths.size() <= 6
-        && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time
-        && request.resource.data.updatedAt == request.time;
-    }
-
-    match /users/{uid} {
-      allow create: if owns(uid) && validUserProfile(uid);
-      allow read: if owns(uid) || isAdmin();
-      allow update: if (owns(uid)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'phone'])
-        && request.resource.data.displayName is string
-        && request.resource.data.displayName.size() <= 80
-        && (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.size() <= 40)))
-        || isAdmin();
-      allow delete: if isAdmin();
-    }
-
-    match /orders/{orderId} {
-      allow create: if signedIn() && validOrder();
-      allow read: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
-      // Customers cannot change amount, owner, status or transaction state.
-      allow update, delete: if isAdmin();
-    }
-
-    match /listings/{listingId} {
-      allow create: if signedIn() && validListing();
-      allow read: if (isAdmin())
-        || (resource.data.status == 'approved')
-        || (signedIn() && resource.data.ownerUid == request.auth.uid);
-      allow update: if isAdmin()
-        || (signedIn()
-          && resource.data.ownerUid == request.auth.uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-            'category', 'title', 'description', 'priceIQD', 'city', 'contact',
-            'imagePaths', 'updatedAt'
-          ])
-          && request.resource.data.status == resource.data.status
-          && request.resource.data.ownerUid == resource.data.ownerUid
-          && request.resource.data.title is string
-          && request.resource.data.title.size() > 0
-          && request.resource.data.title.size() <= 100
-          && request.resource.data.description is string
-          && request.resource.data.description.size() <= 1500
-          && request.resource.data.priceIQD is int
-          && request.resource.data.priceIQD >= 0
-          && request.resource.data.category is string
-          && request.resource.data.category.size() <= 60
-          && request.resource.data.city is string
-          && request.resource.data.city.size() <= 80
-          && request.resource.data.contact is string
-          && request.resource.data.contact.size() <= 40
-          && request.resource.data.imagePaths is list
-          && request.resource.data.imagePaths.size() <= 6
-          && request.resource.data.updatedAt == request.time);
-      allow delete: if isAdmin()
-        || (signedIn() && resource.data.ownerUid == request.auth.uid
-          && resource.data.status == 'pending');
-    }
-
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-})))
+        && (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.matches('^[a-z0-9_]{3,20}$')))
         && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
         && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
         && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000)))
@@ -253,168 +99,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['uid', 'username', 'updatedAt'])
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.username == username
-        && username.matches('^[a-z0-9_]{3,20}
-    }
-
-    match /orders/{orderId} {
-      allow create: if signedIn() && validOrder();
-      allow read: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
-      // Customers cannot change amount, owner, status or transaction state.
-      allow update, delete: if isAdmin();
-    }
-
-    match /listings/{listingId} {
-      allow create: if signedIn() && validListing();
-      allow read: if (isAdmin())
-        || (resource.data.status == 'approved')
-        || (signedIn() && resource.data.ownerUid == request.auth.uid);
-      allow update: if isAdmin()
-        || (signedIn()
-          && resource.data.ownerUid == request.auth.uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-            'category', 'title', 'description', 'priceIQD', 'city', 'contact',
-            'imagePaths', 'updatedAt'
-          ])
-          && request.resource.data.status == resource.data.status
-          && request.resource.data.ownerUid == resource.data.ownerUid
-          && request.resource.data.title is string
-          && request.resource.data.title.size() > 0
-          && request.resource.data.title.size() <= 100
-          && request.resource.data.description is string
-          && request.resource.data.description.size() <= 1500
-          && request.resource.data.priceIQD is int
-          && request.resource.data.priceIQD >= 0
-          && request.resource.data.category is string
-          && request.resource.data.category.size() <= 60
-          && request.resource.data.city is string
-          && request.resource.data.city.size() <= 80
-          && request.resource.data.contact is string
-          && request.resource.data.contact.size() <= 40
-          && request.resource.data.imagePaths is list
-          && request.resource.data.imagePaths.size() <= 6
-          && request.resource.data.updatedAt == request.time);
-      allow delete: if isAdmin()
-        || (signedIn() && resource.data.ownerUid == request.auth.uid
-          && resource.data.status == 'pending');
-    }
-
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-})))
-        && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
-        && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
-        && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000))
-        && (!('email' in request.resource.data) || request.resource.data.email is string)
-        && (!('phone' in request.resource.data) || request.resource.data.phone is string)
-        && request.resource.data.createdAt == request.time;
-    }
-    function validOrder() {
-      return request.resource.data.keys().hasOnly([
-          'uid', 'serviceId', 'category', 'accountInfo', 'amount', 'notes', 'status', 'createdAt'
-        ])
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.serviceId in [
-          'games', 'apps', 'google', 'apple', 'mobile', 'zain', 'master',
-          'earnings', 'repair', 'phones', 'vehicles', 'property', 'wallet'
-        ]
-        && request.resource.data.accountInfo is string
-        && request.resource.data.accountInfo.size() > 0
-        && request.resource.data.accountInfo.size() <= 120
-        && request.resource.data.notes is string
-        && request.resource.data.notes.size() <= 500
-        && request.resource.data.amount is int
-        && request.resource.data.amount >= 0
-        && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time;
-    }
-    function validListing() {
-      return request.resource.data.keys().hasOnly([
-          'ownerUid', 'section', 'category', 'title', 'description', 'priceIQD',
-          'city', 'contact', 'imagePaths', 'status', 'createdAt', 'updatedAt'
-        ])
-        && request.resource.data.ownerUid == request.auth.uid
-        && request.resource.data.section in ['phones', 'vehicles', 'property']
-        && request.resource.data.category is string
-        && request.resource.data.category.size() <= 60
-        && request.resource.data.title is string
-        && request.resource.data.title.size() > 0
-        && request.resource.data.title.size() <= 100
-        && request.resource.data.description is string
-        && request.resource.data.description.size() <= 1500
-        && request.resource.data.priceIQD is int
-        && request.resource.data.priceIQD >= 0
-        && request.resource.data.city is string
-        && request.resource.data.city.size() <= 80
-        && request.resource.data.contact is string
-        && request.resource.data.contact.size() <= 40
-        && request.resource.data.imagePaths is list
-        && request.resource.data.imagePaths.size() <= 6
-        && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time
-        && request.resource.data.updatedAt == request.time;
-    }
-
-    match /users/{uid} {
-      allow create: if owns(uid) && validUserProfile(uid);
-      allow read: if owns(uid) || isAdmin();
-      allow update: if (owns(uid)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'phone'])
-        && request.resource.data.displayName is string
-        && request.resource.data.displayName.size() <= 80
-        && (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.size() <= 40)))
-        || isAdmin();
-      allow delete: if isAdmin();
-    }
-
-    match /orders/{orderId} {
-      allow create: if signedIn() && validOrder();
-      allow read: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
-      // Customers cannot change amount, owner, status or transaction state.
-      allow update, delete: if isAdmin();
-    }
-
-    match /listings/{listingId} {
-      allow create: if signedIn() && validListing();
-      allow read: if (isAdmin())
-        || (resource.data.status == 'approved')
-        || (signedIn() && resource.data.ownerUid == request.auth.uid);
-      allow update: if isAdmin()
-        || (signedIn()
-          && resource.data.ownerUid == request.auth.uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-            'category', 'title', 'description', 'priceIQD', 'city', 'contact',
-            'imagePaths', 'updatedAt'
-          ])
-          && request.resource.data.status == resource.data.status
-          && request.resource.data.ownerUid == resource.data.ownerUid
-          && request.resource.data.title is string
-          && request.resource.data.title.size() > 0
-          && request.resource.data.title.size() <= 100
-          && request.resource.data.description is string
-          && request.resource.data.description.size() <= 1500
-          && request.resource.data.priceIQD is int
-          && request.resource.data.priceIQD >= 0
-          && request.resource.data.category is string
-          && request.resource.data.category.size() <= 60
-          && request.resource.data.city is string
-          && request.resource.data.city.size() <= 80
-          && request.resource.data.contact is string
-          && request.resource.data.contact.size() <= 40
-          && request.resource.data.imagePaths is list
-          && request.resource.data.imagePaths.size() <= 6
-          && request.resource.data.updatedAt == request.time);
-      allow delete: if isAdmin()
-        || (signedIn() && resource.data.ownerUid == request.auth.uid
-          && resource.data.status == 'pending');
-    }
-
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-});
+        && username.matches('^[a-z0-9_]{3,20}$');
       allow update: if signedIn()
         && resource.data.uid == request.auth.uid
         && request.resource.data.uid == request.auth.uid
@@ -425,125 +110,12 @@ service cloud.firestore {
     match /orders/{orderId} {
       allow create: if signedIn() && validOrder();
       allow read: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
-      // Customers cannot change amount, owner, status or transaction state.
       allow update, delete: if isAdmin();
     }
 
     match /listings/{listingId} {
       allow create: if signedIn() && validListing();
-      allow read: if (isAdmin())
-        || (resource.data.status == 'approved')
-        || (signedIn() && resource.data.ownerUid == request.auth.uid);
-      allow update: if isAdmin()
-        || (signedIn()
-          && resource.data.ownerUid == request.auth.uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-            'category', 'title', 'description', 'priceIQD', 'city', 'contact',
-            'imagePaths', 'updatedAt'
-          ])
-          && request.resource.data.status == resource.data.status
-          && request.resource.data.ownerUid == resource.data.ownerUid
-          && request.resource.data.title is string
-          && request.resource.data.title.size() > 0
-          && request.resource.data.title.size() <= 100
-          && request.resource.data.description is string
-          && request.resource.data.description.size() <= 1500
-          && request.resource.data.priceIQD is int
-          && request.resource.data.priceIQD >= 0
-          && request.resource.data.category is string
-          && request.resource.data.category.size() <= 60
-          && request.resource.data.city is string
-          && request.resource.data.city.size() <= 80
-          && request.resource.data.contact is string
-          && request.resource.data.contact.size() <= 40
-          && request.resource.data.imagePaths is list
-          && request.resource.data.imagePaths.size() <= 6
-          && request.resource.data.updatedAt == request.time);
-      allow delete: if isAdmin()
-        || (signedIn() && resource.data.ownerUid == request.auth.uid
-          && resource.data.status == 'pending');
-    }
-
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-})))
-        && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
-        && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
-        && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000))
-        && (!('email' in request.resource.data) || request.resource.data.email is string)
-        && (!('phone' in request.resource.data) || request.resource.data.phone is string)
-        && request.resource.data.createdAt == request.time;
-    }
-    function validOrder() {
-      return request.resource.data.keys().hasOnly([
-          'uid', 'serviceId', 'category', 'accountInfo', 'amount', 'notes', 'status', 'createdAt'
-        ])
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.serviceId in [
-          'games', 'apps', 'google', 'apple', 'mobile', 'zain', 'master',
-          'earnings', 'repair', 'phones', 'vehicles', 'property', 'wallet'
-        ]
-        && request.resource.data.accountInfo is string
-        && request.resource.data.accountInfo.size() > 0
-        && request.resource.data.accountInfo.size() <= 120
-        && request.resource.data.notes is string
-        && request.resource.data.notes.size() <= 500
-        && request.resource.data.amount is int
-        && request.resource.data.amount >= 0
-        && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time;
-    }
-    function validListing() {
-      return request.resource.data.keys().hasOnly([
-          'ownerUid', 'section', 'category', 'title', 'description', 'priceIQD',
-          'city', 'contact', 'imagePaths', 'status', 'createdAt', 'updatedAt'
-        ])
-        && request.resource.data.ownerUid == request.auth.uid
-        && request.resource.data.section in ['phones', 'vehicles', 'property']
-        && request.resource.data.category is string
-        && request.resource.data.category.size() <= 60
-        && request.resource.data.title is string
-        && request.resource.data.title.size() > 0
-        && request.resource.data.title.size() <= 100
-        && request.resource.data.description is string
-        && request.resource.data.description.size() <= 1500
-        && request.resource.data.priceIQD is int
-        && request.resource.data.priceIQD >= 0
-        && request.resource.data.city is string
-        && request.resource.data.city.size() <= 80
-        && request.resource.data.contact is string
-        && request.resource.data.contact.size() <= 40
-        && request.resource.data.imagePaths is list
-        && request.resource.data.imagePaths.size() <= 6
-        && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time
-        && request.resource.data.updatedAt == request.time;
-    }
-
-    match /users/{uid} {
-      allow create: if owns(uid) && validUserProfile(uid);
-      allow read: if owns(uid) || isAdmin();
-      allow update: if (owns(uid)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'phone'])
-        && request.resource.data.displayName is string
-        && request.resource.data.displayName.size() <= 80
-        && (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.size() <= 40)))
-        || isAdmin();
-      allow delete: if isAdmin();
-    }
-
-    match /orders/{orderId} {
-      allow create: if signedIn() && validOrder();
-      allow read: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
-      // Customers cannot change amount, owner, status or transaction state.
-      allow update, delete: if isAdmin();
-    }
-
-    match /listings/{listingId} {
-      allow create: if signedIn() && validListing();
-      allow read: if (isAdmin())
+      allow read: if isAdmin()
         || (resource.data.status == 'approved')
         || (signedIn() && resource.data.ownerUid == request.auth.uid);
       allow update: if isAdmin()
