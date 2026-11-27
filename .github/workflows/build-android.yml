@@ -36,7 +36,7 @@ jobs:
           const p = 'android/app/src/main/AndroidManifest.xml';
           let xml = fs.readFileSync(p, 'utf8');
           const tag = '<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3940256099942544~3347511713" />';
-          if (!xml.includes('com.google.android.gms.ads.APPLICATION_ID')) xml = xml.replace('</application>', '    ' + tag + '\\n  </application>');
+          if (!xml.includes('com.google.android.gms.ads.APPLICATION_ID')) xml = xml.replace('</application>', '    ' + tag + '\n  </application>');
           fs.writeFileSync(p, xml);
           NODE
       - name: Sync web app
