@@ -26,7 +26,7 @@ service cloud.firestore {
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.serviceId in [
           'games', 'apps', 'google', 'apple', 'mobile', 'zain', 'master',
-          'earnings', 'repair', 'phones', 'vehicles', 'property'
+          'earnings', 'repair', 'phones', 'vehicles', 'property', 'wallet'
         ]
         && request.resource.data.accountInfo is string
         && request.resource.data.accountInfo.size() > 0
