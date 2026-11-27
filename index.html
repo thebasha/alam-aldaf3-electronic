@@ -165,6 +165,7 @@ body:has(#appView:not(.hidden)) .muted{color:#adc2d9}
  <section id="orders" class="page"><div class="section-head"><h3 data-i="myOrders">طلباتي</h3></div><div id="ordersList" class="list"></div></section>
  <section id="profile" class="page">
   <div class="profile"><img id="profileAvatar" alt="الصورة الشخصية" src="" style="width:92px;height:92px;border-radius:50%;object-fit:cover;background:#dce5ed"><h3 id="profileName"></h3><p class="muted" data-i="customerAccount">حساب عميل</p></div>
+  <button class="danger full" id="logoutBtn" type="button" style="margin:14px 0 20px">↪ تسجيل الخروج</button>
   <div class="section-head"><h3>تعديل الملف الشخصي</h3></div>
   <form id="profileForm" class="panel">
    <div class="field"><label for="profileNickname">الاسم المستعار</label><input id="profileNickname" maxlength="60" placeholder="اكتب الاسم الذي يظهر للآخرين"></div>
@@ -375,7 +376,7 @@ async function loadAdminDashboard(){
  }catch(e){console.error("Admin dashboard:",e);$("adminOrdersList").innerHTML='<div class="panel empty">تعذر تحميل البيانات. تحقق من نشر قواعد Firestore وصلاحية المدير.</div>'; $("adminListingsList").innerHTML="";$("adminUsersList").innerHTML="";}
 }
 
-function logout(){clearTimeout(inactivityTimer);auth.signOut().catch(console.error);sessionStorage.removeItem("alam_demo_user");$("appView").classList.add("hidden");$("nav").classList.add("hidden");$("loginView").classList.remove("hidden");}
+async function logout(){if(!confirm(lang==="ar"?"هل تريد تسجيل الخروج من التطبيق؟":"Are you sure you want to sign out?"))return;clearTimeout(inactivityTimer);try{await auth.signOut();}catch(error){console.error("Sign out:",error);alert(lang==="ar"?"تعذر تسجيل الخروج. حاول مرة أخرى.":"Sign out failed. Please try again.");}}
 $("profileForm").addEventListener("submit",saveProfile);$("profileAvatarFile").addEventListener("change",async()=>{try{const f=$("profileAvatarFile").files[0];if(f)$("profileAvatar").src=await compressProfileImage(f);}catch(e){alert(e.message);$("profileAvatarFile").value="";}});$("openAdminBtn").addEventListener("click",loadAdminDashboard);
 $("adminBackBtn").addEventListener("click",()=>showPage("profile"));
 $("refreshAdminBtn").addEventListener("click",loadAdminDashboard);
