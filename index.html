@@ -272,7 +272,7 @@ document.addEventListener("click",async e=>{
  const lb=e.target.closest("[data-listing-status]");
  if(lb){try{await db.collection("listings").doc(lb.dataset.listingStatus).update({status:lb.dataset.status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث الإعلان. تحقق من قواعد Firestore.");}}
 });
-$("loginBtn").addEventListener("click",login);$("password").addEventListener("keydown",e=>{if(e.key==="Enter")login()});$("logoutBtn").addEventListener("click",logout);
+$("loginBtn").addEventListener("click",login);$("password").addEventListener("keydown",e=>{if(e.key==="Enter")login()});const logoutButton=$("logoutBtn");if(logoutButton)logoutButton.addEventListener("click",logout);
 $("langBtn").addEventListener("click",()=>{lang=lang==="ar"?"en":"ar";localStorage.setItem("alam_lang",lang);applyLang();});
 document.addEventListener("click",e=>{const go=e.target.closest("[data-go]");if(go)showPage(go.dataset.go);const wa=e.target.closest("[data-wallet]");if(wa){walletAction=wa.dataset.wallet;$("walletModalTitle").textContent=walletAction==="deposit"?t("depositTitle"):t("withdrawTitle");$("walletModal").classList.remove("hidden");$("walletModal").style.display="grid";}});
 $("closeModal").addEventListener("click",()=>{$("walletModal").classList.add("hidden");$("walletModal").style.display="none"});
