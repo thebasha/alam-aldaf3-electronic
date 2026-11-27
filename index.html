@@ -195,11 +195,14 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
    <button class="service" type="button" onclick="openCardWalletTopup()"><div class="service-icon">💳</div><strong>الشحن عبر البطاقة</strong><small>طلب إضافة رصيد للمحفظة باستخدام Mastercard</small></button>
    <button class="service" type="button" onclick="showPage('wallet')"><div class="service-icon">👛</div><strong>شحن محفظة التطبيق</strong><small>طلب تعبئة رصيد المحفظة</small></button>
   </div>
+  <div class="section-head"><h3>🛍️ إعلانات العملاء حسب الأقسام</h3><button class="smalllink" type="button" onclick="showPage('store')">عرض السوق</button></div>
+  <div id="homeCustomerListings" class="list"><div class="panel empty">جارٍ تحميل إعلانات العملاء…</div></div>
   <div class="section-head"><h3 data-i="recentOrders">آخر الطلبات</h3><button class="smalllink" data-go="orders" data-i="viewAll" type="button" onclick="showPage('orders')">عرض الكل</button></div>
   <div id="recentList" class="list"></div>
  </section>
  <section id="store" class="page">
   <div class="store-head"><h2>السوق الإلكتروني</h2><p>إعلانات المنتجات مع السعر والكمية والصورة والتفاصيل</p></div>
+  <div class="rowitem" style="margin:12px 0"><span class="muted">سلة مشترياتك الخاصة</span><button class="primary" id="openCustomerCart" type="button">🛒 السلة (<span id="customerCartCount">0</span>)</button></div>
   
   <div class="store-search"><input id="storeSearch" type="search" placeholder="ابحث عن بطاقة..." autocomplete="off" aria-label="ابحث عن بطاقة"></div>
   <div class="store-subtitle"><h3>مزودو الخدمة</h3><span class="store-count" id="storeCount"></span></div>
@@ -230,6 +233,15 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
    </form>
   </div>
   <div class="notice" style="margin-top:12px">تُرسل الإعلانات إلى الإدارة للمراجعة، ولا تظهر للآخرين إلا بعد الموافقة.</div>
+ </section>
+ <section id="cart" class="page">
+  <div class="store-head"><h2>🛒 سلة مشترياتي</h2><p>هذه السلة خاصة بحسابك ولا تظهر لبقية العملاء.</p></div>
+  <div id="customerCartItems" class="list"><div class="panel empty">السلة فارغة.</div></div>
+  <div class="panel" style="margin-top:12px"><div class="rowitem"><strong>المجموع الكلي</strong><strong id="customerCartTotal">0 د.ع</strong></div>
+   <button id="checkoutCustomerCart" class="primary full" type="button" style="margin-top:12px">إرسال طلب شراء السلة</button>
+   <p id="customerCartState" class="muted" aria-live="polite"></p>
+  </div>
+  <button class="secondary full" type="button" onclick="showPage('store')" style="margin-top:10px">متابعة التسوق</button>
  </section>
  <section id="services" class="page">
   <div class="section-head"><h3>الأقسام الرئيسية</h3></div>
@@ -338,6 +350,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <div class="field"><label for="buyProductContact">رقم هاتف التواصل</label><input id="buyProductContact" type="tel" maxlength="40" placeholder="07xxxxxxxxx"></div>
   <div class="field"><label for="buyProductNote">ملاحظة للبائع (اختياري)</label><textarea id="buyProductNote" maxlength="300"></textarea></div>
   <div class="notice">سيُسجّل طلب الشراء الآن. رمز QR الرسمي لسوبر كي سيُضاف بعد استلامه والتحقق منه. لا ترسل أي مبلغ قبل ظهور تعليمات دفع موثوقة.</div>
+  <button id="addProductToCart" class="secondary full" type="button" style="margin-top:12px">إضافة إلى السلة</button>
   <button id="submitProductPurchase" class="primary full" type="button" style="margin-top:12px">تأكيد طلب الشراء</button>
   <p id="productPurchaseState" class="muted" aria-live="polite"></p>
  </div>
@@ -481,7 +494,7 @@ $("listingLocationPrecision").addEventListener("change",()=>{pendingListingLocat
 $("locationSharingEnabled").addEventListener("change",e=>{
  if(!e.target.checked){$("listingShareLocation").checked=false;pendingListingLocation=null;$("listingLocationState").textContent="مشاركة الموقع متوقفة من إعدادات حسابك.";}
 });
-async function loadApprovedListings(){try{const snap=await db.collection("listings").where("status","in",["approved","sold_out"]).limit(100).get();window.__approvedListings=snap.docs.map(d=>{const x=d.data();return {id:d.id,uid:x.ownerUid||"",category:x.section||x.category||"other",title:x.title||"",description:x.description||"",price:Number(x.priceIQD||0),quantity:Number(x.quantity||1),image:x.imageData||"",location:x.location||null,status:x.status};}).filter(x=>x.image);renderStore();}catch(e){console.warn("Public listings unavailable:",e);}}
+async function loadApprovedListings(){try{const snap=await db.collection("listings").where("status","in",["approved","sold_out"]).limit(100).get();window.__approvedListings=snap.docs.map(d=>{const x=d.data();return {id:d.id,uid:x.ownerUid||"",category:x.section||x.category||"other",title:x.title||"",description:x.description||"",price:Number(x.priceIQD||0),quantity:Number(x.quantity||1),image:x.imageData||"",location:x.location||null,status:x.status};}).filter(x=>x.image);renderStore();renderHomeCustomerListings();renderCustomerCart();}catch(e){console.warn("Public listings unavailable:",e);}}
 function renderStore(){
  const q=(($("storeSearch")&&$("storeSearch").value)||"").trim().toLowerCase();
  const providers=providerCatalog.filter(x=>(activeStoreCategory==="all"||x.cat===activeStoreCategory)&&(!q||(x.name+" "+x.alt).toLowerCase().includes(q)));
@@ -490,6 +503,35 @@ function renderStore(){
  const localListings=getLocalListings();const cloudListings=window.__approvedListings||[];const listings=[...cloudListings,...localListings].filter((x,i,a)=>a.findIndex(y=>y.id===x.id)===i).filter(x=>!q||(x.title+" "+x.description).toLowerCase().includes(q));
  $("storeGrid").innerHTML=listings.length?listings.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:125px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · '+(x.status==="sold_out"?"نفذت الكمية":"الكمية: "+Number(x.quantity))+'</small></button>').join(""):'<div class="store-empty">لا توجد إعلانات عملاء مطابقة حالياً.</div>';
  $("listingCount").textContent=listings.length+" إعلان";
+ updateCartCount();
+}
+function cartStorageKey(){return "alam_customer_cart_"+(auth.currentUser?auth.currentUser.uid:"guest");}
+function getCustomerCart(){try{return JSON.parse(localStorage.getItem(cartStorageKey())||"[]").filter(x=>x&&typeof x.id==="string"&&Number.isInteger(x.quantity)&&x.quantity>0);}catch{return [];}}
+function saveCustomerCart(items){localStorage.setItem(cartStorageKey(),JSON.stringify(items));renderCustomerCart();}
+function cartProduct(id){return (window.__approvedListings||[]).find(x=>x.id===id&&x.status==="approved");}
+function addSelectedProductToCart(){
+ const x=selectedProductForPurchase,qty=Number($("buyProductQuantity").value);
+ if(!auth.currentUser){$("productPurchaseState").textContent="سجّل الدخول أولاً لاستخدام سلتك الخاصة.";return;}
+ if(!x||!cartProduct(x.id)){ $("productPurchaseState").textContent="هذا المنتج غير متاح حالياً.";return;}
+ if(!Number.isInteger(qty)||qty<1||qty>Number(x.quantity)){ $("productPurchaseState").textContent="تحقق من الكمية المطلوبة.";return;}
+ const items=getCustomerCart(),existing=items.find(i=>i.id===x.id);
+ if(existing){if(existing.quantity+qty>Number(x.quantity)){$("productPurchaseState").textContent="الكمية المطلوبة تتجاوز المتوفر.";return;}existing.quantity+=qty;}
+ else items.push({id:x.id,quantity:qty});
+ saveCustomerCart(items);$("productPurchaseState").textContent="تمت إضافة المنتج إلى سلتك.";updateCartCount();
+}
+function updateCartCount(){const n=getCustomerCart().reduce((sum,x)=>sum+x.quantity,0);const el=$("customerCartCount");if(el)el.textContent=String(n);}
+function renderCustomerCart(){
+ const root=$("customerCartItems");if(!root)return;
+ const items=getCustomerCart(),rows=items.map(item=>{const p=cartProduct(item.id);if(!p)return "";return '<div class="order"><div class="rowitem"><strong>'+escapeHtml(p.title)+'</strong><button class="danger" type="button" data-cart-remove="'+escapeHtml(p.id)+'">حذف</button></div><p class="muted">'+Number(p.price).toLocaleString("en-US")+' د.ع للقطعة · المتوفر '+Number(p.quantity)+'</p><div class="field"><label>الكمية</label><input type="number" min="1" max="'+Number(p.quantity)+'" value="'+item.quantity+'" data-cart-quantity="'+escapeHtml(p.id)+'"></div><strong>الإجمالي: '+(Number(p.price)*item.quantity).toLocaleString("en-US")+' د.ع</strong></div>';}).filter(Boolean);
+ root.innerHTML=rows.length?rows.join(""):'<div class="panel empty">سلتك فارغة أو أن بعض المنتجات لم تعد متاحة.</div>';
+ const total=items.reduce((sum,item)=>{const p=cartProduct(item.id);return sum+(p?Number(p.price)*item.quantity:0);},0);
+ $("customerCartTotal").textContent=total.toLocaleString("en-US")+" د.ع";updateCartCount();
+}
+function renderHomeCustomerListings(){
+ const root=$("homeCustomerListings");if(!root)return;
+ const listings=(window.__approvedListings||[]).filter(x=>x.status==="approved"&&x.image);
+ const groups=[["phones","📱 هواتف وإكسسوارات"],["property","🏠 عقارات ومنازل"],["vehicles","🚗 دراجات وسيارات"],["pets","🐦 طيور الزينة والحيوانات الأليفة"],["other","📦 منتجات وأغراض أخرى"]];
+ root.innerHTML=groups.map(([key,title])=>{const items=listings.filter(x=>x.category===key);return '<div class="panel"><div class="rowitem"><strong>'+title+'</strong><span class="muted">'+items.length+' منتج</span></div><div class="store-grid" style="margin-top:10px">'+(items.length?items.slice(0,4).map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:105px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع</small></button>').join(""):'<div class="store-empty">لا توجد إعلانات معتمدة في هذا القسم حالياً.</div>')+'</div></div>';}).join("");
 }
 let selectedProductForPurchase=null;
 function showProductDetails(id){
@@ -514,24 +556,24 @@ function showProductDetails(id){
  $("productDetailModal").classList.remove("hidden");$("productDetailModal").style.display="grid";
 }
 $("closeProductDetail").addEventListener("click",()=>{$("productDetailModal").classList.add("hidden");$("productDetailModal").style.display="none";});
-$("submitProductPurchase").addEventListener("click",async()=>{
- const user=auth.currentUser,x=selectedProductForPurchase,qty=Number($("buyProductQuantity").value),contact=$("buyProductContact").value.trim(),note=$("buyProductNote").value.trim(),state=$("productPurchaseState"),btn=$("submitProductPurchase");
- if(!user){state.textContent="سجّل الدخول أولاً لإرسال طلب الشراء.";return;}
- if(!x||(window.__approvedListings||[]).every(p=>p.id!==x.id)){state.textContent="هذا الإعلان غير متاح للشراء الإلكتروني.";return;}
- if(!Number.isInteger(qty)||qty<1||qty>Number(x.quantity)){state.textContent="تحقق من الكمية المطلوبة والمتوفرة.";return;}
- if(!contact||contact.length<7){state.textContent="أدخل رقم هاتف صحيحاً للتواصل.";return;}
- btn.disabled=true;state.textContent="جارٍ إرسال طلب الشراء…";
+$("addProductToCart").addEventListener("click",addSelectedProductToCart);
+$("openCustomerCart").addEventListener("click",()=>showPage("cart"));
+$("customerCartItems").addEventListener("change",e=>{const id=e.target.dataset.cartQuantity;if(!id)return;const qty=Number(e.target.value),p=cartProduct(id),items=getCustomerCart(),item=items.find(x=>x.id===id);if(!p||!item)return;if(!Number.isInteger(qty)||qty<1||qty>p.quantity){alert("الكمية غير متاحة.");renderCustomerCart();return;}item.quantity=qty;saveCustomerCart(items);});
+$("customerCartItems").addEventListener("click",e=>{const id=e.target.closest("[data-cart-remove]")?.dataset.cartRemove;if(!id)return;saveCustomerCart(getCustomerCart().filter(x=>x.id!==id));});
+$("checkoutCustomerCart").addEventListener("click",async()=>{
+ const user=auth.currentUser,items=getCustomerCart(),state=$("customerCartState"),btn=$("checkoutCustomerCart");
+ if(!user){state.textContent="سجّل الدخول أولاً لإرسال طلب السلة.";return;}
+ if(!items.length){state.textContent="السلة فارغة.";return;}
+ btn.disabled=true;state.textContent="جارٍ التحقق من المنتجات وإرسال الطلبات…";
  try{
-  const ref=db.collection("listings").doc(x.id),snap=await ref.get();
-  if(!snap.exists)throw new Error("المنتج لم يعد متاحاً.");
-  const live=snap.data();
-  if(live.status!=="approved"||Number(live.quantity)<qty||Number(live.priceIQD)!==Number(x.price))throw new Error("تغير السعر أو الكمية أو حالة المنتج. حدّث المتجر وحاول مجدداً.");
-  await db.collection("productOrders").add({buyerUid:user.uid,listingId:x.id,productTitle:String(live.title).slice(0,100),unitPriceIQD:live.priceIQD,quantity:qty,totalIQD:live.priceIQD*qty,buyerContact:contact.slice(0,40),note:note.slice(0,300),status:"awaiting_payment",paymentStatus:"not_paid",paymentMethod:"superqi_qr_pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-  state.textContent="تم إرسال طلبك إلى الإدارة. سيظهر QR الرسمي وتعليمات الدفع بعد تفعيل ربط التاجر.";
-  btn.textContent="تم إرسال الطلب";btn.disabled=true;
- }catch(err){console.error("Product purchase request:",err);state.textContent=err.message||"تعذر إرسال الطلب. تحقق من اتصالك وقواعد Firestore.";}
- finally{if(state.textContent.includes("تم إرسال"))btn.disabled=true;else btn.disabled=false;}
+  const verified=[];
+  for(const item of items){const snap=await db.collection("listings").doc(item.id).get();if(!snap.exists)throw new Error("أحد المنتجات لم يعد موجوداً.");const p=snap.data();if(p.status!=="approved"||!Number.isInteger(item.quantity)||item.quantity<1||item.quantity>Number(p.quantity))throw new Error("تغير توفر أحد المنتجات أو كميته. راجع السلة.");verified.push({id:item.id,p,quantity:item.quantity});}
+  const batch=db.batch();
+  verified.forEach(({id,p,quantity})=>{const ref=db.collection("productOrders").doc();batch.set(ref,{buyerUid:user.uid,listingId:id,productTitle:String(p.title).slice(0,100),unitPriceIQD:p.priceIQD,quantity,totalIQD:p.priceIQD*quantity,buyerContact:"",note:"طلب من سلة المشتريات",status:"awaiting_payment",paymentStatus:"not_paid",paymentMethod:"superqi_qr_pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});});
+  await batch.commit();saveCustomerCart([]);state.textContent="تم إرسال طلبات منتجات السلة إلى الإدارة. الدفع لم يتم بعد؛ انتظر تعليمات الدفع الرسمية.";renderCustomerCart();
+ }catch(err){console.error("Cart checkout:",err);state.textContent=err.message||"تعذر إرسال السلة. حاول مجدداً.";}finally{btn.disabled=false;}
 });
+$("submitProductPurchase").addEventListener("click",()=>{addSelectedProductToCart();if($("productPurchaseState").textContent.includes("تمت إضافة"))$("submitProductPurchase").textContent="أضيف إلى السلة";});
 async function compressListingImage(file){
  if(!file||!/^image\/(jpeg|png|webp)$/.test(file.type))throw new Error("اختر صورة بصيغة JPG أو PNG أو WEBP.");
  if(file.size>8*1024*1024)throw new Error("حجم الصورة الأصلي كبير؛ اختر صورة أقل من 8 ميغابايت.");
@@ -594,7 +636,7 @@ function renderServices(){
  $("walletMethods").innerHTML=[["💸","ZainCash"],["💳","Mastercard"],["🟦","Super Qi"],["🌐",lang==="ar"?"تحويل يدوي":"Manual transfer"]].map(x=>'<div class="panel rowitem"><span>'+x[0]+' '+x[1]+'</span><span class="badge">'+(lang==="ar"?"يتطلب الربط":"Integration required")+'</span></div>').join("");
 }
 function openCardWalletTopup(){walletAction="deposit";$("walletMethod").value="Mastercard";$("walletModalTitle").textContent="طلب شحن المحفظة عبر البطاقة";$("walletModal").classList.remove("hidden");$("walletModal").style.display="grid";}
-function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));window.scrollTo({top:0,behavior:"smooth"});}
+function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));if(id==="cart")renderCustomerCart();window.scrollTo({top:0,behavior:"smooth"});}
 function openService(i){currentService=i;$("detailIcon").textContent=services[i].icon;$("detailTitle").textContent=serviceName(i);$("detailDesc").textContent=serviceDesc(i);const sub=services[i].subs;const sf=$("subcategoryField");const sel=$("subcategory");if(sub){sf.classList.remove("hidden");sel.innerHTML=sub[lang].map(x=>'<option value="'+escapeHtml(x)+'">'+escapeHtml(x)+'</option>').join("");}else{sf.classList.add("hidden");sel.innerHTML="<option value=\\\"-\\\">-</option>";}$("accountInfo").value="";$("requestAmount").value="";$("notes").value="";showPage("serviceDetail");}
 function getOrders(){try{return JSON.parse(localStorage.getItem("alam_orders")||"[]")}catch{return []}}
 async function saveOrder(o,serviceIdOverride){const a=getOrders();a.unshift(o);localStorage.setItem("alam_orders",JSON.stringify(a));renderOrders();try{const user=auth.currentUser;if(!user)throw new Error("Not authenticated");await db.collection("orders").add({uid:user.uid,serviceId:serviceIdOverride||(services[currentService]&&services[currentService].id)||"wallet",category:services[currentService]&&services[currentService].subs?$("subcategory").value:"",accountInfo:String(o.info||"").slice(0,120),amount:Math.max(0,Math.trunc(Number(o.amount)||0)),notes:String(o.notes||"").slice(0,500),status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});}catch(error){console.error("Firestore order save:",error);alert(lang==="ar"?"تم حفظ الطلب على هذا الجهاز فقط، ولم يصل إلى الخادم. تأكد من نشر قواعد Firestore وتسجيل الدخول.":"The request was saved on this device only and did not reach the server. Check Firestore rules deployment and sign-in.");}}
