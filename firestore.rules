@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Fail-closed baseline: no client access is allowed until collections,
+    // ownership checks, field validation and trusted admin claims are reviewed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
