@@ -13,7 +13,7 @@ service cloud.firestore {
     function validUserProfile(uid) {
       return request.resource.data.keys().hasOnly([
         'uid', 'displayName', 'email', 'phone', 'createdAt',
-        'nickname', 'username', 'hideEmail', 'hidePhone', 'photoData', 'updatedAt'
+        'nickname', 'username', 'hideEmail', 'hidePhone', 'photoData', 'locationSharingEnabled', 'locationPrecision', 'updatedAt'
       ])
       && request.resource.data.uid == uid
       && request.resource.data.displayName is string
@@ -25,6 +25,8 @@ service cloud.firestore {
       && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
       && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
       && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000))
+      && (!('locationSharingEnabled' in request.resource.data) || request.resource.data.locationSharingEnabled is bool)
+      && (!('locationPrecision' in request.resource.data) || request.resource.data.locationPrecision in ['exact', 'approx'])
       && request.resource.data.createdAt == request.time;
     }
     function validOrder() {
@@ -79,7 +81,7 @@ service cloud.firestore {
       allow update: if (owns(uid)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'displayName', 'phone', 'nickname', 'username', 'hideEmail',
-          'hidePhone', 'photoData', 'updatedAt'
+          'hidePhone', 'photoData', 'locationSharingEnabled', 'locationPrecision', 'updatedAt'
         ])
         && request.resource.data.displayName is string
         && request.resource.data.displayName.size() <= 80
@@ -88,7 +90,9 @@ service cloud.firestore {
         && (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.matches('^[a-zA-Z0-9_ء-ي٠-٩]{3,20}$')))
         && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
         && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
-        && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000)))
+        && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000))
+        && (!('locationSharingEnabled' in request.resource.data) || request.resource.data.locationSharingEnabled is bool)
+        && (!('locationPrecision' in request.resource.data) || request.resource.data.locationPrecision in ['exact', 'approx']))
         || isAdmin();
       allow delete: if isAdmin();
     }
@@ -105,6 +109,28 @@ service cloud.firestore {
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.username == username;
       allow delete: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
+    }
+
+    match /feedback/{feedbackId} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'nickname', 'type', 'subject', 'message', 'status', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.nickname is string
+        && request.resource.data.nickname.size() <= 60
+        && request.resource.data.type in ['suggestion', 'complaint']
+        && request.resource.data.subject is string
+        && request.resource.data.subject.size() > 0
+        && request.resource.data.subject.size() <= 100
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 1500
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt == request.time;
+      allow read: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+        && request.resource.data.status in ['pending', 'resolved'];
+      allow delete: if isAdmin();
     }
 
     match /orders/{orderId} {
