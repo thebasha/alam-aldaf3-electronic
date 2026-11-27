@@ -149,7 +149,7 @@ service cloud.firestore {
     match /listings/{listingId} {
       allow create: if signedIn() && validListing();
       allow read: if isAdmin()
-        || (resource.data.status == 'approved')
+        || (resource.data.status in ['approved', 'sold_out'])
         || (signedIn() && resource.data.ownerUid == request.auth.uid);
       allow update: if isAdmin()
         || (signedIn()
