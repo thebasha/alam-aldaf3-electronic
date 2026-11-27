@@ -311,7 +311,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <div class="panel"><small class="muted">طلبات قيد المراجعة</small><h2 id="adminPendingCount">—</h2></div>
   <div class="panel"><small class="muted">الإعلانات قيد المراجعة</small><h2 id="adminListingsCount">—</h2></div>
   <div class="panel"><small class="muted">الطلبات المكتملة</small><h2 id="adminCompletedCount">—</h2></div>
-  <div class="panel"><small class="muted">العملاء المسجلون (حتى 100)</small><h2 id="adminUsersCount">—</h2></div>
+  <div class="panel"><small class="muted">إجمالي الحسابات المسجلة</small><h2 id="adminUsersCount">—</h2></div>
  </div>
  <div class="section-head"><h3>طلبات العملاء</h3><button class="secondary" id="refreshAdminBtn" type="button">تحديث</button></div>
  <div id="adminOrdersList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
@@ -623,7 +623,7 @@ async function loadAdminDashboard(){
   const [ordersSnap,listingsSnap,usersSnap,feedbackSnap]=await Promise.all([
    db.collection("orders").orderBy("createdAt","desc").limit(100).get(),
    db.collection("listings").orderBy("createdAt","desc").limit(100).get(),
-   db.collection("users").orderBy("createdAt","desc").limit(200).get(),
+   db.collection("users").orderBy("createdAt","desc").get(),
    db.collection("feedback").orderBy("createdAt","desc").limit(100).get()
   ]);
   const orders=ordersSnap.docs.map(d=>({id:d.id,...d.data()}));
