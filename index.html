@@ -110,11 +110,11 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
 #home .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:17px 2px 10px}
 #home .section-head h3{font-size:16px;font-weight:800;margin:0}
 #home .section-head .muted{font-size:11px}
-#home #homeServices.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-#home #homeServices .service{min-width:0;min-height:104px;padding:10px 6px 9px;border-radius:14px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;box-shadow:0 4px 14px #102b480b}
-#home #homeServices .service-icon{width:34px;height:34px;min-width:34px;border-radius:10px;margin:0 auto 2px;font-size:18px;line-height:1}
-#home #homeServices .service strong{font-size:11px;line-height:1.35;margin:0;max-width:100%;overflow-wrap:anywhere}
-#home #homeServices .service small{font-size:9px;line-height:1.35;max-width:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#home #homeServices.grid,#home #homePayments.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+#home #homeServices .service,#home #homePayments .service{min-width:0;min-height:104px;padding:10px 6px 9px;border-radius:14px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;box-shadow:0 4px 14px #102b480b}
+#home #homeServices .service-icon,#home #homePayments .service-icon{width:34px;height:34px;min-width:34px;border-radius:10px;margin:0 auto 2px;font-size:18px;line-height:1}
+#home #homeServices .service strong,#home #homePayments .service strong{font-size:11px;line-height:1.35;margin:0;max-width:100%;overflow-wrap:anywhere}
+#home #homeServices .service small,#home #homePayments .service small{font-size:9px;line-height:1.35;max-width:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 #home #recentList{gap:8px}
 #home #recentList .panel{padding:11px 12px;border-radius:13px}
 #home .service:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
@@ -189,18 +189,35 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   </div>
   <div class="section-head"><h3 data-i="mainServices">الخدمات الرئيسية</h3><span class="muted" data-i="chooseService">اختر الخدمة</span></div>
   <div class="grid" id="homeServices"></div>
+  <div class="section-head"><h3>الدفع الإلكتروني والشحن</h3><span class="muted">خدمات المحفظة والبطاقات</span></div>
+  <div class="grid" id="homePayments">
+   <button class="service" type="button" onclick="showPage('wallet')"><div class="service-icon">💳</div><strong>الدفع الإلكتروني</strong><small>طرق الدفع والخدمات المالية</small></button>
+   <button class="service" type="button" onclick="openService(1)"><div class="service-icon">🎟️</div><strong>شحن البطاقات</strong><small>طلب شحن البطاقات الإلكترونية</small></button>
+   <button class="service" type="button" onclick="showPage('wallet')"><div class="service-icon">👛</div><strong>شحن محفظة التطبيق</strong><small>طلب تعبئة رصيد المحفظة</small></button>
+  </div>
   <div class="section-head"><h3 data-i="recentOrders">آخر الطلبات</h3><button class="smalllink" data-go="orders" data-i="viewAll" type="button" onclick="showPage('orders')">عرض الكل</button></div>
   <div id="recentList" class="list"></div>
  </section>
  <section id="store" class="page">
-  <div class="store-head"><h2>المتجر</h2><p>مزودو الخدمة والبطاقات والألعاب في مكان واحد</p></div>
-  <div class="store-search"><input id="storeSearch" type="search" placeholder="ابحث عن بطاقة أو خدمة..." autocomplete="off" aria-label="ابحث عن بطاقة أو خدمة"></div>
-  <div class="store-tabs" id="storeTabs" aria-label="تصنيفات المتجر">
-   <button class="active" type="button" data-store-cat="all">الجميع</button><button type="button" data-store-cat="entertainment">ترفيه</button><button type="button" data-store-cat="games">ألعاب</button><button type="button" data-store-cat="telecom">اتصالات</button><button type="button" data-store-cat="cards">بطاقات إلكترونية</button>
+  <div class="store-head"><h2>السوق الإلكتروني</h2><p>إعلانات المنتجات مع السعر والكمية والصورة والتفاصيل</p></div>
+  <div class="store-search"><input id="storeSearch" type="search" placeholder="ابحث عن منتج..." autocomplete="off" aria-label="ابحث عن منتج"></div>
+  <div class="store-tabs" id="storeTabs" aria-label="أقسام السوق">
+   <button class="active" type="button" data-store-cat="phones">هواتف وإكسسوارات</button><button type="button" data-store-cat="property">عقارات ومنازل</button><button type="button" data-store-cat="vehicles">دراجات وسيارات</button>
   </div>
-  <div class="store-subtitle"><h3>مزودو الخدمة</h3><span class="store-count" id="storeCount"></span></div>
+  <div class="store-subtitle"><h3>المنتجات والإعلانات</h3><span class="store-count" id="storeCount"></span></div>
   <div class="store-grid" id="storeGrid"></div>
-  <div class="notice" style="margin-top:14px">اختيار أي بطاقة أو مزود يفتح نموذج الطلب. تنفيذ الشحن أو الدفع الفعلي يعتمد على توفر الربط ومزود الخدمة.</div>
+  <div class="panel" style="margin-top:16px"><h3>إضافة منتج أو إعلان جديد</h3>
+   <form id="productListingForm">
+    <div class="field"><label for="listingCategory">القسم</label><select id="listingCategory" required><option value="phones">هواتف وإكسسوارات</option><option value="property">عقارات ومنازل</option><option value="vehicles">دراجات وسيارات</option></select></div>
+    <div class="field"><label for="listingTitle">اسم المنتج / عنوان الإعلان</label><input id="listingTitle" maxlength="90" required></div>
+    <div class="field"><label for="listingDescription">تفاصيل المنتج</label><textarea id="listingDescription" maxlength="1200" required></textarea></div>
+    <div class="field"><label for="listingPrice">السعر بالدينار العراقي</label><input id="listingPrice" type="number" min="0" step="1000" required></div>
+    <div class="field"><label for="listingQuantity">الكمية المتوفرة</label><input id="listingQuantity" type="number" min="1" max="99999" value="1" required></div>
+    <div class="field"><label for="listingImage">صورة المنتج</label><input id="listingImage" type="file" accept="image/jpeg,image/png,image/webp" required></div>
+    <button class="primary full" type="submit" id="publishListingBtn">نشر الإعلان</button><p id="listingSaveState" class="muted" aria-live="polite"></p>
+   </form>
+  </div>
+  <div class="notice" style="margin-top:12px">الإعلان يُحفظ محلياً، ومزامنته بين العملاء تتطلب إعداد صلاحيات Firestore الآمنة واعتماد الإدارة.</div>
  </section>
  <section id="services" class="page">
   <div class="section-head"><h3 data-i="allServices">جميع الخدمات</h3></div>
@@ -344,48 +361,52 @@ const t=key=>translations[lang][key]||key;
 function applyLang(){document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";$("langBtn").textContent=lang==="ar"?"English":"العربية";document.querySelectorAll("[data-i]").forEach(el=>{const k=el.dataset.i;if(translations[lang][k])el.textContent=t(k)});renderServices();renderStore();renderOrders();$("year").textContent=new Date().getFullYear();$("username").placeholder=t("username");$("password").placeholder=t("password");}
 function serviceName(i){return translations[lang].serviceNames[i]}
 function serviceDesc(i){return translations[lang].serviceDescs[i]}
-const storeItems=[
- {name:"Asiacell",sub:"آسياسيل – تعبئة رصيد",cat:"telecom",icon:"A",kind:"مزود اتصالات",service:3},
- {name:"آسياسيل",sub:"آسياسيل – باقات إنترنت ومكالمات",cat:"telecom",icon:"A",kind:"باقات اتصالات",service:3},
- {name:"كورك",sub:"كورك – تعبئة رصيد",cat:"telecom",icon:"K",kind:"مزود اتصالات",service:3},
- {name:"LUDO",sub:"Yalla Ludo",cat:"games",icon:"🎲",kind:"لعبة",service:2},
- {name:"يلا لودو",sub:"Yalla Ludo",cat:"games",icon:"🎲",kind:"لعبة",service:2},
- {name:"NEW STATE",sub:"PUBG Mobile – شحن UC",cat:"games",icon:"N",kind:"ألعاب",service:2},
- {name:"PUBG MOBILE",sub:"PUBG Mobile – شحن UC",cat:"games",icon:"P",kind:"شحن ألعاب",service:2},
- {name:"بوبجي",sub:"PUBG Mobile – شحن UC",cat:"games",icon:"P",kind:"شحن ألعاب",service:2},
- {name:"بوبجي نيو ستيت",sub:"PUBG Mobile – شحن UC",cat:"games",icon:"N",kind:"ألعاب",service:2},
- {name:"Google Play",sub:"Google Play – 10$",cat:"cards",icon:"▶",kind:"بطاقة إلكترونية",service:1},
- {name:"iTunes",sub:"iTunes",cat:"cards",icon:"♪",kind:"بطاقة إلكترونية",service:1},
- {name:"بلي ستيشن نيتورك",sub:"PlayStation Store",cat:"cards",icon:"PS",kind:"بطاقة ألعاب",service:1},
- {name:"رايزر",sub:"Razer Gold",cat:"cards",icon:"R",kind:"بطاقة ألعاب",service:1},
- {name:"جواكر",sub:"Jawaker",cat:"entertainment",icon:"J",kind:"ترفيه وألعاب",service:2},
- {name:"روبلوكس",sub:"Roblox",cat:"games",icon:"▧",kind:"لعبة",service:2},
- {name:"ستيم",sub:"Steam Wallet",cat:"cards",icon:"S",kind:"بطاقة ألعاب",service:1},
- {name:"Rahma رحمة تيليكوم",sub:"تعبئة خطوط أخرى – حسب التوفر",cat:"telecom",icon:"R",kind:"مزود خدمة",service:3},
- {name:"UIMS",sub:"Qi / كي كارد – خدمات (طلب)",cat:"entertainment",icon:"U",kind:"خدمات",service:4},
- {name:"مؤسسة العين",sub:"خدمات وعروض رقمية أخرى – حسب التوفر",cat:"entertainment",icon:"ع",kind:"خدمات",service:4},
- {name:"آي كيو - بسماية",sub:"Qi / كي كارد – خدمات (طلب)",cat:"entertainment",icon:"IQ",kind:"خدمات",service:4},
- {name:"الرحمة FTTH",sub:"تعبئة خطوط أخرى – حسب التوفر",cat:"telecom",icon:"🌐",kind:"إنترنت",service:3}
-];
-let activeStoreCategory="all";
+let activeStoreCategory="phones";
+function getLocalListings(){try{return JSON.parse(localStorage.getItem("alam_product_listings")||"[]")}catch{return []}}
 function renderStore(){
  const q=(($("storeSearch")&&$("storeSearch").value)||"").trim().toLowerCase();
- const list=storeItems.filter(x=>(activeStoreCategory==="all"||x.cat===activeStoreCategory)&&(!q||(x.name+" "+x.sub+" "+x.kind).toLowerCase().includes(q)));
- $("storeGrid").innerHTML=list.length?list.map((x,i)=>'<button class="store-item" type="button" data-store-index="'+storeItems.indexOf(x)+'"><span class="store-logo">'+escapeHtml(x.icon)+'</span><strong>'+escapeHtml(x.name)+'</strong><small>'+escapeHtml(x.kind)+'</small></button>').join(""):'<div class="store-empty">لا توجد نتائج مطابقة لبحثك</div>';
- $("storeCount").textContent=list.length+" خدمة";
+ const list=getLocalListings().filter(x=>x.category===activeStoreCategory&&(!q||(x.title+" "+x.description).toLowerCase().includes(q)));
+ $("storeGrid").innerHTML=list.length?list.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:125px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · الكمية: '+Number(x.quantity)+'</small></button>').join(""):'<div class="store-empty">لا توجد إعلانات في هذا القسم حالياً.</div>';
+ $("storeCount").textContent=list.length+" إعلان";
 }
-function openStoreItem(index){
- const item=storeItems[index];if(!item)return;
- openService(item.service);
- const subs=services[item.service]&&services[item.service].subs;
- if(subs){const wanted=subs.ar.findIndex(x=>x===item.sub||x.toLowerCase().includes(item.sub.toLowerCase())||item.sub.toLowerCase().includes(x.toLowerCase()));if(wanted>=0)$("subcategory").selectedIndex=wanted;}
+function showProductDetails(id){
+ const x=getLocalListings().find(p=>p.id===id);if(!x)return;
+ alert(x.title+"\n\nالتفاصيل: "+x.description+"\nالسعر: "+Number(x.price).toLocaleString("en-US")+" د.ع\nالكمية: "+x.quantity);
+}
+async function compressListingImage(file){
+ if(!file||!/^image\/(jpeg|png|webp)$/.test(file.type)||file.size>5*1024*1024)throw new Error("اختر صورة JPG أو PNG أو WEBP لا يتجاوز حجمها 5 ميغابايت.");
+ const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});
+ const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=data;});
+ const canvas=document.createElement("canvas");const scale=Math.min(1,900/Math.max(img.width,img.height));canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+ const out=canvas.toDataURL("image/jpeg",0.72);if(out.length>450000)throw new Error("الصورة كبيرة بعد الضغط، اختر صورة أصغر.");return out;
 }
 document.addEventListener("click",function(e){
- const cat=e.target.closest("[data-store-cat]");if(cat){activeStoreCategory=cat.dataset.storeCat;document.querySelectorAll("[data-store-cat]").forEach(b=>b.classList.toggle("active",b===cat));renderStore();return;}
- const item=e.target.closest("[data-store-index]");if(item){openStoreItem(Number(item.dataset.storeIndex));return;}
+ const cat=e.target.closest("[data-store-cat]");if(cat){activeStoreCategory=cat.dataset.storeCat;$("listingCategory").value=activeStoreCategory;document.querySelectorAll("[data-store-cat]").forEach(b=>b.classList.toggle("active",b===cat));renderStore();return;}
+ const item=e.target.closest("[data-product-id]");if(item){showProductDetails(item.dataset.productId);return;}
 });
 document.addEventListener("input",function(e){if(e.target&&e.target.id==="storeSearch")renderStore();});
-function renderServices(){const cards=services.map((s,i)=>'<button class="service" data-service="'+i+'"><div class="service-icon">'+s.icon+'</div><strong>'+serviceName(i)+'</strong><small>'+serviceDesc(i)+'</small></button>').join("");$("homeServices").innerHTML=cards;$("allServices").innerHTML=cards;document.querySelectorAll("[data-service]").forEach(b=>b.addEventListener("click",()=>openService(+b.dataset.service)));$("walletMethods").innerHTML=[["💸","ZainCash"],["💳","Mastercard"],["🟦","Super Qi"],["🌐",lang==="ar"?"تحويل يدوي":"Manual transfer"]].map(x=>'<div class="panel rowitem"><span>'+x[0]+' '+x[1]+'</span><span class="badge">'+(lang==="ar"?"يتطلب الربط":"Integration required")+'</span></div>').join("");}
+$("productListingForm").addEventListener("submit",async function(e){
+ e.preventDefault();const btn=$("publishListingBtn"),state=$("listingSaveState");btn.disabled=true;state.textContent="جارٍ تجهيز الإعلان...";
+ try{
+  const image=await compressListingImage($("listingImage").files[0]);
+  const item={id:"PRD-"+Date.now(),uid:auth.currentUser?auth.currentUser.uid:"",category:$("listingCategory").value,title:$("listingTitle").value.trim(),description:$("listingDescription").value.trim(),price:Math.max(0,Math.trunc(Number($("listingPrice").value))),quantity:Math.max(1,Math.trunc(Number($("listingQuantity").value))),image,status:"pending",createdAt:new Date().toISOString()};
+  if(!item.title||!item.description||!item.price||!item.quantity)throw new Error("أكمل جميع بيانات المنتج.");
+  const all=getLocalListings();all.unshift(item);localStorage.setItem("alam_product_listings",JSON.stringify(all.slice(0,100)));renderStore();
+  try{if(!auth.currentUser)throw new Error("no-user");await db.collection("listings").add({uid:auth.currentUser.uid,section:item.category,title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});state.textContent="تم حفظ الإعلان وإرساله للإدارة للمراجعة.";}
+  catch(err){console.warn("Listing cloud sync:",err);state.textContent="تم حفظ الإعلان على هذا الجهاز فقط. لم تتم مزامنته مع الخادم؛ تحقق من قواعد Firestore.";}
+  $("productListingForm").reset();$("listingQuantity").value="1";
+ }catch(err){state.textContent=err.message||"تعذر حفظ الإعلان.";}
+ finally{btn.disabled=false;}
+});
+function renderServices(){
+ const homeIndices=[14,16,15];
+ const cards=homeIndices.map(i=>'<button class="service" data-service="'+i+'"><div class="service-icon">'+services[i].icon+'</div><strong>'+(i===14?"هواتف وإكسسوارات":i===16?"عقارات ومنازل":"دراجات وسيارات")+'</strong><small>'+serviceDesc(i)+'</small></button>').join("");
+ $("homeServices").innerHTML=cards;
+ const allCards=services.map((s,i)=>'<button class="service" data-service="'+i+'"><div class="service-icon">'+s.icon+'</div><strong>'+serviceName(i)+'</strong><small>'+serviceDesc(i)+'</small></button>').join("");
+ $("allServices").innerHTML=allCards;
+ document.querySelectorAll("[data-service]").forEach(b=>b.addEventListener("click",()=>openService(+b.dataset.service)));
+ $("walletMethods").innerHTML=[["💸","ZainCash"],["💳","Mastercard"],["🟦","Super Qi"],["🌐",lang==="ar"?"تحويل يدوي":"Manual transfer"]].map(x=>'<div class="panel rowitem"><span>'+x[0]+' '+x[1]+'</span><span class="badge">'+(lang==="ar"?"يتطلب الربط":"Integration required")+'</span></div>').join("");
+}
 function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));window.scrollTo({top:0,behavior:"smooth"});}
 function openService(i){currentService=i;$("detailIcon").textContent=services[i].icon;$("detailTitle").textContent=serviceName(i);$("detailDesc").textContent=serviceDesc(i);const sub=services[i].subs;const sf=$("subcategoryField");const sel=$("subcategory");if(sub){sf.classList.remove("hidden");sel.innerHTML=sub[lang].map(x=>'<option value="'+escapeHtml(x)+'">'+escapeHtml(x)+'</option>').join("");}else{sf.classList.add("hidden");sel.innerHTML="<option value=\\\"-\\\">-</option>";}$("accountInfo").value="";$("requestAmount").value="";$("notes").value="";showPage("serviceDetail");}
 function getOrders(){try{return JSON.parse(localStorage.getItem("alam_orders")||"[]")}catch{return []}}
