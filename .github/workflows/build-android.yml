@@ -29,13 +29,13 @@ jobs:
         run: npx cap add android
       - name: Build AdMob JavaScript bridge
         run: npx esbuild ads.js --bundle --platform=browser --format=iife --outfile=www/admob.bundle.js
-      - name: Configure AdMob test application ID
+      - name: Configure AdMob application ID
         run: |
           node - <<'NODE'
           const fs = require('fs');
           const p = 'android/app/src/main/AndroidManifest.xml';
           let xml = fs.readFileSync(p, 'utf8');
-          const tag = '<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3940256099942544~3347511713" />';
+          const tag = '<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-8770009560907706~5412734381" />';
           if (!xml.includes('com.google.android.gms.ads.APPLICATION_ID')) xml = xml.replace('</application>', '    ' + tag + '\n  </application>');
           fs.writeFileSync(p, xml);
           NODE
