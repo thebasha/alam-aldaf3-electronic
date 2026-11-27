@@ -208,6 +208,8 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
    <button class="service" type="button" onclick="openCardWalletTopup()"><div class="service-icon">💳</div><strong>الشحن عبر البطاقة</strong><small>طلب إضافة رصيد للمحفظة باستخدام Mastercard</small></button>
    <button class="service" type="button" onclick="showPage('wallet')"><div class="service-icon">👛</div><strong>شحن محفظة التطبيق</strong><small>طلب تعبئة رصيد المحفظة</small></button>
   </div>
+  <div class="section-head"><h3>📣 النشر والإعلان</h3><span class="muted">أضف منتجك ليظهر في القسم المناسب</span></div>
+  <button class="service full" type="button" onclick="openPublishPage()" style="display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:13px;text-align:right;padding:13px;margin-bottom:14px"><div class="service-icon">📢</div><span><strong>إضافة منتج أو إعلان جديد</strong><small>ارفع صورة، اختر القسم، وانشر إعلانك</small></span><span style="margin-right:auto">＋</span></button>
   <div class="section-head"><h3>🛍️ إعلانات العملاء حسب الأقسام</h3><button class="smalllink" type="button" onclick="showPage('store')">عرض السوق</button></div>
   <div class="store-search"><input id="homeListingSearch" type="search" placeholder="ابحث عن أي منتج أو إعلان..." autocomplete="off" aria-label="ابحث في إعلانات العملاء"></div>
   <div class="store-tabs home-listing-tabs" id="homeListingTabs" aria-label="أقسام إعلانات العملاء">
@@ -234,6 +236,9 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <div class="store-grid" id="providerGrid"></div>
   <div class="store-subtitle"><h3>إعلانات العملاء</h3><span class="store-count" id="listingCount"></span></div>
   <div class="store-grid" id="storeGrid"></div>
+ </section>
+ <section id="publish" class="page">
+  <div class="store-head"><h2>📣 النشر والإعلان</h2><p>أضف منتجك أو إعلانك واختر القسم المناسب ليظهر ضمن إعلانات العملاء في القائمة الرئيسية بعد موافقة الإدارة.</p></div>
   <div class="panel" style="margin-top:16px"><h3>إضافة منتج أو إعلان جديد</h3>
    <form id="productListingForm">
     <div class="field"><label for="listingCategory">القسم</label><select id="listingCategory" required><option value="phones">هواتف وإكسسوارات</option><option value="property">عقارات ومنازل</option><option value="vehicles">دراجات وسيارات</option><option value="pets">طيور الزينة والحيوانات الأليفة</option><option value="other">منتجات وأغراض أخرى</option></select></div>
@@ -249,7 +254,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
     <button class="primary full" type="submit" id="publishListingBtn">نشر الإعلان</button><p id="listingSaveState" class="muted" aria-live="polite"></p>
    </form>
   </div>
-  <div class="notice" style="margin-top:12px">تُرسل الإعلانات إلى الإدارة للمراجعة، ولا تظهر للآخرين إلا بعد الموافقة.</div>
+
  </section>
  <section id="cart" class="page">
   <div class="store-head"><h2>🛒 سلة مشترياتي</h2><p>هذه السلة خاصة بحسابك ولا تظهر لبقية العملاء.</p></div>
@@ -673,6 +678,7 @@ function renderServices(){
  $("walletMethods").innerHTML=[["💸","ZainCash"],["💳","Mastercard"],["🟦","Super Qi"],["🌐",lang==="ar"?"تحويل يدوي":"Manual transfer"]].map(x=>'<div class="panel rowitem"><span>'+x[0]+' '+x[1]+'</span><span class="badge">'+(lang==="ar"?"يتطلب الربط":"Integration required")+'</span></div>').join("");
 }
 function openCardWalletTopup(){walletAction="deposit";$("walletMethod").value="Mastercard";$("walletModalTitle").textContent="طلب شحن المحفظة عبر البطاقة";$("walletModal").classList.remove("hidden");$("walletModal").style.display="grid";}
+function openPublishPage(){if(!auth.currentUser){alert("سجّل الدخول أولاً لنشر منتج أو إعلان.");return;}showPage("publish");setTimeout(()=>{const f=$("productListingForm");if(f)f.scrollIntoView({behavior:"smooth",block:"start"});$("listingTitle").focus({preventScroll:true});},120);}
 function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));if(id==="cart")renderCustomerCart();window.scrollTo({top:0,behavior:"smooth"});}
 function openService(i){currentService=i;$("detailIcon").textContent=services[i].icon;$("detailTitle").textContent=serviceName(i);$("detailDesc").textContent=serviceDesc(i);const sub=services[i].subs;const sf=$("subcategoryField");const sel=$("subcategory");if(sub){sf.classList.remove("hidden");sel.innerHTML=sub[lang].map(x=>'<option value="'+escapeHtml(x)+'">'+escapeHtml(x)+'</option>').join("");}else{sf.classList.add("hidden");sel.innerHTML="<option value=\\\"-\\\">-</option>";}$("accountInfo").value="";$("requestAmount").value="";$("notes").value="";showPage("serviceDetail");}
 function getOrders(){try{return JSON.parse(localStorage.getItem("alam_orders")||"[]")}catch{return []}}
