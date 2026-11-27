@@ -146,6 +146,43 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    function validProductOrder() {
+      let listing = get(/databases/$(database)/documents/listings/$(request.resource.data.listingId)).data;
+      return request.resource.data.keys().hasOnly([
+        'buyerUid', 'listingId', 'productTitle', 'unitPriceIQD', 'quantity',
+        'totalIQD', 'buyerContact', 'note', 'status', 'paymentStatus',
+        'paymentMethod', 'createdAt'
+      ])
+      && request.resource.data.buyerUid == request.auth.uid
+      && request.resource.data.listingId is string
+      && listing.status == 'approved'
+      && request.resource.data.productTitle == listing.title
+      && request.resource.data.unitPriceIQD == listing.priceIQD
+      && request.resource.data.quantity is int
+      && request.resource.data.quantity >= 1
+      && request.resource.data.quantity <= listing.quantity
+      && request.resource.data.totalIQD == listing.priceIQD * request.resource.data.quantity
+      && request.resource.data.buyerContact is string
+      && request.resource.data.buyerContact.size() >= 7
+      && request.resource.data.buyerContact.size() <= 40
+      && request.resource.data.note is string
+      && request.resource.data.note.size() <= 300
+      && request.resource.data.status == 'awaiting_payment'
+      && request.resource.data.paymentStatus == 'not_paid'
+      && request.resource.data.paymentMethod == 'superqi_qr_pending'
+      && request.resource.data.createdAt == request.time;
+    }
+
+    match /productOrders/{productOrderId} {
+      allow create: if signedIn() && validProductOrder();
+      allow read: if isAdmin() || (signedIn() && resource.data.buyerUid == request.auth.uid);
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'paymentStatus', 'updatedAt'])
+        && request.resource.data.status in ['confirmed', 'rejected']
+        && request.resource.data.paymentStatus in ['confirmed', 'rejected'];
+      allow delete: if isAdmin();
+    }
+
     match /listings/{listingId} {
       allow create: if signedIn() && validListing();
       allow read: if isAdmin()
