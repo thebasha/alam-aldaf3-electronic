@@ -4,13 +4,15 @@
   "private": true,
   "description": "عالم الدفع الإلكتروني - Android prototype",
   "scripts": {
-    "build:android": "cap sync android"
+    "build:android": "npx cap sync android && npx esbuild ads.js --bundle --platform=browser --format=iife --outfile=www/admob.bundle.js"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
-    "@capacitor/core": "^7.4.3"
+    "@capacitor/core": "^7.4.3",
+    "@capacitor-community/admob": "^7.0.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.4.3"
+    "@capacitor/cli": "^7.4.3",
+    "esbuild": "^0.25.0"
   }
 }
