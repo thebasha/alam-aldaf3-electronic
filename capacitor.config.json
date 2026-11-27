@@ -1,6 +1,6 @@
 {
   "appId": "com.alamaldaf3.electronic",
   "appName": "عالم الدفع الإلكتروني",
-  "webDir": ".",
+  "webDir": "www",
   "bundledWebRuntime": false
 }
