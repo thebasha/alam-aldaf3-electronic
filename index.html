@@ -315,6 +315,8 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
  </div>
  <div class="section-head"><h3>طلبات العملاء</h3><button class="secondary" id="refreshAdminBtn" type="button">تحديث</button></div>
  <div id="adminOrdersList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
+ <div class="section-head"><h3>طلبات شراء المنتجات</h3></div>
+ <div id="adminProductOrdersList" class="list"><div class="panel empty">جارٍ تحميل طلبات الشراء…</div></div>
  <div class="section-head"><h3>الإعلانات للمراجعة</h3></div>
  <div id="adminListingsList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
  <div class="section-head"><h3>العملاء المسجلون</h3></div>
@@ -332,6 +334,12 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <div class="rowitem" style="margin-top:10px"><strong>الكمية المتوفرة</strong><strong id="productDetailQuantity"></strong></div>
   <p id="productDetailLocation" class="muted"></p>
   <a id="productDetailMapLink" class="secondary full hidden" style="display:block;text-align:center;text-decoration:none;margin-top:10px;padding:12px;border-radius:12px" target="_blank" rel="noopener noreferrer">📍 عرض موقع الناشر على الخريطة</a>
+  <div class="field"><label for="buyProductQuantity">الكمية المطلوبة</label><input id="buyProductQuantity" type="number" min="1" value="1" step="1"></div>
+  <div class="field"><label for="buyProductContact">رقم هاتف التواصل</label><input id="buyProductContact" type="tel" maxlength="40" placeholder="07xxxxxxxxx"></div>
+  <div class="field"><label for="buyProductNote">ملاحظة للبائع (اختياري)</label><textarea id="buyProductNote" maxlength="300"></textarea></div>
+  <div class="notice">سيُسجّل طلب الشراء الآن. رمز QR الرسمي لسوبر كي سيُضاف بعد استلامه والتحقق منه. لا ترسل أي مبلغ قبل ظهور تعليمات دفع موثوقة.</div>
+  <button id="submitProductPurchase" class="primary full" type="button" style="margin-top:12px">تأكيد طلب الشراء</button>
+  <p id="productPurchaseState" class="muted" aria-live="polite"></p>
  </div>
 </div>
 <div id="walletModal" class="hidden" style="position:fixed;inset:0;background:#07182dcc;z-index:10;display:grid;place-items:center;padding:18px">
@@ -483,8 +491,16 @@ function renderStore(){
  $("storeGrid").innerHTML=listings.length?listings.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:125px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · '+(x.status==="sold_out"?"نفذت الكمية":"الكمية: "+Number(x.quantity))+'</small></button>').join(""):'<div class="store-empty">لا توجد إعلانات عملاء مطابقة حالياً.</div>';
  $("listingCount").textContent=listings.length+" إعلان";
 }
+let selectedProductForPurchase=null;
 function showProductDetails(id){
  const x=[...(window.__approvedListings||[]),...getLocalListings()].find(p=>p.id===id);if(!x)return;
+ selectedProductForPurchase=x;
+ const purchaseBtn=$("submitProductPurchase"),purchaseQty=$("buyProductQuantity");
+ const isCloudProduct=(window.__approvedListings||[]).some(p=>p.id===id);
+ purchaseBtn.disabled=!isCloudProduct||x.status==="sold_out"||Number(x.quantity)<1;
+ purchaseBtn.textContent=!isCloudProduct?"الشراء غير متاح لهذا الإعلان":x.status==="sold_out"?"نفذت الكمية":"تأكيد طلب الشراء";
+ purchaseQty.value="1";purchaseQty.max=String(Math.max(1,Number(x.quantity)||1));
+ $("buyProductContact").value="";$("buyProductNote").value="";$("productPurchaseState").textContent=isCloudProduct?"يمكنك إرسال طلب الشراء. الدفع عبر QR سيُفعّل بعد إضافة رمز التاجر الرسمي.":"هذا المنتج محفوظ محلياً فقط، ولا يمكن إرسال طلب شراء إلكتروني له.";
  $("productDetailTitle").textContent=x.title;$("productDetailImage").src=x.image;
  $("productDetailDescription").textContent=x.description;
  $("productDetailPrice").textContent=Number(x.price).toLocaleString("en-US")+" د.ع";
@@ -498,6 +514,24 @@ function showProductDetails(id){
  $("productDetailModal").classList.remove("hidden");$("productDetailModal").style.display="grid";
 }
 $("closeProductDetail").addEventListener("click",()=>{$("productDetailModal").classList.add("hidden");$("productDetailModal").style.display="none";});
+$("submitProductPurchase").addEventListener("click",async()=>{
+ const user=auth.currentUser,x=selectedProductForPurchase,qty=Number($("buyProductQuantity").value),contact=$("buyProductContact").value.trim(),note=$("buyProductNote").value.trim(),state=$("productPurchaseState"),btn=$("submitProductPurchase");
+ if(!user){state.textContent="سجّل الدخول أولاً لإرسال طلب الشراء.";return;}
+ if(!x||(window.__approvedListings||[]).every(p=>p.id!==x.id)){state.textContent="هذا الإعلان غير متاح للشراء الإلكتروني.";return;}
+ if(!Number.isInteger(qty)||qty<1||qty>Number(x.quantity)){state.textContent="تحقق من الكمية المطلوبة والمتوفرة.";return;}
+ if(!contact||contact.length<7){state.textContent="أدخل رقم هاتف صحيحاً للتواصل.";return;}
+ btn.disabled=true;state.textContent="جارٍ إرسال طلب الشراء…";
+ try{
+  const ref=db.collection("listings").doc(x.id),snap=await ref.get();
+  if(!snap.exists)throw new Error("المنتج لم يعد متاحاً.");
+  const live=snap.data();
+  if(live.status!=="approved"||Number(live.quantity)<qty||Number(live.priceIQD)!==Number(x.price))throw new Error("تغير السعر أو الكمية أو حالة المنتج. حدّث المتجر وحاول مجدداً.");
+  await db.collection("productOrders").add({buyerUid:user.uid,listingId:x.id,productTitle:String(live.title).slice(0,100),unitPriceIQD:live.priceIQD,quantity:qty,totalIQD:live.priceIQD*qty,buyerContact:contact.slice(0,40),note:note.slice(0,300),status:"awaiting_payment",paymentStatus:"not_paid",paymentMethod:"superqi_qr_pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  state.textContent="تم إرسال طلبك إلى الإدارة. سيظهر QR الرسمي وتعليمات الدفع بعد تفعيل ربط التاجر.";
+  btn.textContent="تم إرسال الطلب";btn.disabled=true;
+ }catch(err){console.error("Product purchase request:",err);state.textContent=err.message||"تعذر إرسال الطلب. تحقق من اتصالك وقواعد Firestore.";}
+ finally{if(state.textContent.includes("تم إرسال"))btn.disabled=true;else btn.disabled=false;}
+});
 async function compressListingImage(file){
  if(!file||!/^image\/(jpeg|png|webp)$/.test(file.type))throw new Error("اختر صورة بصيغة JPG أو PNG أو WEBP.");
  if(file.size>8*1024*1024)throw new Error("حجم الصورة الأصلي كبير؛ اختر صورة أقل من 8 ميغابايت.");
@@ -648,22 +682,25 @@ async function loadAdminDashboard(){
  $("adminOrdersList").innerHTML='<div class="panel empty">جارٍ تحميل الطلبات…</div>';
  $("adminListingsList").innerHTML='<div class="panel empty">جارٍ تحميل الإعلانات…</div>';
  try{
-  const [ordersSnap,listingsSnap,usersSnap,feedbackSnap]=await Promise.all([
+  const [ordersSnap,listingsSnap,usersSnap,feedbackSnap,productOrdersSnap]=await Promise.all([
    db.collection("orders").orderBy("createdAt","desc").limit(100).get(),
    db.collection("listings").orderBy("createdAt","desc").limit(100).get(),
    db.collection("users").orderBy("createdAt","desc").get(),
-   db.collection("feedback").orderBy("createdAt","desc").limit(100).get()
+   db.collection("feedback").orderBy("createdAt","desc").limit(100).get(),
+   db.collection("productOrders").orderBy("createdAt","desc").limit(100).get()
   ]);
   const orders=ordersSnap.docs.map(d=>({id:d.id,...d.data()}));
   const listings=listingsSnap.docs.map(d=>({id:d.id,...d.data()}));
   const users=usersSnap.docs.map(d=>({id:d.id,...d.data()}));
   const feedback=feedbackSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const productOrders=productOrdersSnap.docs.map(d=>({id:d.id,...d.data()}));
   $("adminOrdersCount").textContent=orders.length;
   $("adminPendingCount").textContent=orders.filter(x=>x.status==="pending").length;
   $("adminListingsCount").textContent=listings.filter(x=>x.status==="pending").length;
   $("adminCompletedCount").textContent=orders.filter(x=>x.status==="completed").length;
   $("adminUsersCount").textContent=users.length;
   $("adminOrdersList").innerHTML=orders.length?orders.map(o=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(o.serviceId||"طلب")+'</strong><span class="badge">'+escapeHtml(o.status||"غير محدد")+'</span></div><p class="muted">العميل: '+escapeHtml(o.uid||"—")+' · المبلغ: '+escapeHtml(o.amount??"—")+' د.ع</p><p>'+escapeHtml(o.accountInfo||o.notes||"")+'</p><div class="rowitem"><button class="secondary" data-order-status="'+o.id+'" data-status="processing">قيد التنفيذ</button><button class="primary" data-order-status="'+o.id+'" data-status="completed">مكتمل</button><button class="danger" data-order-status="'+o.id+'" data-status="rejected">رفض</button></div></div>').join(""):'<div class="panel empty">لا توجد طلبات.</div>';
+  $("adminProductOrdersList").innerHTML=productOrders.length?productOrders.map(o=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(o.productTitle||"شراء منتج")+'</strong><span class="badge '+(o.paymentStatus==="confirmed"?"ok":"")+'">'+escapeHtml(o.paymentStatus==="confirmed"?"تم تأكيد الدفع":o.status==="rejected"?"مرفوض":"بانتظار الدفع والتحقق")+'</span></div><p class="muted">الكمية: '+escapeHtml(o.quantity)+' · الإجمالي: '+Number(o.totalIQD||0).toLocaleString("en-US")+' د.ع</p><p>هاتف العميل: '+escapeHtml(o.buyerContact||"—")+'</p><p class="muted">معرّف المشتري: '+escapeHtml(o.buyerUid||"—")+'</p><div class="rowitem" style="flex-wrap:wrap"><button class="primary" data-product-order-status="'+o.id+'" data-status="confirmed">تأكيد الدفع بعد التحقق</button><button class="danger" data-product-order-status="'+o.id+'" data-status="rejected">رفض الطلب</button></div></div>').join(""):'<div class="panel empty">لا توجد طلبات شراء منتجات.</div>';
   $("adminListingsList").innerHTML=listings.length?listings.map(x=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(x.title||"إعلان")+'</strong><span class="badge">'+escapeHtml(x.status==="sold_out"?"نفذت الكمية":x.status==="approved"?"معروض":x.status==="rejected"?"مرفوض":"قيد المراجعة")+'</span></div>'+(x.imageData?'<img src="'+escapeHtml(x.imageData)+'" alt="" style="width:100%;max-height:150px;object-fit:contain;border-radius:10px">':'')+'<p class="muted">'+escapeHtml(x.section||"")+' · '+escapeHtml(x.priceIQD??"—")+' د.ع · الكمية: '+escapeHtml(x.quantity??"—")+'</p><p>'+escapeHtml(x.description||"")+'</p><div class="rowitem" style="flex-wrap:wrap"><button class="primary" data-listing-status="'+x.id+'" data-status="approved">موافقة / متوفر</button><button class="secondary" data-listing-status="'+x.id+'" data-status="sold_out">نفذت الكمية</button><button class="danger" data-listing-status="'+x.id+'" data-status="rejected">رفض</button><button class="danger" data-listing-delete="'+x.id+'">حذف المنتج</button></div></div>').join(""):'<div class="panel empty">لا توجد إعلانات.</div>';
   $("adminUsersList").innerHTML=users.length?users.map(u=>'<div class="panel"><div class="rowitem"><strong>'+escapeHtml(u.nickname||u.displayName||"عميل")+'</strong><span class="badge ok">حساب مسجل</span></div><p class="muted">اسم المستخدم: '+escapeHtml(u.username||"غير محدد")+' · البريد: '+escapeHtml(u.email||"غير مسجل")+'</p><small class="muted">تاريخ التسجيل: '+escapeHtml(formatAdminDate(u.createdAt))+'<br>معرّف الحساب: '+escapeHtml(u.id)+'</small></div>').join(""):'<div class="panel empty">لا توجد حسابات مسجلة بعد.</div>';
   $("adminFeedbackList").innerHTML=feedback.length?feedback.map(x=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(x.type==="complaint"?"شكوى":"اقتراح")+' · '+escapeHtml(x.subject||"بدون عنوان")+'</strong><span class="badge '+(x.status==="resolved"?"ok":"")+'">'+escapeHtml(x.status==="resolved"?"تمت المعالجة":"بانتظار المراجعة")+'</span></div><p>'+escapeHtml(x.message||"")+'</p><small class="muted">المستخدم: '+escapeHtml(x.nickname||x.uid||"—")+' · '+escapeHtml(formatAdminDate(x.createdAt))+'</small><div class="rowitem" style="margin-top:10px"><button class="primary" data-feedback-status="'+x.id+'" data-status="resolved">تمت المعالجة</button><button class="secondary" data-feedback-status="'+x.id+'" data-status="pending">إعادة للمراجعة</button></div></div>').join(""):'<div class="panel empty">لا توجد اقتراحات أو شكاوى.</div>';
@@ -696,6 +733,8 @@ $("refreshAdminBtn").addEventListener("click",loadAdminDashboard);
 document.addEventListener("click",async e=>{
  const ob=e.target.closest("[data-order-status]");
  if(ob){try{await db.collection("orders").doc(ob.dataset.orderStatus).update({status:ob.dataset.status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث الطلب. تحقق من قواعد Firestore.");}}
+ const po=e.target.closest("[data-product-order-status]");
+ if(po){const next=po.dataset.status;if(!confirm(next==="confirmed"?"تأكدت من وصول المبلغ فعلياً إلى حساب التاجر؟":"هل تريد رفض طلب الشراء؟"))return;try{await db.collection("productOrders").doc(po.dataset.productOrderStatus).update({status:next,paymentStatus:next==="confirmed"?"confirmed":"rejected",updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث طلب الشراء. تحقق من قواعد Firestore.");}}
  const fb=e.target.closest("[data-feedback-status]");
  if(fb){try{await db.collection("feedback").doc(fb.dataset.feedbackStatus).update({status:fb.dataset.status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث حالة الرسالة. تحقق من قواعد Firestore.");}}
  const lb=e.target.closest("[data-listing-status]");
