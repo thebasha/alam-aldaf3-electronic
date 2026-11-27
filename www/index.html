@@ -11,6 +11,8 @@
 :root{--navy:#0b1d35;--navy2:#142d4d;--blue:#087eaa;--cyan:#20b8c5;--gold:#e7b85b;--bg:#f3f6fa;--ink:#17263c;--muted:#718096;--line:#e6ebf1;--white:#fff;--green:#13865b;--red:#bd4545;--shadow:0 10px 28px #102b4810}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Tahoma,Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.shell{max-width:1100px;margin:auto;min-height:100vh;padding-bottom:86px}.top{background:linear-gradient(130deg,var(--navy),#124d70);color:white;padding:22px 18px 28px;border-radius:0 0 26px 26px}.toprow{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:11px}.logo{width:46px;height:46px;border-radius:15px;background:linear-gradient(140deg,var(--gold),#fff0c7);color:var(--navy);display:grid;place-items:center;font-size:23px;font-weight:bold}.brand h1{font-size:18px;margin:0 0 4px}.brand small{color:#c7d9e9}.lang{background:#ffffff20;border:1px solid #ffffff45;color:white;border-radius:12px;padding:9px 12px;font-weight:bold}.welcome{margin-top:25px}.welcome h2{font-size:23px;margin:0 0 6px}.welcome p{color:#c9d9e8;margin:0}.content{padding:16px}.balance{margin-top:-4px;background:linear-gradient(120deg,#12385b,#087eaa);color:white;border-radius:20px;padding:20px;box-shadow:var(--shadow)}.balance-head{display:flex;justify-content:space-between;align-items:center}.balance-label{color:#d4e5f2}.amount{font-size:30px;font-weight:800;margin:13px 0 16px;letter-spacing:.4px}.pill{font-size:11px;border-radius:30px;padding:6px 10px;background:#ffffff20}.primary,.secondary,.danger{border-radius:12px;padding:11px 15px;font-weight:bold}.primary{background:var(--gold);color:#1c2c40}.secondary{background:#e7f5fa;color:#075d7c}.danger{background:#fff0f0;color:var(--red)}.section-head{display:flex;align-items:center;justify-content:space-between;margin:23px 2px 12px}.section-head h3{margin:0;font-size:17px}.muted{color:var(--muted);font-size:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.service,.panel,.order,.profile,.formbox{background:var(--white);border:1px solid var(--line);border-radius:17px;padding:15px;box-shadow:var(--shadow)}.service{text-align:start;min-height:120px}.service-icon{width:42px;height:42px;border-radius:13px;background:#eaf6fa;display:grid;place-items:center;font-size:22px;margin-bottom:12px}.service strong{display:block;font-size:14px;margin-bottom:5px}.service small{color:var(--muted);font-size:11px;line-height:1.5}.service:active{transform:scale(.98)}.page{display:none}.page.active{display:block}.list{display:grid;gap:10px}.rowitem{display:flex;justify-content:space-between;gap:12px;align-items:center}.badge{font-size:11px;padding:5px 9px;border-radius:30px;background:#fff4db;color:#805700}.badge.ok{background:#e4f6ed;color:#14734f}.badge.no{background:#fdecec;color:#a93636}.field{display:grid;gap:7px;margin:12px 0}.field label{font-size:13px;font-weight:bold}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #dce4ed;border-radius:11px;background:#fff;color:var(--ink);outline-color:var(--blue)}.field textarea{min-height:85px;resize:vertical}.full{width:100%}.nav{position:fixed;z-index:5;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;box-shadow:0 -6px 22px #102b480c}.navinner{width:min(1100px,100%);display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom))}.nav button{background:transparent;color:#718096;display:grid;gap:4px;justify-items:center;font-size:10px;padding:5px 8px}.nav button span{font-size:19px}.nav button.active{color:var(--blue);font-weight:bold}.hidden{display:none!important}.notice{background:#fff8e8;border:1px solid #f0dfb6;color:#72551a;border-radius:13px;padding:12px;font-size:12px;line-height:1.7}.empty{text-align:center;padding:25px;color:var(--muted)}.loginwrap{max-width:440px;margin:35px auto;padding:18px}.loginbox{background:white;padding:22px;border-radius:20px;box-shadow:var(--shadow)}.loginbox h2{margin-top:0}.smalllink{background:none;color:var(--blue);padding:8px}.footer{text-align:center;color:#9aa6b5;font-size:11px;padding:22px}.ltr{direction:ltr;text-align:left}html[dir=ltr] .service{text-align:left}html[dir=ltr] .field{text-align:left}
 @media(min-width:700px){.content{padding:22px 28px}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.top{padding:28px 30px 34px}.amount{font-size:34px}}
+
+.loginwrap{max-width:520px;margin:18px auto 30px;padding:14px}.auth-hero{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:190px;padding:22px 18px;border-radius:24px 24px 12px 12px;color:#fff;background:radial-gradient(circle at 15% 20%,#087eaa 0,transparent 35%),linear-gradient(135deg,#06152d,#092c56 65%,#087eaa);border:1px solid #168fd0;box-shadow:0 12px 30px #06264c35}.auth-globe{font-size:72px;filter:drop-shadow(0 0 16px #19b9ff);z-index:1}.auth-brand{text-align:center;flex:1}.auth-crown{font-size:30px;color:#ffd36b}.auth-brand h1{font-size:26px;margin:0;color:#fff;text-shadow:0 2px 8px #000}.auth-brand strong{display:block;color:#ffd36b;font-size:16px;margin-top:4px}.auth-brand p{margin:8px 0 0;color:#d8eaff;font-size:12px}.auth-services{position:absolute;bottom:10px;left:12px;right:12px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.auth-services span{font-size:10px;background:#ffffff18;border:1px solid #ffffff35;padding:5px 9px;border-radius:30px}.auth-card{margin-top:10px;background:linear-gradient(155deg,#071a35,#0b2b50);border:1px solid #d8a947;color:#fff;padding:22px;box-shadow:0 14px 35px #05172e35}.auth-title{text-align:center;margin-bottom:18px}.auth-title h2{font-size:23px;margin:2px 0 7px;color:#fff}.auth-title p{font-size:12px;color:#c8d9ed;margin:0}.auth-card .field label{color:#e7eef8}.auth-card .field input{background:#06152b;border:1px solid #6685aa;color:#fff;border-radius:13px;padding:14px}.auth-card .field input::placeholder{color:#9eb0c7}.auth-login{background:linear-gradient(90deg,#ffcf55,#e7a91f);color:#17263c;border-radius:14px;padding:15px;font-size:16px;box-shadow:0 5px 16px #d89d2b40}.auth-register{background:linear-gradient(90deg,#087be5,#0750b6);color:#fff;border:1px solid #20b8ff;border-radius:14px;padding:14px}.auth-link{display:block;margin:8px auto;color:#ffd36b}.auth-separator{display:flex;align-items:center;gap:12px;color:#c7d8ec;font-size:12px;margin:8px 0}.auth-separator:before,.auth-separator:after{content:'';height:1px;background:#56718f;flex:1}.auth-message{text-align:center;color:#d4e5f5;font-size:12px;margin:17px 0 0}.auth-card .notice{margin-top:12px}@media(max-width:380px){.auth-globe{font-size:54px}.auth-brand h1{font-size:21px}.auth-card{padding:17px}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -26,13 +28,30 @@
  <div class="welcome"><h2 data-i="welcome">مرحباً بك</h2><p data-i="subtitle">خدماتك الرقمية والدفع الإلكتروني في مكان واحد</p></div>
 </header>
 <div id="loginView" class="loginwrap">
- <div class="loginbox">
-  <h2 data-i="loginTitle">تسجيل الدخول</h2>
-  <p class="muted" data-i="loginHint">أدخل بيانات حسابك للمتابعة</p>
-  <div class="field"><label data-i="username">البريد الإلكتروني</label><input id="username" type="email" autocomplete="username" maxlength="120" placeholder="البريد الإلكتروني"></div>
-  <div class="field"><label data-i="password">كلمة المرور</label><input id="password" type="password" autocomplete="current-password" maxlength="128" placeholder="كلمة المرور"></div>
-  <button class="primary full" id="loginBtn" data-i="login">دخول</button>
-  <div class="notice" style="margin-top:14px" data-i="demoNotice">يتم تسجيل الدخول عبر Firebase Authentication.</div>
+ <div class="auth-hero">
+  <div class="auth-globe">🌐</div>
+  <div class="auth-brand"><div class="auth-crown">♛</div><h1>مكتب الباشا</h1><strong>عالم الدفع الإلكتروني</strong><p>كل خدماتك في مكان واحد</p></div>
+  <div class="auth-services"><span>🎮 شحن الألعاب</span><span>📱 الرصيد</span><span>💳 المحفظة</span></div>
+ </div>
+ <div class="loginbox auth-card">
+  <div id="signInPanel">
+   <div class="auth-title"><h2>مرحباً بك</h2><p>سجّل دخولك للاستمتاع بجميع خدماتنا</p></div>
+   <div class="field"><label for="username">البريد الإلكتروني</label><input id="username" type="email" autocomplete="username" maxlength="120" placeholder="أدخل بريدك الإلكتروني"></div>
+   <div class="field"><label for="password">كلمة المرور</label><input id="password" type="password" autocomplete="current-password" maxlength="128" placeholder="أدخل كلمة المرور"></div>
+   <button class="primary full auth-login" id="loginBtn" type="button">تسجيل الدخول　➜</button>
+   <button class="smalllink auth-link" id="forgotPasswordBtn" type="button">نسيت كلمة المرور؟</button>
+   <div class="auth-separator">أو</div>
+   <button class="secondary full auth-register" id="showSignupBtn" type="button">＋ إنشاء حساب جديد</button>
+  </div>
+  <form id="signUpPanel" class="hidden">
+   <div class="auth-title"><h2>إنشاء حساب جديد</h2><p>أنشئ حسابك وابدأ باستخدام خدماتنا</p></div>
+   <div class="field"><label for="signupName">الاسم الكامل</label><input id="signupName" maxlength="80" autocomplete="name" required placeholder="اكتب اسمك"></div>
+   <div class="field"><label for="signupEmail">البريد الإلكتروني</label><input id="signupEmail" type="email" maxlength="120" autocomplete="email" required placeholder="example@email.com"></div>
+   <div class="field"><label for="signupPassword">كلمة المرور</label><input id="signupPassword" type="password" minlength="6" maxlength="128" autocomplete="new-password" required placeholder="6 أحرف على الأقل"></div>
+   <button class="primary full auth-login" type="submit">إنشاء الحساب</button>
+   <button class="smalllink auth-link" id="showLoginBtn" type="button">لديك حساب؟ تسجيل الدخول</button>
+  </form>
+  <p id="authMessage" class="auth-message" aria-live="polite">🔒 أمان حسابك وبياناتك أولويتنا</p>
  </div>
 </div>
 <main id="appView" class="content hidden">
@@ -298,6 +317,26 @@ document.addEventListener("click",async e=>{
  const lb=e.target.closest("[data-listing-status]");
  if(lb){try{await db.collection("listings").doc(lb.dataset.listingStatus).update({status:lb.dataset.status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث الإعلان. تحقق من قواعد Firestore.");}}
 });
+async function registerAccount(event){
+ event.preventDefault();
+ const name=$("signupName").value.trim(),email=$("signupEmail").value.trim(),password=$("signupPassword").value;
+ const message=$("authMessage");
+ if(!name||!email||password.length<6){message.textContent="أدخل الاسم والبريد وكلمة مرور لا تقل عن 6 أحرف.";return;}
+ const button=$("signUpPanel").querySelector('button[type="submit"]');button.disabled=true;message.textContent="جارٍ إنشاء الحساب…";
+ try{
+  const credential=await auth.createUserWithEmailAndPassword(email,password);
+  await credential.user.updateProfile({displayName:name});
+  await db.collection("users").doc(credential.user.uid).set({uid:credential.user.uid,displayName:name,email:email,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  message.textContent="تم إنشاء الحساب بنجاح. جارٍ فتح التطبيق…";
+ }catch(error){
+  console.error("Account creation:",error);
+  message.textContent=error.code==="auth/email-already-in-use"?"هذا البريد مسجل مسبقاً.":error.code==="auth/weak-password"?"كلمة المرور ضعيفة. استخدم 6 أحرف على الأقل.":"تعذر إنشاء الحساب: "+(error.message||"تحقق من إعدادات Firebase Authentication.");
+ }finally{button.disabled=false;}
+}
+$("showSignupBtn").addEventListener("click",()=>{$("signInPanel").classList.add("hidden");$("signUpPanel").classList.remove("hidden");$("authMessage").textContent="أنشئ حساباً جديداً للبدء.";});
+$("showLoginBtn").addEventListener("click",()=>{$("signUpPanel").classList.add("hidden");$("signInPanel").classList.remove("hidden");$("authMessage").textContent="🔒 أمان حسابك وبياناتك أولويتنا";});
+$("signUpPanel").addEventListener("submit",registerAccount);
+$("forgotPasswordBtn").addEventListener("click",async()=>{const email=$("username").value.trim();if(!email){$("authMessage").textContent="اكتب بريدك الإلكتروني أولاً ثم اضغط نسيت كلمة المرور.";return;}try{await auth.sendPasswordResetEmail(email);$("authMessage").textContent="تم إرسال رابط استعادة كلمة المرور إلى بريدك إذا كان مسجلاً.";}catch(e){$("authMessage").textContent="تعذر إرسال رابط الاستعادة. تحقق من البريد وإعدادات Firebase.";console.error(e);}});
 $("loginBtn").addEventListener("click",login);$("password").addEventListener("keydown",e=>{if(e.key==="Enter")login()});const logoutButton=$("logoutBtn");if(logoutButton)logoutButton.addEventListener("click",logout);
 $("langBtn").addEventListener("click",()=>{lang=lang==="ar"?"en":"ar";localStorage.setItem("alam_lang",lang);applyLang();});
 document.addEventListener("click",e=>{const go=e.target.closest("[data-go]");if(go)showPage(go.dataset.go);const wa=e.target.closest("[data-wallet]");if(wa){walletAction=wa.dataset.wallet;$("walletModalTitle").textContent=walletAction==="deposit"?t("depositTitle"):t("withdrawTitle");$("walletModal").classList.remove("hidden");$("walletModal").style.display="grid";}});
