@@ -21,7 +21,7 @@ service cloud.firestore {
       && (!('email' in request.resource.data) || request.resource.data.email is string)
       && (!('phone' in request.resource.data) || request.resource.data.phone is string)
       && (!('nickname' in request.resource.data) || (request.resource.data.nickname is string && request.resource.data.nickname.size() <= 60))
-      && (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.matches('^[a-zA-Z0-9_ء-ي٠-٩]{3,20}))
+      && (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.matches('^[a-zA-Z0-9_ء-ي٠-٩]{3,20})
       && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
       && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
       && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000))
@@ -99,7 +99,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['uid', 'username', 'updatedAt'])
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.username == username
-        && username.matches('^[a-z0-9_]{3,20}$');
+        && username.matches('^[a-zA-Z0-9_ء-ي٠-٩]{3,20};
       allow update: if signedIn()
         && resource.data.uid == request.auth.uid
         && request.resource.data.uid == request.auth.uid
@@ -152,7 +152,8 @@ service cloud.firestore {
       allow read, write: if false;
     }
   }
-})))
+}
+))
       && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
       && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
       && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000))
@@ -216,7 +217,7 @@ service cloud.firestore {
         && request.resource.data.displayName.size() <= 80
         && (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.size() <= 40))
         && (!('nickname' in request.resource.data) || (request.resource.data.nickname is string && request.resource.data.nickname.size() <= 60))
-        && (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.matches('^[a-z0-9_]{3,20}$')))
+        && (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.matches('^[a-zA-Z0-9_ء-ي٠-٩]{3,20})
         && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
         && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
         && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000)))
@@ -283,7 +284,8 @@ service cloud.firestore {
       allow read, write: if false;
     }
   }
-})))
+}
+))
         && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
         && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
         && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000)))
@@ -350,7 +352,62 @@ service cloud.firestore {
       allow read, write: if false;
     }
   }
-})))
+}
+);
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.username == username;
+      allow delete: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow create: if signedIn() && validOrder();
+      allow read: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    match /listings/{listingId} {
+      allow create: if signedIn() && validListing();
+      allow read: if isAdmin()
+        || (resource.data.status == 'approved')
+        || (signedIn() && resource.data.ownerUid == request.auth.uid);
+      allow update: if isAdmin()
+        || (signedIn()
+          && resource.data.ownerUid == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'category', 'title', 'description', 'priceIQD', 'city', 'contact',
+            'imagePaths', 'updatedAt'
+          ])
+          && request.resource.data.status == resource.data.status
+          && request.resource.data.ownerUid == resource.data.ownerUid
+          && request.resource.data.title is string
+          && request.resource.data.title.size() > 0
+          && request.resource.data.title.size() <= 100
+          && request.resource.data.description is string
+          && request.resource.data.description.size() <= 1500
+          && request.resource.data.priceIQD is int
+          && request.resource.data.priceIQD >= 0
+          && request.resource.data.category is string
+          && request.resource.data.category.size() <= 60
+          && request.resource.data.city is string
+          && request.resource.data.city.size() <= 80
+          && request.resource.data.contact is string
+          && request.resource.data.contact.size() <= 40
+          && request.resource.data.imagePaths is list
+          && request.resource.data.imagePaths.size() <= 6
+          && request.resource.data.updatedAt == request.time);
+      allow delete: if isAdmin()
+        || (signedIn() && resource.data.ownerUid == request.auth.uid
+          && resource.data.status == 'pending');
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+))
       && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
       && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
       && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000))
@@ -414,7 +471,75 @@ service cloud.firestore {
         && request.resource.data.displayName.size() <= 80
         && (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.size() <= 40))
         && (!('nickname' in request.resource.data) || (request.resource.data.nickname is string && request.resource.data.nickname.size() <= 60))
-        && (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.matches('^[a-z0-9_]{3,20}$')))
+        && (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.matches('^[a-zA-Z0-9_ء-ي٠-٩]{3,20})
+        && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
+        && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
+        && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000)))
+        || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /usernames/{username} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'username', 'updatedAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.username == username
+        && username.matches('^[a-z0-9_]{3,20}$');
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.username == username;
+      allow delete: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow create: if signedIn() && validOrder();
+      allow read: if (signedIn() && resource.data.uid == request.auth.uid) || isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    match /listings/{listingId} {
+      allow create: if signedIn() && validListing();
+      allow read: if isAdmin()
+        || (resource.data.status == 'approved')
+        || (signedIn() && resource.data.ownerUid == request.auth.uid);
+      allow update: if isAdmin()
+        || (signedIn()
+          && resource.data.ownerUid == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'category', 'title', 'description', 'priceIQD', 'city', 'contact',
+            'imagePaths', 'updatedAt'
+          ])
+          && request.resource.data.status == resource.data.status
+          && request.resource.data.ownerUid == resource.data.ownerUid
+          && request.resource.data.title is string
+          && request.resource.data.title.size() > 0
+          && request.resource.data.title.size() <= 100
+          && request.resource.data.description is string
+          && request.resource.data.description.size() <= 1500
+          && request.resource.data.priceIQD is int
+          && request.resource.data.priceIQD >= 0
+          && request.resource.data.category is string
+          && request.resource.data.category.size() <= 60
+          && request.resource.data.city is string
+          && request.resource.data.city.size() <= 80
+          && request.resource.data.contact is string
+          && request.resource.data.contact.size() <= 40
+          && request.resource.data.imagePaths is list
+          && request.resource.data.imagePaths.size() <= 6
+          && request.resource.data.updatedAt == request.time);
+      allow delete: if isAdmin()
+        || (signedIn() && resource.data.ownerUid == request.auth.uid
+          && resource.data.status == 'pending');
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+))
         && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
         && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
         && (!('photoData' in request.resource.data) || (request.resource.data.photoData is string && request.resource.data.photoData.size() <= 220000)))
