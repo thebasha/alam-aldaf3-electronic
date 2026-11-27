@@ -200,11 +200,19 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
  </section>
  <section id="store" class="page">
   <div class="store-head"><h2>السوق الإلكتروني</h2><p>إعلانات المنتجات مع السعر والكمية والصورة والتفاصيل</p></div>
-  <div class="store-search"><input id="storeSearch" type="search" placeholder="ابحث عن منتج..." autocomplete="off" aria-label="ابحث عن منتج"></div>
-  <div class="store-tabs" id="storeTabs" aria-label="أقسام السوق">
-   <button class="active" type="button" data-store-cat="phones">هواتف وإكسسوارات</button><button type="button" data-store-cat="property">عقارات ومنازل</button><button type="button" data-store-cat="vehicles">دراجات وسيارات</button>
+  
+  <div class="store-search"><input id="storeSearch" type="search" placeholder="ابحث عن بطاقة..." autocomplete="off" aria-label="ابحث عن بطاقة"></div>
+  <div class="store-subtitle"><h3>مزودو الخدمة</h3><span class="store-count" id="storeCount"></span></div>
+  <div class="store-tabs" id="storeTabs" aria-label="تصنيفات البطاقات والخدمات">
+   <button class="active" type="button" data-store-cat="all">للجميع</button>
+   <button type="button" data-store-cat="entertainment">ترفيه</button>
+   <button type="button" data-store-cat="games">ألعاب</button>
+   <button type="button" data-store-cat="telecom">اتصالات</button>
+   <button type="button" data-store-cat="internet">إنترنت</button>
+   <button type="button" data-store-cat="cards">بطاقات إلكترونية</button>
   </div>
-  <div class="store-subtitle"><h3>المنتجات والإعلانات</h3><span class="store-count" id="storeCount"></span></div>
+  <div class="store-grid" id="providerGrid"></div>
+  <div class="store-subtitle"><h3>إعلانات العملاء</h3><span class="store-count" id="listingCount"></span></div>
   <div class="store-grid" id="storeGrid"></div>
   <div class="panel" style="margin-top:16px"><h3>إضافة منتج أو إعلان جديد</h3>
    <form id="productListingForm">
@@ -369,13 +377,57 @@ const t=key=>translations[lang][key]||key;
 function applyLang(){document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";$("langBtn").textContent=lang==="ar"?"English":"العربية";document.querySelectorAll("[data-i]").forEach(el=>{const k=el.dataset.i;if(translations[lang][k])el.textContent=t(k)});renderServices();renderStore();renderOrders();$("year").textContent=new Date().getFullYear();$("username").placeholder=t("username");$("password").placeholder=t("password");}
 function serviceName(i){return translations[lang].serviceNames[i]}
 function serviceDesc(i){return translations[lang].serviceDescs[i]}
-let activeStoreCategory="phones";
+let activeStoreCategory="all";
+const providerCatalog=[
+ {name:"Asiacell",alt:"آسياسيل",cat:"telecom",icon:"A"},
+ {name:"Korek",alt:"كورك",cat:"telecom",icon:"K"},
+ {name:"Rahma Telecom",alt:"رحمة تيليكوم",cat:"telecom",icon:"R"},
+ {name:"Viber",alt:"فايبر",cat:"internet",icon:"V"},
+ {name:"Supercell",alt:"سوبرسيل",cat:"games",icon:"S"},
+ {name:"Fiber X",alt:"فايبر X",cat:"internet",icon:"FX"},
+ {name:"iTunes",alt:"آيتونز",cat:"cards",icon:"♪"},
+ {name:"Google Play",alt:"بطاقات Google Play",cat:"cards",icon:"G"},
+ {name:"PlayStation Network",alt:"بلايستيشن نتورك",cat:"games",icon:"PS"},
+ {name:"Razer Gold",alt:"رايزر",cat:"cards",icon:"R"},
+ {name:"LUDO",alt:"يلا لودو",cat:"games",icon:"L"},
+ {name:"Ludo Club",alt:"لودو كلوب",cat:"games",icon:"LC"},
+ {name:"NEW STATE MOBILE",alt:"بوبجي نيو ستيت",cat:"games",icon:"N"},
+ {name:"PUBG MOBILE",alt:"بوبجي",cat:"games",icon:"P"},
+ {name:"Free Fire",alt:"فري فاير",cat:"games",icon:"FF"},
+ {name:"Jawaker",alt:"جواكر",cat:"games",icon:"J"},
+ {name:"Roblox",alt:"روبلوكس",cat:"games",icon:"R"},
+ {name:"Steam",alt:"ستيم",cat:"games",icon:"ST"},
+ {name:"Nintendo eShop",alt:"نينتندو",cat:"games",icon:"N"},
+ {name:"Xbox",alt:"أكس بوكس",cat:"games",icon:"X"},
+ {name:"Mobile Legends",alt:"موبايل ليجندز",cat:"games",icon:"ML"},
+ {name:"5v5",alt:"ألعاب 5v5",cat:"games",icon:"5"},
+ {name:"Call of Duty",alt:"نداء الحرب",cat:"games",icon:"COD"},
+ {name:"Shahid",alt:"شاهد",cat:"entertainment",icon:"ش"},
+ {name:"1001",alt:"1001",cat:"entertainment",icon:"1"},
+ {name:"101",alt:"101",cat:"entertainment",icon:"101"},
+ {name:"Amazon",alt:"أمازون",cat:"cards",icon:"a"},
+ {name:"OpenSooq",alt:"السوق المفتوح",cat:"entertainment",icon:"O"},
+ {name:"Iraqi Cinema",alt:"السينما العراقية",cat:"entertainment",icon:"🎬"},
+ {name:"Fourth Stars",alt:"نجوم الرابعة",cat:"entertainment",icon:"★"},
+ {name:"Kareem",alt:"كريم",cat:"entertainment",icon:"ك"},
+ {name:"UIMS",alt:"الصحة والصدق",cat:"entertainment",icon:"U"},
+ {name:"RAQ",alt:"RAQ",cat:"cards",icon:"Q"},
+ {name:"Warith Fund",alt:"صندوق وارث",cat:"entertainment",icon:"W"},
+ {name:"Bli Customer",alt:"بلي - زبون",cat:"entertainment",icon:"B"},
+ {name:"Bli Captain",alt:"بلي - كابتن",cat:"entertainment",icon:"B"},
+ {name:"Al Manasa",alt:"المنصة",cat:"entertainment",icon:"M"},
+ {name:"Diak",alt:"دياك",cat:"entertainment",icon:"D"},
+ {name:"GS",alt:"GS",cat:"cards",icon:"GS"}
+];
 function getLocalListings(){try{return JSON.parse(localStorage.getItem("alam_product_listings")||"[]")}catch{return []}}
 function renderStore(){
  const q=(($("storeSearch")&&$("storeSearch").value)||"").trim().toLowerCase();
- const list=getLocalListings().filter(x=>x.category===activeStoreCategory&&(!q||(x.title+" "+x.description).toLowerCase().includes(q)));
- $("storeGrid").innerHTML=list.length?list.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:125px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · الكمية: '+Number(x.quantity)+'</small></button>').join(""):'<div class="store-empty">لا توجد إعلانات في هذا القسم حالياً.</div>';
- $("storeCount").textContent=list.length+" إعلان";
+ const providers=providerCatalog.filter(x=>(activeStoreCategory==="all"||x.cat===activeStoreCategory)&&(!q||(x.name+" "+x.alt).toLowerCase().includes(q)));
+ $("providerGrid").innerHTML=providers.length?providers.map(x=>'<div class="store-item"><div class="store-logo">'+escapeHtml(x.icon)+'</div><strong>'+escapeHtml(x.name)+'</strong><small>'+escapeHtml(x.alt)+'</small></div>').join(""):'<div class="store-empty">لا توجد نتائج مطابقة لبحثك.</div>';
+ $("storeCount").textContent=providers.length+" مزود خدمة";
+ const listings=getLocalListings().filter(x=>!q||(x.title+" "+x.description).toLowerCase().includes(q));
+ $("storeGrid").innerHTML=listings.length?listings.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:125px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · الكمية: '+Number(x.quantity)+'</small></button>').join(""):'<div class="store-empty">لا توجد إعلانات عملاء مطابقة حالياً.</div>';
+ $("listingCount").textContent=listings.length+" إعلان";
 }
 function showProductDetails(id){
  const x=getLocalListings().find(p=>p.id===id);if(!x)return;
@@ -394,7 +446,7 @@ async function compressListingImage(file){
  const out=canvas.toDataURL("image/jpeg",0.72);if(out.length>450000)throw new Error("الصورة كبيرة بعد الضغط، اختر صورة أصغر.");return out;
 }
 document.addEventListener("click",function(e){
- const cat=e.target.closest("[data-store-cat]");if(cat){activeStoreCategory=cat.dataset.storeCat;$("listingCategory").value=activeStoreCategory;document.querySelectorAll("[data-store-cat]").forEach(b=>b.classList.toggle("active",b===cat));renderStore();return;}
+ const cat=e.target.closest("[data-store-cat]");if(cat){activeStoreCategory=cat.dataset.storeCat;document.querySelectorAll("[data-store-cat]").forEach(b=>b.classList.toggle("active",b===cat));renderStore();return;}
  const item=e.target.closest("[data-product-id]");if(item){showProductDetails(item.dataset.productId);return;}
 });
 document.addEventListener("input",function(e){if(e.target&&e.target.id==="storeSearch")renderStore();});
