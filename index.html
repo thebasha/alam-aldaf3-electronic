@@ -656,7 +656,7 @@ async function submitFeedback(event){
 }
 async function loadMyFeedback(){
  const user=auth.currentUser;if(!user)return;const box=$("myFeedbackList");box.innerHTML='<div class="panel empty">جارٍ تحميل رسائلك…</div>';
- try{const snap=await db.collection("feedback").where("uid","==",user.uid).orderBy("createdAt","desc").limit(30).get();const rows=snap.docs.map(d=>d.data());
+ try{const snap=await db.collection("feedback").where("uid","==",user.uid).limit(30).get();const rows=snap.docs.map(d=>d.data());
   box.innerHTML=rows.length?rows.map(x=>'<div class="panel"><div class="rowitem"><strong>'+escapeHtml(x.type==="complaint"?"شكوى":"اقتراح")+' · '+escapeHtml(x.subject||"")+'</strong><span class="badge '+(x.status==="resolved"?"ok":"")+'">'+escapeHtml(x.status==="resolved"?"تمت المعالجة":"قيد المراجعة")+'</span></div><p>'+escapeHtml(x.message||"")+'</p><small class="muted">'+escapeHtml(formatAdminDate(x.createdAt))+'</small></div>').join(""):'<div class="panel empty">لا توجد رسائل مرسلة بعد.</div>';
  }catch(e){console.error(e);box.innerHTML='<div class="panel empty">تعذر تحميل الرسائل. تحقق من قواعد Firestore.</div>';}
 }
