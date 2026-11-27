@@ -40,6 +40,41 @@ body:has(#loginView:not(.hidden)) #loginView{max-width:560px;margin:0 auto;paddi
 .auth-message{border-top:1px solid #ffffff20;padding-top:14px;color:#d8e9fa;font-size:13px}
 @media(max-width:390px){body:has(#loginView:not(.hidden)) #loginView{padding:9px}.auth-hero{min-height:200px;padding:18px 12px 58px}.auth-globe{font-size:58px}.auth-card{padding:17px}.auth-title h2{font-size:21px}}
 
+
+/* Premium in-app home inspired by the approved concept */
+body:has(#appView:not(.hidden)){background:#041329;background-image:radial-gradient(ellipse at 50% 0%,#0a3966 0,transparent 48%),linear-gradient(180deg,#061a36,#020b1b);color:#f4f8ff}
+body:has(#appView:not(.hidden)) .shell{max-width:1100px}
+body:has(#appView:not(.hidden)) .top{background:linear-gradient(130deg,#031127,#082e55 68%,#07577b);border:0;border-bottom:1px solid #168bd477;border-radius:0 0 26px 26px;box-shadow:0 8px 28px #0006}
+body:has(#appView:not(.hidden)) .brand .logo{background:linear-gradient(145deg,#fff0a8,#e5a929);box-shadow:0 0 18px #f3ba4a66}
+body:has(#appView:not(.hidden)) .content{padding:14px 16px 24px}
+.home-showcase{position:relative;overflow:hidden;min-height:156px;margin:0 0 13px;padding:23px 18px 54px;border-radius:22px;border:1px solid #168de4;background:radial-gradient(circle at 15% 35%,#0c83bd 0,transparent 33%),radial-gradient(circle at 90% 90%,#07518b 0,transparent 35%),linear-gradient(135deg,#04132b,#092d55 65%,#03152b);box-shadow:inset 0 0 25px #168bdb33,0 12px 28px #0006}
+.showcase-orbit{position:absolute;left:14px;top:17px;font-size:74px;opacity:.92;filter:drop-shadow(0 0 15px #14aaff);transform:rotate(-12deg)}
+.showcase-copy{position:relative;z-index:1;text-align:right;margin-right:90px}
+.showcase-kicker{display:block;color:#ffd15d;font-weight:900;font-size:14px;margin-bottom:4px}
+.showcase-copy h2{margin:0;color:#fff;font-size:clamp(21px,5vw,29px);font-weight:900;text-shadow:0 2px 0 #76510e,0 0 14px #ffd45a55}
+.showcase-copy p{margin:7px 0 0;color:#ffcf45;font-weight:800;font-size:15px}
+.showcase-chips{position:absolute;bottom:10px;left:12px;right:12px;display:flex;justify-content:center;gap:7px;flex-wrap:wrap}
+.showcase-chips span{padding:6px 10px;border-radius:30px;color:#fff;background:#06264cdd;border:1px solid #20aaff77;font-size:11px}
+.home-promo{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px;padding:13px 16px;border-radius:17px;background:linear-gradient(110deg,#26106b,#4b19a5 55%,#092f70);border:1px solid #8d62ff;box-shadow:0 8px 22px #160b4c66;color:white}
+.home-promo strong,.home-promo span{display:block}.home-promo strong{font-size:16px}.home-promo span{font-size:11px;color:#e4d9ff;margin-top:5px}
+.promo-pad{width:58px;height:48px;display:grid;place-items:center;font-size:32px;border-radius:14px;background:#ffffff18;filter:drop-shadow(0 0 8px #b59aff)}
+body:has(#appView:not(.hidden)) .balance{background:linear-gradient(120deg,#061a35,#0b4772 65%,#087eaa);border:1px solid #1baaff;box-shadow:inset 0 0 20px #168bdb33,0 10px 26px #0007}
+body:has(#appView:not(.hidden)) .balance .primary{background:linear-gradient(180deg,#ffe47c,#ffbd25 55%,#e99a08);border:1px solid #fff0a5;box-shadow:0 3px 0 #9b5b08;color:#07172c}
+body:has(#appView:not(.hidden)) .section-head h3{color:#ffd15d}
+body:has(#appView:not(.hidden)) .section-head .muted{color:#b5cde5}
+body:has(#appView:not(.hidden)) .service,body:has(#appView:not(.hidden)) .panel,body:has(#appView:not(.hidden)) .order,body:has(#appView:not(.hidden)) .profile,body:has(#appView:not(.hidden)) .formbox{background:linear-gradient(150deg,#071b37,#0a2c4e);border:1px solid #167fc0;color:#f4f8ff;box-shadow:inset 0 0 14px #087bc322,0 8px 18px #0005}
+body:has(#appView:not(.hidden)) .service{min-height:132px;text-align:center;border-radius:17px;padding:13px 9px}
+body:has(#appView:not(.hidden)) .service-icon{width:54px;height:54px;margin:0 auto 10px;border-radius:16px;background:linear-gradient(145deg,#0b4b79,#06203e);border:1px solid #1aa9ef;box-shadow:0 0 14px #078bdb55;font-size:28px}
+body:has(#appView:not(.hidden)) .service strong{color:#fff;font-size:13px}
+body:has(#appView:not(.hidden)) .service small{color:#b9d0e7}
+body:has(#appView:not(.hidden)) .nav{background:linear-gradient(180deg,#071a34,#020c1c);border-top:1px solid #168bd477;box-shadow:0 -8px 25px #0008}
+body:has(#appView:not(.hidden)) .nav button{color:#b8cce2}
+body:has(#appView:not(.hidden)) .nav button.active{color:#ffd15d}
+body:has(#appView:not(.hidden)) .footer{color:#7f9ab8}
+body:has(#appView:not(.hidden)) .muted{color:#adc2d9}
+@media(min-width:700px){body:has(#appView:not(.hidden)) .grid{grid-template-columns:repeat(4,minmax(0,1fr))}.home-showcase{min-height:180px}.showcase-orbit{font-size:100px}.showcase-copy{margin-right:125px}}
+@media(max-width:380px){.showcase-orbit{font-size:58px}.showcase-copy{margin-right:72px}.showcase-copy h2{font-size:19px}.home-promo strong{font-size:14px}}
+
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -83,6 +118,12 @@ body:has(#loginView:not(.hidden)) #loginView{max-width:560px;margin:0 auto;paddi
 </div>
 <main id="appView" class="content hidden">
  <section id="home" class="page active">
+  <div class="home-showcase">
+   <div class="showcase-orbit" aria-hidden="true">🌐</div>
+   <div class="showcase-copy"><span class="showcase-kicker">♛ مكتب الباشا</span><h2>عالم الدفع الإلكتروني</h2><p>كل خدماتك في مكان واحد</p></div>
+   <div class="showcase-chips"><span>🎮 شحن الألعاب</span><span>📱 الرصيد</span><span>💳 المحفظة</span></div>
+  </div>
+  <div class="home-promo"><div><strong>شحن الألعاب والرصيد</strong><span>بسهولة • أمان • متابعة للطلبات</span></div><div class="promo-pad">🎮</div></div>
   <div class="balance">
    <div class="balance-head"><span class="balance-label" data-i="walletBalance">رصيد المحفظة</span><span class="pill">IQD</span></div>
    <div class="amount"><span id="balance">0</span> <span data-i="iqd">د.ع</span></div>
