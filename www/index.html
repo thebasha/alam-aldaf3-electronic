@@ -133,6 +133,15 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
  #home #homeServices.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  #home #homeServices .service{min-height:98px}
 }
+
+/* Customer listing discovery and compact category rail */
+.home-listing-tabs{gap:6px;padding:4px 1px 9px;overscroll-behavior-x:contain;scroll-snap-type:x proximity}
+.home-listing-tabs button{padding:7px 11px;font-size:11px;border-radius:18px;scroll-snap-align:start;flex:0 0 auto}
+#homeListingSearch{font-size:13px;padding:11px 40px 11px 12px}
+#homeCustomerListings .panel{padding:11px;border-radius:15px}
+#homeCustomerListings .store-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#homeCustomerListings .store-item{min-width:0;padding:9px 7px;min-height:95px}
+#adminEditListingModal .field{margin:9px 0}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -196,6 +205,10 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
    <button class="service" type="button" onclick="showPage('wallet')"><div class="service-icon">👛</div><strong>شحن محفظة التطبيق</strong><small>طلب تعبئة رصيد المحفظة</small></button>
   </div>
   <div class="section-head"><h3>🛍️ إعلانات العملاء حسب الأقسام</h3><button class="smalllink" type="button" onclick="showPage('store')">عرض السوق</button></div>
+  <div class="store-search"><input id="homeListingSearch" type="search" placeholder="ابحث عن أي منتج أو إعلان..." autocomplete="off" aria-label="ابحث في إعلانات العملاء"></div>
+  <div class="store-tabs home-listing-tabs" id="homeListingTabs" aria-label="أقسام إعلانات العملاء">
+   <button class="active" type="button" data-home-cat="all">الكل</button><button type="button" data-home-cat="phones">هواتف وإكسسوارات</button><button type="button" data-home-cat="property">عقارات</button><button type="button" data-home-cat="vehicles">سيارات ودراجات</button><button type="button" data-home-cat="pets">طيور وحيوانات</button><button type="button" data-home-cat="other">أخرى</button>
+  </div>
   <div id="homeCustomerListings" class="list"><div class="panel empty">جارٍ تحميل إعلانات العملاء…</div></div>
   <div class="section-head"><h3 data-i="recentOrders">آخر الطلبات</h3><button class="smalllink" data-go="orders" data-i="viewAll" type="button" onclick="showPage('orders')">عرض الكل</button></div>
   <div id="recentList" class="list"></div>
@@ -339,6 +352,18 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
  <div class="notice" style="margin-top:14px">اعتماد الطلب هنا يغيّر حالته الإدارية فقط. لا يتم تنفيذ تحويل مالي أو شحن تلقائي. لا تعتمد أي عملية قبل التحقق من الدفع ومزود الخدمة.</div>
 </section>
 </main>
+<div id="adminEditListingModal" class="hidden" style="position:fixed;inset:0;background:#07182de8;z-index:20;display:grid;place-items:center;padding:18px">
+ <form id="adminEditListingForm" class="formbox" style="width:min(480px,100%);max-height:90vh;overflow:auto">
+  <div class="rowitem"><h3>تعديل المنتج</h3><button class="smalllink" id="closeAdminEditListing" type="button">✕</button></div>
+  <input id="adminEditListingId" type="hidden">
+  <div class="field"><label for="adminEditListingCategory">القسم</label><select id="adminEditListingCategory"><option value="phones">هواتف وإكسسوارات</option><option value="property">عقارات ومنازل</option><option value="vehicles">سيارات ودراجات</option><option value="pets">طيور الزينة والحيوانات الأليفة</option><option value="other">منتجات وأغراض أخرى</option></select></div>
+  <div class="field"><label for="adminEditListingTitle">اسم المنتج</label><input id="adminEditListingTitle" maxlength="100" required></div>
+  <div class="field"><label for="adminEditListingDescription">التفاصيل</label><textarea id="adminEditListingDescription" maxlength="1500" required></textarea></div>
+  <div class="field"><label for="adminEditListingPrice">السعر بالدينار</label><input id="adminEditListingPrice" type="number" min="1" step="1" required></div>
+  <div class="field"><label for="adminEditListingQuantity">الكمية</label><input id="adminEditListingQuantity" type="number" min="0" max="99999" required></div>
+  <button class="primary full" id="saveAdminEditListing" type="submit">حفظ التعديلات</button><p id="adminEditListingState" class="muted" aria-live="polite"></p>
+ </form>
+</div>
 <div id="productDetailModal" class="hidden" style="position:fixed;inset:0;background:#07182de8;z-index:12;display:grid;place-items:center;padding:18px">
  <div class="formbox" style="width:min(480px,100%);max-height:90vh;overflow:auto">
   <div class="rowitem"><h3 id="productDetailTitle">تفاصيل المنتج</h3><button class="smalllink" id="closeProductDetail" type="button">✕</button></div>
@@ -495,14 +520,14 @@ $("listingLocationPrecision").addEventListener("change",()=>{pendingListingLocat
 $("locationSharingEnabled").addEventListener("change",e=>{
  if(!e.target.checked){$("listingShareLocation").checked=false;pendingListingLocation=null;$("listingLocationState").textContent="مشاركة الموقع متوقفة من إعدادات حسابك.";}
 });
-async function loadApprovedListings(){try{const snap=await db.collection("listings").where("status","in",["approved","sold_out"]).limit(100).get();window.__approvedListings=snap.docs.map(d=>{const x=d.data();return {id:d.id,uid:x.ownerUid||"",category:x.section||x.category||"other",title:x.title||"",description:x.description||"",price:Number(x.priceIQD||0),quantity:Number(x.quantity||1),image:x.imageData||"",location:x.location||null,status:x.status};}).filter(x=>x.image);renderStore();renderHomeCustomerListings();renderCustomerCart();}catch(e){console.warn("Public listings unavailable:",e);}}
+async function loadApprovedListings(){try{const snap=await db.collection("listings").where("status","in",["approved","sold_out","sold"]).limit(150).get();window.__approvedListings=snap.docs.map(d=>{const x=d.data();const ts=x.createdAt&&typeof x.createdAt.toMillis==="function"?x.createdAt.toMillis():0;return {id:d.id,uid:x.ownerUid||"",category:x.section||x.category||"other",title:x.title||"",description:x.description||"",price:Number(x.priceIQD||0),quantity:Number(x.quantity||1),image:x.imageData||"",location:x.location||null,status:x.status,createdAtMs:ts,city:x.city||""};}).filter(x=>x.image).sort((a,b)=>b.createdAtMs-a.createdAtMs);renderStore();renderHomeCustomerListings();renderCustomerCart();}catch(e){console.warn("Public listings unavailable:",e);}}
 function renderStore(){
  const q=(($("storeSearch")&&$("storeSearch").value)||"").trim().toLowerCase();
  const providers=providerCatalog.filter(x=>(activeStoreCategory==="all"||x.cat===activeStoreCategory)&&(!q||(x.name+" "+x.alt).toLowerCase().includes(q)));
  $("providerGrid").innerHTML=providers.length?providers.map(x=>'<div class="store-item"><div class="store-logo">'+escapeHtml(x.icon)+'</div><strong>'+escapeHtml(x.name)+'</strong><small>'+escapeHtml(x.alt)+'</small></div>').join(""):'<div class="store-empty">لا توجد نتائج مطابقة لبحثك.</div>';
  $("storeCount").textContent=providers.length+" مزود خدمة";
  const localListings=getLocalListings();const cloudListings=window.__approvedListings||[];const listings=[...cloudListings,...localListings].filter((x,i,a)=>a.findIndex(y=>y.id===x.id)===i).filter(x=>!q||(x.title+" "+x.description).toLowerCase().includes(q));
- $("storeGrid").innerHTML=listings.length?listings.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:125px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · '+(x.status==="sold_out"?"نفذت الكمية":"الكمية: "+Number(x.quantity))+'</small></button>').join(""):'<div class="store-empty">لا توجد إعلانات عملاء مطابقة حالياً.</div>';
+ $("storeGrid").innerHTML=listings.length?listings.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:125px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · '+(x.status==="sold_out"?"نفذت الكمية":x.status==="sold"?"مباع":"الكمية: "+Number(x.quantity))+'</small></button>').join(""):'<div class="store-empty">لا توجد إعلانات عملاء مطابقة حالياً.</div>';
  $("listingCount").textContent=listings.length+" إعلان";
  updateCartCount();
 }
@@ -528,11 +553,16 @@ function renderCustomerCart(){
  const total=items.reduce((sum,item)=>{const p=cartProduct(item.id);return sum+(p?Number(p.price)*item.quantity:0);},0);
  $("customerCartTotal").textContent=total.toLocaleString("en-US")+" د.ع";updateCartCount();
 }
+let activeHomeListingCategory="all";
+function listingCategoryName(key){return ({phones:"📱 هواتف وإكسسوارات",property:"🏠 عقارات ومنازل",vehicles:"🚗 سيارات ودراجات",pets:"🐦 طيور الزينة والحيوانات الأليفة",other:"📦 منتجات وأغراض أخرى"})[key]||"📦 منتجات أخرى";}
 function renderHomeCustomerListings(){
  const root=$("homeCustomerListings");if(!root)return;
- const listings=(window.__approvedListings||[]).filter(x=>x.status==="approved"&&x.image);
- const groups=[["phones","📱 هواتف وإكسسوارات"],["property","🏠 عقارات ومنازل"],["vehicles","🚗 دراجات وسيارات"],["pets","🐦 طيور الزينة والحيوانات الأليفة"],["other","📦 منتجات وأغراض أخرى"]];
- root.innerHTML=groups.map(([key,title])=>{const items=listings.filter(x=>x.category===key);return '<div class="panel"><div class="rowitem"><strong>'+title+'</strong><span class="muted">'+items.length+' منتج</span></div><div class="store-grid" style="margin-top:10px">'+(items.length?items.slice(0,4).map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:105px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع</small></button>').join(""):'<div class="store-empty">لا توجد إعلانات معتمدة في هذا القسم حالياً.</div>')+'</div></div>';}).join("");
+ const q=(($("homeListingSearch")&&$("homeListingSearch").value)||"").trim().toLocaleLowerCase("ar");
+ const all=(window.__approvedListings||[]).filter(x=>x.image).slice().sort((a,b)=>(b.createdAtMs||0)-(a.createdAtMs||0));
+ const listings=all.filter(x=>(activeHomeListingCategory==="all"||x.category===activeHomeListingCategory)&&(!q||[x.title,x.description,x.category,x.city].join(" ").toLocaleLowerCase("ar").includes(q)));
+ if(!listings.length){root.innerHTML='<div class="panel empty">لا توجد منتجات مطابقة لبحثك حالياً.</div>';return;}
+ const groups=activeHomeListingCategory==="all"?["phones","property","vehicles","pets","other"]:[activeHomeListingCategory];
+ root.innerHTML=groups.map(key=>{const items=listings.filter(x=>x.category===key);if(!items.length)return "";return '<div class="panel"><div class="rowitem"><strong>'+listingCategoryName(key)+'</strong><span class="muted">'+items.length+' منتج</span></div><div class="store-grid" style="margin-top:10px">'+items.slice(0,8).map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:105px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · '+(x.status==="sold_out"?"نفذت الكمية":x.status==="sold"?"مباع":"متوفر")+'</small></button>').join("")+'</div></div>';}).join("");
 }
 let selectedProductForPurchase=null;
 function showProductDetails(id){
@@ -597,7 +627,8 @@ document.addEventListener("click",function(e){
  const cat=e.target.closest("[data-store-cat]");if(cat){activeStoreCategory=cat.dataset.storeCat;document.querySelectorAll("[data-store-cat]").forEach(b=>b.classList.toggle("active",b===cat));renderStore();return;}
  const item=e.target.closest("[data-product-id]");if(item){showProductDetails(item.dataset.productId);return;}
 });
-document.addEventListener("input",function(e){if(e.target&&e.target.id==="storeSearch")renderStore();});
+document.addEventListener("input",function(e){if(e.target&&e.target.id==="storeSearch")renderStore();if(e.target&&e.target.id==="homeListingSearch")renderHomeCustomerListings();});
+document.addEventListener("click",function(e){const b=e.target.closest("[data-home-cat]");if(b){activeHomeListingCategory=b.dataset.homeCat;document.querySelectorAll("[data-home-cat]").forEach(x=>x.classList.toggle("active",x===b));renderHomeCustomerListings();}});
 $("productListingForm").addEventListener("submit",async function(e){
  e.preventDefault();
  const btn=$("publishListingBtn"),state=$("listingSaveState");
@@ -745,7 +776,7 @@ async function loadAdminDashboard(){
   $("adminUsersCount").textContent=users.length;
   $("adminOrdersList").innerHTML=orders.length?orders.map(o=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(o.serviceId||"طلب")+'</strong><span class="badge">'+escapeHtml(o.status||"غير محدد")+'</span></div><p class="muted">العميل: '+escapeHtml(o.uid||"—")+' · المبلغ: '+escapeHtml(o.amount??"—")+' د.ع</p><p>'+escapeHtml(o.accountInfo||o.notes||"")+'</p><div class="rowitem"><button class="secondary" data-order-status="'+o.id+'" data-status="processing">قيد التنفيذ</button><button class="primary" data-order-status="'+o.id+'" data-status="completed">مكتمل</button><button class="danger" data-order-status="'+o.id+'" data-status="rejected">رفض</button></div></div>').join(""):'<div class="panel empty">لا توجد طلبات.</div>';
   $("adminProductOrdersList").innerHTML=productOrders.length?productOrders.map(o=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(o.productTitle||"شراء منتج")+'</strong><span class="badge '+(o.paymentStatus==="confirmed"?"ok":"")+'">'+escapeHtml(o.paymentStatus==="confirmed"?"تم تأكيد الدفع":o.status==="rejected"?"مرفوض":"بانتظار الدفع والتحقق")+'</span></div><p class="muted">الكمية: '+escapeHtml(o.quantity)+' · الإجمالي: '+Number(o.totalIQD||0).toLocaleString("en-US")+' د.ع</p><p>هاتف العميل: '+escapeHtml(o.buyerContact||"—")+'</p><p class="muted">معرّف المشتري: '+escapeHtml(o.buyerUid||"—")+'</p><div class="rowitem" style="flex-wrap:wrap"><button class="primary" data-product-order-status="'+o.id+'" data-status="confirmed">تأكيد الدفع بعد التحقق</button><button class="danger" data-product-order-status="'+o.id+'" data-status="rejected">رفض الطلب</button></div></div>').join(""):'<div class="panel empty">لا توجد طلبات شراء منتجات.</div>';
-  $("adminListingsList").innerHTML=listings.length?listings.map(x=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(x.title||"إعلان")+'</strong><span class="badge">'+escapeHtml(x.status==="sold_out"?"نفذت الكمية":x.status==="approved"?"معروض":x.status==="rejected"?"مرفوض":"قيد المراجعة")+'</span></div>'+(x.imageData?'<img src="'+escapeHtml(x.imageData)+'" alt="" style="width:100%;max-height:150px;object-fit:contain;border-radius:10px">':'')+'<p class="muted">'+escapeHtml(x.section||"")+' · '+escapeHtml(x.priceIQD??"—")+' د.ع · الكمية: '+escapeHtml(x.quantity??"—")+'</p><p>'+escapeHtml(x.description||"")+'</p><div class="rowitem" style="flex-wrap:wrap"><button class="primary" data-listing-status="'+x.id+'" data-status="approved">موافقة / متوفر</button><button class="secondary" data-listing-status="'+x.id+'" data-status="sold_out">نفذت الكمية</button><button class="danger" data-listing-status="'+x.id+'" data-status="rejected">رفض</button><button class="danger" data-listing-delete="'+x.id+'">حذف المنتج</button></div></div>').join(""):'<div class="panel empty">لا توجد إعلانات.</div>';
+  $("adminListingsList").innerHTML=listings.length?listings.map(x=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(x.title||"إعلان")+'</strong><span class="badge">'+escapeHtml(x.status==="sold_out"?"نفذت الكمية":x.status==="approved"?"معروض":x.status==="rejected"?"مرفوض":"قيد المراجعة")+'</span></div>'+(x.imageData?'<img src="'+escapeHtml(x.imageData)+'" alt="" style="width:100%;max-height:150px;object-fit:contain;border-radius:10px">':'')+'<p class="muted">'+escapeHtml(x.section||"")+' · '+escapeHtml(x.priceIQD??"—")+' د.ع · الكمية: '+escapeHtml(x.quantity??"—")+'</p><p>'+escapeHtml(x.description||"")+'</p><div class="rowitem" style="flex-wrap:wrap"><button class="primary" data-listing-status="'+x.id+'" data-status="approved">موافقة / متوفر</button><button class="secondary" data-listing-status="'+x.id+'" data-status="sold_out">نفذت الكمية</button><button class="secondary" data-listing-status="'+x.id+'" data-status="sold">مباع</button><button class="secondary" data-listing-edit="'+x.id+'">تعديل</button><button class="danger" data-listing-status="'+x.id+'" data-status="rejected">رفض</button><button class="danger" data-listing-delete="'+x.id+'">حذف المنتج</button></div></div>').join(""):'<div class="panel empty">لا توجد إعلانات.</div>';
   $("adminUsersList").innerHTML=users.length?users.map(u=>'<div class="panel"><div class="rowitem"><strong>'+escapeHtml(u.nickname||u.displayName||"عميل")+'</strong><span class="badge ok">حساب مسجل</span></div><p class="muted">اسم المستخدم: '+escapeHtml(u.username||"غير محدد")+' · البريد: '+escapeHtml(u.email||"غير مسجل")+'</p><small class="muted">تاريخ التسجيل: '+escapeHtml(formatAdminDate(u.createdAt))+'<br>معرّف الحساب: '+escapeHtml(u.id)+'</small></div>').join(""):'<div class="panel empty">لا توجد حسابات مسجلة بعد.</div>';
   $("adminFeedbackList").innerHTML=feedback.length?feedback.map(x=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(x.type==="complaint"?"شكوى":"اقتراح")+' · '+escapeHtml(x.subject||"بدون عنوان")+'</strong><span class="badge '+(x.status==="resolved"?"ok":"")+'">'+escapeHtml(x.status==="resolved"?"تمت المعالجة":"بانتظار المراجعة")+'</span></div><p>'+escapeHtml(x.message||"")+'</p><small class="muted">المستخدم: '+escapeHtml(x.nickname||x.uid||"—")+' · '+escapeHtml(formatAdminDate(x.createdAt))+'</small><div class="rowitem" style="margin-top:10px"><button class="primary" data-feedback-status="'+x.id+'" data-status="resolved">تمت المعالجة</button><button class="secondary" data-feedback-status="'+x.id+'" data-status="pending">إعادة للمراجعة</button></div></div>').join(""):'<div class="panel empty">لا توجد اقتراحات أو شكاوى.</div>';
  }catch(e){console.error("Admin dashboard:",e);$("adminOrdersList").innerHTML='<div class="panel empty">تعذر تحميل البيانات. تحقق من نشر قواعد Firestore وصلاحية المدير.</div>'; $("adminListingsList").innerHTML="";$("adminUsersList").innerHTML="";}
@@ -774,6 +805,8 @@ $("refreshFeedbackBtn").addEventListener("click",loadMyFeedback);
 $("profileForm").addEventListener("submit",saveProfile);$("profileAvatarFile").addEventListener("change",async()=>{try{const f=$("profileAvatarFile").files[0];if(f)$("profileAvatar").src=await compressProfileImage(f);}catch(e){alert(e.message);$("profileAvatarFile").value="";}});$("openAdminBtn").addEventListener("click",loadAdminDashboard);
 $("adminBackBtn").addEventListener("click",()=>showPage("profile"));
 $("refreshAdminBtn").addEventListener("click",loadAdminDashboard);
+$("closeAdminEditListing").addEventListener("click",()=>$("adminEditListingModal").classList.add("hidden"));
+$("adminEditListingForm").addEventListener("submit",async e=>{e.preventDefault();const id=$("adminEditListingId").value,state=$("adminEditListingState"),btn=$("saveAdminEditListing");const title=$("adminEditListingTitle").value.trim(),description=$("adminEditListingDescription").value.trim(),price=Math.trunc(Number($("adminEditListingPrice").value)),quantity=Math.trunc(Number($("adminEditListingQuantity").value));if(!title||!description||!Number.isInteger(price)||price<1||!Number.isInteger(quantity)||quantity<0||quantity>99999){state.textContent="تحقق من الاسم والتفاصيل والسعر والكمية.";return;}btn.disabled=true;state.textContent="جارٍ حفظ التعديلات…";try{await db.collection("listings").doc(id).update({section:$("adminEditListingCategory").value,category:$("adminEditListingCategory").value,title,description,priceIQD:price,quantity,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});$("adminEditListingModal").classList.add("hidden");await loadAdminDashboard();await loadApprovedListings();}catch(err){console.error(err);state.textContent="تعذر حفظ التعديلات. تحقق من صلاحية المدير وقواعد Firestore.";}finally{btn.disabled=false;}});
 document.addEventListener("click",async e=>{
  const ob=e.target.closest("[data-order-status]");
  if(ob){try{await db.collection("orders").doc(ob.dataset.orderStatus).update({status:ob.dataset.status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث الطلب. تحقق من قواعد Firestore.");}}
@@ -781,6 +814,8 @@ document.addEventListener("click",async e=>{
  if(po){const next=po.dataset.status;if(!confirm(next==="confirmed"?"تأكدت من وصول المبلغ فعلياً إلى حساب التاجر؟":"هل تريد رفض طلب الشراء؟"))return;try{await db.collection("productOrders").doc(po.dataset.productOrderStatus).update({status:next,paymentStatus:next==="confirmed"?"confirmed":"rejected",updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث طلب الشراء. تحقق من قواعد Firestore.");}}
  const fb=e.target.closest("[data-feedback-status]");
  if(fb){try{await db.collection("feedback").doc(fb.dataset.feedbackStatus).update({status:fb.dataset.status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث حالة الرسالة. تحقق من قواعد Firestore.");}}
+ const le=e.target.closest("[data-listing-edit]");
+ if(le){try{const doc=await db.collection("listings").doc(le.dataset.listingEdit).get();if(!doc.exists)throw new Error("المنتج غير موجود.");const x=doc.data();$("adminEditListingId").value=doc.id;$("adminEditListingCategory").value=x.section||x.category||"other";$("adminEditListingTitle").value=x.title||"";$("adminEditListingDescription").value=x.description||"";$("adminEditListingPrice").value=Number(x.priceIQD||0);$("adminEditListingQuantity").value=Number(x.quantity||0);$("adminEditListingState").textContent="";$("adminEditListingModal").classList.remove("hidden");}catch(err){console.error(err);alert("تعذر فتح تعديل المنتج.");}}
  const lb=e.target.closest("[data-listing-status]");
  if(lb){try{await db.collection("listings").doc(lb.dataset.listingStatus).update({status:lb.dataset.status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();await loadApprovedListings();}catch(err){console.error(err);alert("تعذر تحديث الإعلان. تحقق من صلاحية المدير وقواعد Firestore.");}}
  const ld=e.target.closest("[data-listing-delete]");
