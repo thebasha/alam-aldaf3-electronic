@@ -237,6 +237,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
  <section id="cart" class="page">
   <div class="store-head"><h2>🛒 سلة مشترياتي</h2><p>هذه السلة خاصة بحسابك ولا تظهر لبقية العملاء.</p></div>
   <div id="customerCartItems" class="list"><div class="panel empty">السلة فارغة.</div></div>
+  <div class="field"><label for="cartBuyerContact">رقم هاتفك للتواصل بشأن الطلب</label><input id="cartBuyerContact" type="tel" maxlength="40" placeholder="07xxxxxxxxx" required></div>
   <div class="panel" style="margin-top:12px"><div class="rowitem"><strong>المجموع الكلي</strong><strong id="customerCartTotal">0 د.ع</strong></div>
    <button id="checkoutCustomerCart" class="primary full" type="button" style="margin-top:12px">إرسال طلب شراء السلة</button>
    <p id="customerCartState" class="muted" aria-live="polite"></p>
@@ -564,12 +565,13 @@ $("checkoutCustomerCart").addEventListener("click",async()=>{
  const user=auth.currentUser,items=getCustomerCart(),state=$("customerCartState"),btn=$("checkoutCustomerCart");
  if(!user){state.textContent="سجّل الدخول أولاً لإرسال طلب السلة.";return;}
  if(!items.length){state.textContent="السلة فارغة.";return;}
+ const buyerContact=$("cartBuyerContact").value.trim();if(buyerContact.length<7){state.textContent="أدخل رقم هاتف صحيحاً للتواصل قبل إرسال الطلب.";return;}
  btn.disabled=true;state.textContent="جارٍ التحقق من المنتجات وإرسال الطلبات…";
  try{
   const verified=[];
   for(const item of items){const snap=await db.collection("listings").doc(item.id).get();if(!snap.exists)throw new Error("أحد المنتجات لم يعد موجوداً.");const p=snap.data();if(p.status!=="approved"||!Number.isInteger(item.quantity)||item.quantity<1||item.quantity>Number(p.quantity))throw new Error("تغير توفر أحد المنتجات أو كميته. راجع السلة.");verified.push({id:item.id,p,quantity:item.quantity});}
   const batch=db.batch();
-  verified.forEach(({id,p,quantity})=>{const ref=db.collection("productOrders").doc();batch.set(ref,{buyerUid:user.uid,listingId:id,productTitle:String(p.title).slice(0,100),unitPriceIQD:p.priceIQD,quantity,totalIQD:p.priceIQD*quantity,buyerContact:"",note:"طلب من سلة المشتريات",status:"awaiting_payment",paymentStatus:"not_paid",paymentMethod:"superqi_qr_pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});});
+  verified.forEach(({id,p,quantity})=>{const ref=db.collection("productOrders").doc();batch.set(ref,{buyerUid:user.uid,listingId:id,productTitle:String(p.title).slice(0,100),unitPriceIQD:p.priceIQD,quantity,totalIQD:p.priceIQD*quantity,buyerContact:buyerContact.slice(0,40),note:"طلب من سلة المشتريات",status:"awaiting_payment",paymentStatus:"not_paid",paymentMethod:"superqi_qr_pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});});
   await batch.commit();saveCustomerCart([]);state.textContent="تم إرسال طلبات منتجات السلة إلى الإدارة. الدفع لم يتم بعد؛ انتظر تعليمات الدفع الرسمية.";renderCustomerCart();
  }catch(err){console.error("Cart checkout:",err);state.textContent=err.message||"تعذر إرسال السلة. حاول مجدداً.";}finally{btn.disabled=false;}
 });
