@@ -77,7 +77,18 @@
  </section>
  <section id="orders" class="page"><div class="section-head"><h3 data-i="myOrders">طلباتي</h3></div><div id="ordersList" class="list"></div></section>
  <section id="profile" class="page">
-  <div class="profile"><div class="service-icon">👤</div><h3 id="profileName"></h3><p class="muted" data-i="customerAccount">حساب عميل</p><button class="secondary" id="logoutBtn" data-i="logout">تسجيل الخروج</button></div>
+  <div class="profile"><img id="profileAvatar" alt="الصورة الشخصية" src="" style="width:92px;height:92px;border-radius:50%;object-fit:cover;background:#dce5ed"><h3 id="profileName"></h3><p class="muted" data-i="customerAccount">حساب عميل</p></div>
+  <div class="section-head"><h3>تعديل الملف الشخصي</h3></div>
+  <form id="profileForm" class="panel">
+   <div class="field"><label for="profileNickname">الاسم المستعار</label><input id="profileNickname" maxlength="60" placeholder="اكتب الاسم الذي يظهر للآخرين"></div>
+   <div class="field"><label for="profileUsername">اسم المستخدم (بدون مسافات)</label><input id="profileUsername" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" placeholder="username" autocomplete="username"></div>
+   <div class="field"><label for="profileAvatarFile">الصورة الشخصية</label><input id="profileAvatarFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
+   <div class="field"><label><input id="hideProfileEmail" type="checkbox" checked> إخفاء البريد الإلكتروني</label></div>
+   <div class="field"><label><input id="hideProfilePhone" type="checkbox" checked> إخفاء رقم الهاتف</label></div>
+   <p class="muted">البريد ورقم الهاتف لا يظهران للزوار في هذه النسخة. إعدادات الإخفاء تحفظ تفضيلاتك.</p>
+   <button class="primary full" id="saveProfileBtn" type="submit">حفظ التعديلات</button>
+   <p id="profileSaveState" class="muted" aria-live="polite"></p>
+  </form>
   <div class="section-head"><h3 data-i="support">الدعم الفني</h3></div><div class="panel"><p>07733661844</p><p class="muted" data-i="supportHint">اتصل بنا للاستفسار عن حالة الطلب.</p></div>
   <div class="section-head"><h3>منطقة الإدارة</h3></div><div class="panel"><p>لوحة الإدارة محمية بصلاحية المدير من Firebase.</p><button class="primary" id="openAdminBtn" type="button">فتح لوحة المدير</button><span id="adminAccessState" class="badge">جارٍ التحقق من الصلاحية</span></div>
  </section>
@@ -162,6 +173,47 @@ function resetInactivityTimer(){
  inactivityTimer=setTimeout(()=>{sessionStorage.removeItem("alam_demo_user");alert(lang==="ar"?"انتهت الجلسة بسبب عدم النشاط. سجّل الدخول مجدداً.":"Session expired due to inactivity. Please sign in again.");location.reload();},SESSION_IDLE_MS);
 }
 ["pointerdown","keydown","touchstart","scroll"].forEach(evt=>document.addEventListener(evt,resetInactivityTimer,{passive:true}));
+async function loadProfileEditor(){
+ const user=auth.currentUser;if(!user)return;
+ $("profileSaveState").textContent="جارٍ تحميل بيانات الملف الشخصي…";
+ try{const snap=await db.collection("users").doc(user.uid).get();const p=snap.exists?snap.data():{};
+  $("profileNickname").value=p.nickname||p.displayName||user.displayName||"";
+  $("profileUsername").value=p.username||"";
+  $("hideProfileEmail").checked=p.hideEmail!==false;$("hideProfilePhone").checked=p.hidePhone!==false;
+  $("profileName").textContent=p.nickname||p.displayName||p.username||"حسابي";
+  $("profileAvatar").src=p.photoData||"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23dce5ed'/%3E%3Ccircle cx='50' cy='37' r='18' fill='%237b8da0'/%3E%3Cpath d='M15 95c3-24 17-35 35-35s32 11 35 35' fill='%237b8da0'/%3E%3C/svg%3E";
+  $("profileSaveState").textContent="";
+ }catch(e){console.error(e);$("profileSaveState").textContent="تعذر تحميل الملف الشخصي.";}
+}
+async function compressProfileImage(file){
+ if(!file)return "";
+ if(!/^image\/(jpeg|png|webp)$/.test(file.type)||file.size>5*1024*1024)throw new Error("اختر صورة JPG أو PNG أو WEBP لا يتجاوز حجمها 5 ميغابايت.");
+ const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});
+ const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=data;});
+ const canvas=document.createElement("canvas");const scale=Math.min(1,320/Math.max(img.width,img.height));canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+ const out=canvas.toDataURL("image/jpeg",0.72);if(out.length>220000)throw new Error("حجم الصورة بعد الضغط كبير. اختر صورة أصغر.");return out;
+}
+async function saveProfile(e){
+ e.preventDefault();const user=auth.currentUser;if(!user)return;
+ const nickname=$("profileNickname").value.trim(),username=$("profileUsername").value.trim().toLowerCase();
+ if(!nickname||nickname.length>60){alert("أدخل اسماً مستعاراً من 1 إلى 60 حرفاً.");return;}
+ if(!/^[a-z0-9_]{3,20}$/.test(username)){alert("اسم المستخدم يجب أن يكون 3-20 حرفاً إنجليزياً أو رقماً أو _");return;}
+ const btn=$("saveProfileBtn");btn.disabled=true;$("profileSaveState").textContent="جارٍ حفظ التعديلات…";
+ try{const file=$("profileAvatarFile").files[0];const photoData=file?await compressProfileImage(file):undefined;
+  const userRef=db.collection("users").doc(user.uid),newNameRef=db.collection("usernames").doc(username);
+  await db.runTransaction(async tx=>{
+   const [profileSnap,nameSnap]=await Promise.all([tx.get(userRef),tx.get(newNameRef)]);
+   const oldName=profileSnap.exists?String(profileSnap.data().username||"").toLowerCase():"";
+   if(nameSnap.exists&&nameSnap.data().uid!==user.uid)throw new Error("اسم المستخدم مستخدم بالفعل. اختر اسماً آخر.");
+   const patch={uid:user.uid,displayName:nickname,nickname,username,hideEmail:$("hideProfileEmail").checked,hidePhone:$("hideProfilePhone").checked,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+   if(photoData)patch.photoData=photoData;if(!profileSnap.exists){patch.email=String(user.email||"");patch.createdAt=firebase.firestore.FieldValue.serverTimestamp();}
+   tx.set(userRef,patch,{merge:true});tx.set(newNameRef,{uid:user.uid,username,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+   if(oldName&&oldName!==username)tx.delete(db.collection("usernames").doc(oldName));
+  });
+  $("profileName").textContent=nickname;if(photoData)$("profileAvatar").src=photoData;$("profileSaveState").textContent="تم حفظ الملف الشخصي بنجاح.";$("profileAvatarFile").value="";
+ }catch(err){console.error(err);$("profileSaveState").textContent=err.message||"تعذر حفظ الملف الشخصي.";}
+ finally{btn.disabled=false;}
+}
 async function ensureUserProfile(user){
  try{
   const ref=db.collection("users").doc(user.uid);
@@ -173,7 +225,7 @@ async function ensureUserProfile(user){
   }
  }catch(e){console.warn("User profile sync:",e);}
 }
-async function showApp(){resetInactivityTimer();$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("nav").classList.remove("hidden");$("profileName").textContent=(auth.currentUser&&auth.currentUser.email)||"";applyLang();await checkAdminAccess();}
+async function showApp(){resetInactivityTimer();$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("nav").classList.remove("hidden");applyLang();await loadProfileEditor();await checkAdminAccess();}
 async function checkAdminAccess(){
  const btn=$("openAdminBtn"),state=$("adminAccessState");
  if(!auth.currentUser){if(btn)btn.classList.add("hidden");return false;}
@@ -211,7 +263,7 @@ async function loadAdminDashboard(){
 }
 
 function logout(){clearTimeout(inactivityTimer);auth.signOut().catch(console.error);sessionStorage.removeItem("alam_demo_user");$("appView").classList.add("hidden");$("nav").classList.add("hidden");$("loginView").classList.remove("hidden");}
-$("openAdminBtn").addEventListener("click",loadAdminDashboard);
+$("profileForm").addEventListener("submit",saveProfile);$("profileAvatarFile").addEventListener("change",async()=>{try{const f=$("profileAvatarFile").files[0];if(f)$("profileAvatar").src=await compressProfileImage(f);}catch(e){alert(e.message);$("profileAvatarFile").value="";}});$("openAdminBtn").addEventListener("click",loadAdminDashboard);
 $("adminBackBtn").addEventListener("click",()=>showPage("profile"));
 $("refreshAdminBtn").addEventListener("click",loadAdminDashboard);
 document.addEventListener("click",async e=>{
