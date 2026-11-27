@@ -51,10 +51,11 @@ service cloud.firestore {
     function validListing() {
       return request.resource.data.keys().hasOnly([
         'ownerUid', 'section', 'category', 'title', 'description', 'priceIQD',
-        'city', 'contact', 'imagePaths', 'status', 'createdAt', 'updatedAt'
+        'quantity', 'city', 'contact', 'imagePaths', 'imageData', 'location',
+        'status', 'createdAt', 'updatedAt'
       ])
       && request.resource.data.ownerUid == request.auth.uid
-      && request.resource.data.section in ['phones', 'vehicles', 'property']
+      && request.resource.data.section in ['phones', 'vehicles', 'property', 'pets', 'other']
       && request.resource.data.category is string
       && request.resource.data.category.size() <= 60
       && request.resource.data.title is string
@@ -63,13 +64,19 @@ service cloud.firestore {
       && request.resource.data.description is string
       && request.resource.data.description.size() <= 1500
       && request.resource.data.priceIQD is int
-      && request.resource.data.priceIQD >= 0
+      && request.resource.data.priceIQD > 0
+      && request.resource.data.quantity is int
+      && request.resource.data.quantity >= 1
+      && request.resource.data.quantity <= 99999
       && request.resource.data.city is string
       && request.resource.data.city.size() <= 80
       && request.resource.data.contact is string
       && request.resource.data.contact.size() <= 40
       && request.resource.data.imagePaths is list
       && request.resource.data.imagePaths.size() <= 6
+      && request.resource.data.imageData is string
+      && request.resource.data.imageData.size() <= 450000
+      && (request.resource.data.location == null || request.resource.data.location is map)
       && request.resource.data.status == 'pending'
       && request.resource.data.createdAt == request.time
       && request.resource.data.updatedAt == request.time;
