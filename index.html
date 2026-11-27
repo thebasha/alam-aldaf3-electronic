@@ -229,7 +229,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
     <button class="primary full" type="submit" id="publishListingBtn">نشر الإعلان</button><p id="listingSaveState" class="muted" aria-live="polite"></p>
    </form>
   </div>
-  <div class="notice" style="margin-top:12px">الإعلان يُحفظ محلياً، ومزامنته بين العملاء تتطلب إعداد صلاحيات Firestore الآمنة واعتماد الإدارة.</div>
+  <div class="notice" style="margin-top:12px">تُرسل الإعلانات إلى الإدارة للمراجعة، ولا تظهر للآخرين إلا بعد الموافقة.</div>
  </section>
  <section id="services" class="page">
   <div class="section-head"><h3>الأقسام الرئيسية</h3></div>
@@ -499,11 +499,21 @@ function showProductDetails(id){
 }
 $("closeProductDetail").addEventListener("click",()=>{$("productDetailModal").classList.add("hidden");$("productDetailModal").style.display="none";});
 async function compressListingImage(file){
- if(!file||!/^image\/(jpeg|png|webp)$/.test(file.type)||file.size>5*1024*1024)throw new Error("اختر صورة JPG أو PNG أو WEBP لا يتجاوز حجمها 5 ميغابايت.");
- const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});
- const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=data;});
- const canvas=document.createElement("canvas");const scale=Math.min(1,900/Math.max(img.width,img.height));canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
- const out=canvas.toDataURL("image/jpeg",0.72);if(out.length>450000)throw new Error("الصورة كبيرة بعد الضغط، اختر صورة أصغر.");return out;
+ if(!file||!/^image\/(jpeg|png|webp)$/.test(file.type))throw new Error("اختر صورة بصيغة JPG أو PNG أو WEBP.");
+ if(file.size>8*1024*1024)throw new Error("حجم الصورة الأصلي كبير؛ اختر صورة أقل من 8 ميغابايت.");
+ const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error("تعذرت قراءة الصورة."));reader.readAsDataURL(file);});
+ const img=await new Promise((resolve,reject)=>{const picture=new Image();picture.onload=()=>resolve(picture);picture.onerror=()=>reject(new Error("ملف الصورة غير صالح."));picture.src=data;});
+ const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d");
+ if(!ctx)throw new Error("تعذر تجهيز الصورة على هذا الجهاز.");
+ let scale=Math.min(1,1000/Math.max(img.width,img.height)),out="";
+ for(let attempt=0;attempt<12;attempt++){
+  canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));
+  ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  const quality=Math.max(.38,.76-attempt*.035);out=canvas.toDataURL("image/jpeg",quality);
+  if(out.length<=400000)return out;
+  scale*=.86;
+ }
+ throw new Error("تعذر تصغير الصورة إلى الحجم المسموح. اختر صورة أصغر أو التقط صورة جديدة.");
 }
 document.addEventListener("click",function(e){
  const cat=e.target.closest("[data-store-cat]");if(cat){activeStoreCategory=cat.dataset.storeCat;document.querySelectorAll("[data-store-cat]").forEach(b=>b.classList.toggle("active",b===cat));renderStore();return;}
@@ -511,17 +521,34 @@ document.addEventListener("click",function(e){
 });
 document.addEventListener("input",function(e){if(e.target&&e.target.id==="storeSearch")renderStore();});
 $("productListingForm").addEventListener("submit",async function(e){
- e.preventDefault();const btn=$("publishListingBtn"),state=$("listingSaveState");btn.disabled=true;state.textContent="جارٍ تجهيز الإعلان...";
+ e.preventDefault();
+ const btn=$("publishListingBtn"),state=$("listingSaveState");
+ if(!auth.currentUser){state.textContent="سجّل الدخول إلى حسابك أولاً ثم أعد نشر الإعلان.";return;}
+ btn.disabled=true;state.textContent="جارٍ تجهيز الصورة وإرسال الإعلان…";
  try{
   const image=await compressListingImage($("listingImage").files[0]);
-  const item={id:"PRD-"+Date.now(),uid:auth.currentUser?auth.currentUser.uid:"",location:($("listingShareLocation").checked&&$("locationSharingEnabled").checked)?pendingListingLocation:null,category:$("listingCategory").value,title:$("listingTitle").value.trim(),description:$("listingDescription").value.trim(),price:Math.max(0,Math.trunc(Number($("listingPrice").value))),quantity:Math.max(1,Math.trunc(Number($("listingQuantity").value))),image,status:"pending",createdAt:new Date().toISOString()};
-  if(!item.title||!item.description||!item.price||!item.quantity)throw new Error("أكمل جميع بيانات المنتج.");
-  const all=getLocalListings();all.unshift(item);localStorage.setItem("alam_product_listings",JSON.stringify(all.slice(0,100)));renderStore();
-  try{if(!auth.currentUser)throw new Error("no-user");await db.collection("listings").add({ownerUid:auth.currentUser.uid,section:item.category,category:item.category,title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,location:item.location||null,city:"",contact:"",imagePaths:[],status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});state.textContent="تم حفظ الإعلان وإرساله للإدارة للمراجعة.";}
-  catch(err){console.warn("Listing cloud sync:",err);state.textContent="تم حفظ الإعلان على هذا الجهاز فقط. لم تتم مزامنته مع الخادم؛ تحقق من قواعد Firestore.";}
-  $("productListingForm").reset();pendingListingLocation=null;$("listingLocationState").textContent="الموقع غير مضاف إلى الإعلان.";$("listingQuantity").value="1";
- }catch(err){state.textContent=err.message||"تعذر حفظ الإعلان.";}
- finally{btn.disabled=false;}
+  const item={id:"PRD-"+Date.now(),uid:auth.currentUser.uid,location:($("listingShareLocation").checked&&$("locationSharingEnabled").checked)?pendingListingLocation:null,category:$("listingCategory").value,title:$("listingTitle").value.trim(),description:$("listingDescription").value.trim(),price:Math.trunc(Number($("listingPrice").value)),quantity:Math.trunc(Number($("listingQuantity").value)),image,status:"pending",createdAt:new Date().toISOString()};
+  if(!item.title||!item.description||!Number.isInteger(item.price)||item.price<=0||!Number.isInteger(item.quantity)||item.quantity<1)throw new Error("تحقق من العنوان والسعر والكمية؛ يجب أن يكون السعر أكبر من صفر.");
+  let cloudSaved=false,cloudError=null;
+  try{
+   await db.collection("listings").add({ownerUid:auth.currentUser.uid,section:item.category,category:item.category,title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,location:item.location||null,city:"",contact:"",imagePaths:[],status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+   cloudSaved=true;
+  }catch(err){cloudError=err;console.error("Listing Firestore error:",err);}
+  try{
+   const all=getLocalListings();all.unshift(item);localStorage.setItem("alam_product_listings",JSON.stringify(all.slice(0,30)));renderStore();
+  }catch(storageError){console.warn("Local listing cache:",storageError);}
+  if(cloudSaved){
+   state.textContent="تم إرسال إعلانك إلى الإدارة بنجاح. سيظهر للآخرين بعد الموافقة.";
+   $("productListingForm").reset();pendingListingLocation=null;$("listingLocationState").textContent="الموقع غير مضاف إلى الإعلان.";$("listingQuantity").value="1";
+  }else{
+   const code=cloudError&&cloudError.code?cloudError.code:"unknown";
+   const detail=cloudError&&cloudError.message?cloudError.message:"تعذر الاتصال بالخادم.";
+   state.textContent="لم تتم مزامنة الإعلان مع الخادم ("+code+"): "+detail+" — بقيت نسخة على هذا الجهاز فقط. لا تحذف بيانات النموذج وأعد المحاولة بعد إصلاح الاتصال أو الصلاحيات.";
+  }
+ }catch(err){
+  console.error("Listing save:",err);
+  state.textContent=err.message||"تعذر حفظ الإعلان. تحقق من الصورة والبيانات ثم حاول مجدداً.";
+ }finally{btn.disabled=false;}
 });
 function renderServices(){
  const categoryIndices=[14,16,15,17];
