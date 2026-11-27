@@ -278,6 +278,15 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
    <button class="primary full" id="saveProfileBtn" type="submit">حفظ التعديلات</button>
    <p id="profileSaveState" class="muted" aria-live="polite"></p>
   </form>
+  <div class="section-head"><h3>الاقتراحات والشكاوى</h3></div>
+  <form id="feedbackForm" class="formbox">
+   <div class="field"><label for="feedbackType">نوع الرسالة</label><select id="feedbackType" required><option value="suggestion">اقتراح</option><option value="complaint">شكوى</option></select></div>
+   <div class="field"><label for="feedbackSubject">عنوان الرسالة</label><input id="feedbackSubject" maxlength="100" required placeholder="اكتب عنواناً مختصراً"></div>
+   <div class="field"><label for="feedbackMessage">التفاصيل</label><textarea id="feedbackMessage" maxlength="1500" required placeholder="اكتب اقتراحك أو شكواك هنا"></textarea></div>
+   <button class="primary full" id="sendFeedbackBtn" type="submit">إرسال إلى المدير</button><p id="feedbackState" class="muted" aria-live="polite"></p>
+  </form>
+  <div class="section-head"><h3>رسائلي السابقة</h3><button class="secondary" id="refreshFeedbackBtn" type="button">تحديث</button></div>
+  <div id="myFeedbackList" class="list"><div class="panel empty">لا توجد رسائل بعد.</div></div>
   <div class="section-head"><h3>معلومات عنا</h3></div>
    <div class="panel">
     <h4>عالم الدفع الإلكتروني</h4>
@@ -310,6 +319,8 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
  <div id="adminListingsList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
  <div class="section-head"><h3>العملاء المسجلون</h3></div>
  <div id="adminUsersList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
+ <div class="section-head"><h3>اقتراحات وشكاوى المستخدمين</h3></div>
+ <div id="adminFeedbackList" class="list"><div class="panel empty">جارٍ تحميل الرسائل…</div></div>
  <div class="notice" style="margin-top:14px">اعتماد الطلب هنا يغيّر حالته الإدارية فقط. لا يتم تنفيذ تحويل مالي أو شحن تلقائي. لا تعتمد أي عملية قبل التحقق من الدفع ومزود الخدمة.</div>
 </section>
 </main>
@@ -590,7 +601,7 @@ async function ensureUserProfile(user){
   }
  }catch(e){console.warn("User profile sync:",e);}
 }
-async function showApp(){resetInactivityTimer();$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("nav").classList.remove("hidden");applyLang();await loadProfileEditor();await checkAdminAccess();if(window.startAdMob)window.startAdMob();}
+async function showApp(){resetInactivityTimer();$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("nav").classList.remove("hidden");applyLang();await loadProfileEditor();await loadMyFeedback();await checkAdminAccess();if(window.startAdMob)window.startAdMob();}
 async function checkAdminAccess(){
  const btn=$("openAdminBtn"),state=$("adminAccessState");
  if(!auth.currentUser){if(btn)btn.classList.add("hidden");return false;}
@@ -602,20 +613,23 @@ async function checkAdminAccess(){
   return ok;
  }catch(e){console.error("Admin claim check:",e);if(btn)btn.classList.add("hidden");if(state){state.textContent="تعذر التحقق";state.className="badge no";}return false;}
 }
+function formatAdminDate(value){try{const d=value&&typeof value.toDate==="function"?value.toDate():null;return d?d.toLocaleString("ar-IQ"):"—";}catch{return "—";}}
 async function loadAdminDashboard(){
  const ok=await checkAdminAccess();if(!ok){alert("ليس لديك صلاحية المدير.");showPage("profile");return;}
  showPage("adminDashboard");
  $("adminOrdersList").innerHTML='<div class="panel empty">جارٍ تحميل الطلبات…</div>';
  $("adminListingsList").innerHTML='<div class="panel empty">جارٍ تحميل الإعلانات…</div>';
  try{
-  const [ordersSnap,listingsSnap,usersSnap]=await Promise.all([
+  const [ordersSnap,listingsSnap,usersSnap,feedbackSnap]=await Promise.all([
    db.collection("orders").orderBy("createdAt","desc").limit(100).get(),
    db.collection("listings").orderBy("createdAt","desc").limit(100).get(),
-   db.collection("users").limit(100).get()
+   db.collection("users").orderBy("createdAt","desc").limit(200).get(),
+   db.collection("feedback").orderBy("createdAt","desc").limit(100).get()
   ]);
   const orders=ordersSnap.docs.map(d=>({id:d.id,...d.data()}));
   const listings=listingsSnap.docs.map(d=>({id:d.id,...d.data()}));
   const users=usersSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const feedback=feedbackSnap.docs.map(d=>({id:d.id,...d.data()}));
   $("adminOrdersCount").textContent=orders.length;
   $("adminPendingCount").textContent=orders.filter(x=>x.status==="pending").length;
   $("adminListingsCount").textContent=listings.filter(x=>x.status==="pending").length;
@@ -623,17 +637,39 @@ async function loadAdminDashboard(){
   $("adminUsersCount").textContent=users.length;
   $("adminOrdersList").innerHTML=orders.length?orders.map(o=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(o.serviceId||"طلب")+'</strong><span class="badge">'+escapeHtml(o.status||"غير محدد")+'</span></div><p class="muted">العميل: '+escapeHtml(o.uid||"—")+' · المبلغ: '+escapeHtml(o.amount??"—")+' د.ع</p><p>'+escapeHtml(o.accountInfo||o.notes||"")+'</p><div class="rowitem"><button class="secondary" data-order-status="'+o.id+'" data-status="processing">قيد التنفيذ</button><button class="primary" data-order-status="'+o.id+'" data-status="completed">مكتمل</button><button class="danger" data-order-status="'+o.id+'" data-status="rejected">رفض</button></div></div>').join(""):'<div class="panel empty">لا توجد طلبات.</div>';
   $("adminListingsList").innerHTML=listings.length?listings.map(x=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(x.title||"إعلان")+'</strong><span class="badge">'+escapeHtml(x.status||"—")+'</span></div>'+(x.imageData?'<img src="'+escapeHtml(x.imageData)+'" alt="" style="width:100%;max-height:150px;object-fit:contain;border-radius:10px">':'')+'<p class="muted">'+escapeHtml(x.section||"")+' · '+escapeHtml(x.priceIQD??"—")+' د.ع · الكمية: '+escapeHtml(x.quantity??"—")+'</p><p>'+escapeHtml(x.description||"")+'</p><div class="rowitem"><button class="primary" data-listing-status="'+x.id+'" data-status="approved">موافقة</button><button class="danger" data-listing-status="'+x.id+'" data-status="rejected">رفض</button></div></div>').join(""):'<div class="panel empty">لا توجد إعلانات.</div>';
-  $("adminUsersList").innerHTML=users.length?users.map(u=>'<div class="panel"><strong>'+escapeHtml(u.displayName||"عميل")+'</strong><p class="muted">'+escapeHtml(u.email||"لا يوجد بريد مسجل")+'</p><small class="muted">معرّف الحساب: '+escapeHtml(u.id)+'</small></div>').join(""):'<div class="panel empty">لا توجد ملفات عملاء بعد.</div>';
+  $("adminUsersList").innerHTML=users.length?users.map(u=>'<div class="panel"><div class="rowitem"><strong>'+escapeHtml(u.nickname||u.displayName||"عميل")+'</strong><span class="badge ok">حساب مسجل</span></div><p class="muted">اسم المستخدم: '+escapeHtml(u.username||"غير محدد")+' · البريد: '+escapeHtml(u.email||"غير مسجل")+'</p><small class="muted">تاريخ التسجيل: '+escapeHtml(formatAdminDate(u.createdAt))+'<br>معرّف الحساب: '+escapeHtml(u.id)+'</small></div>').join(""):'<div class="panel empty">لا توجد حسابات مسجلة بعد.</div>';
+  $("adminFeedbackList").innerHTML=feedback.length?feedback.map(x=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(x.type==="complaint"?"شكوى":"اقتراح")+' · '+escapeHtml(x.subject||"بدون عنوان")+'</strong><span class="badge '+(x.status==="resolved"?"ok":"")+'">'+escapeHtml(x.status==="resolved"?"تمت المعالجة":"بانتظار المراجعة")+'</span></div><p>'+escapeHtml(x.message||"")+'</p><small class="muted">المستخدم: '+escapeHtml(x.nickname||x.uid||"—")+' · '+escapeHtml(formatAdminDate(x.createdAt))+'</small><div class="rowitem" style="margin-top:10px"><button class="primary" data-feedback-status="'+x.id+'" data-status="resolved">تمت المعالجة</button><button class="secondary" data-feedback-status="'+x.id+'" data-status="pending">إعادة للمراجعة</button></div></div>').join(""):'<div class="panel empty">لا توجد اقتراحات أو شكاوى.</div>';
  }catch(e){console.error("Admin dashboard:",e);$("adminOrdersList").innerHTML='<div class="panel empty">تعذر تحميل البيانات. تحقق من نشر قواعد Firestore وصلاحية المدير.</div>'; $("adminListingsList").innerHTML="";$("adminUsersList").innerHTML="";}
 }
 
 async function logout(){if(!confirm(lang==="ar"?"هل تريد تسجيل الخروج من التطبيق؟":"Are you sure you want to sign out?"))return;clearTimeout(inactivityTimer);try{await auth.signOut();}catch(error){console.error("Sign out:",error);alert(lang==="ar"?"تعذر تسجيل الخروج. حاول مرة أخرى.":"Sign out failed. Please try again.");}}
+async function submitFeedback(event){
+ event.preventDefault();const user=auth.currentUser;if(!user){$("feedbackState").textContent="سجّل الدخول أولاً.";return;}
+ const type=$("feedbackType").value,subject=$("feedbackSubject").value.trim(),message=$("feedbackMessage").value.trim();
+ if(!subject||!message){$("feedbackState").textContent="أكمل العنوان والتفاصيل.";return;}
+ const btn=$("sendFeedbackBtn");btn.disabled=true;$("feedbackState").textContent="جارٍ إرسال الرسالة…";
+ try{const profileSnap=await db.collection("users").doc(user.uid).get();const p=profileSnap.exists?profileSnap.data():{};
+  await db.collection("feedback").add({uid:user.uid,nickname:String(p.nickname||p.displayName||user.displayName||"مستخدم").slice(0,60),type,subject:subject.slice(0,100),message:message.slice(0,1500),status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  $("feedbackForm").reset();$("feedbackState").textContent="تم إرسال رسالتك إلى المدير.";await loadMyFeedback();
+ }catch(e){console.error("Feedback submit:",e);$("feedbackState").textContent="تعذر الإرسال إلى الخادم. تحقق من قواعد Firestore.";}
+ finally{btn.disabled=false;}
+}
+async function loadMyFeedback(){
+ const user=auth.currentUser;if(!user)return;const box=$("myFeedbackList");box.innerHTML='<div class="panel empty">جارٍ تحميل رسائلك…</div>';
+ try{const snap=await db.collection("feedback").where("uid","==",user.uid).orderBy("createdAt","desc").limit(30).get();const rows=snap.docs.map(d=>d.data());
+  box.innerHTML=rows.length?rows.map(x=>'<div class="panel"><div class="rowitem"><strong>'+escapeHtml(x.type==="complaint"?"شكوى":"اقتراح")+' · '+escapeHtml(x.subject||"")+'</strong><span class="badge '+(x.status==="resolved"?"ok":"")+'">'+escapeHtml(x.status==="resolved"?"تمت المعالجة":"قيد المراجعة")+'</span></div><p>'+escapeHtml(x.message||"")+'</p><small class="muted">'+escapeHtml(formatAdminDate(x.createdAt))+'</small></div>').join(""):'<div class="panel empty">لا توجد رسائل مرسلة بعد.</div>';
+ }catch(e){console.error(e);box.innerHTML='<div class="panel empty">تعذر تحميل الرسائل. تحقق من قواعد Firestore.</div>';}
+}
+$("feedbackForm").addEventListener("submit",submitFeedback);
+$("refreshFeedbackBtn").addEventListener("click",loadMyFeedback);
 $("profileForm").addEventListener("submit",saveProfile);$("profileAvatarFile").addEventListener("change",async()=>{try{const f=$("profileAvatarFile").files[0];if(f)$("profileAvatar").src=await compressProfileImage(f);}catch(e){alert(e.message);$("profileAvatarFile").value="";}});$("openAdminBtn").addEventListener("click",loadAdminDashboard);
 $("adminBackBtn").addEventListener("click",()=>showPage("profile"));
 $("refreshAdminBtn").addEventListener("click",loadAdminDashboard);
 document.addEventListener("click",async e=>{
  const ob=e.target.closest("[data-order-status]");
  if(ob){try{await db.collection("orders").doc(ob.dataset.orderStatus).update({status:ob.dataset.status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث الطلب. تحقق من قواعد Firestore.");}}
+ const fb=e.target.closest("[data-feedback-status]");
+ if(fb){try{await db.collection("feedback").doc(fb.dataset.feedbackStatus).update({status:fb.dataset.status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث حالة الرسالة. تحقق من قواعد Firestore.");}}
  const lb=e.target.closest("[data-listing-status]");
  if(lb){try{await db.collection("listings").doc(lb.dataset.listingStatus).update({status:lb.dataset.status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث الإعلان. تحقق من قواعد Firestore.");}}
 });
