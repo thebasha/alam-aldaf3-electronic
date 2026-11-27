@@ -153,7 +153,7 @@ document.addEventListener("click",e=>{const go=e.target.closest("[data-go]");if(
 $("closeModal").addEventListener("click",()=>{$("walletModal").classList.add("hidden");$("walletModal").style.display="none"});
 $("orderForm").addEventListener("submit",e=>{e.preventDefault();const info=$("accountInfo").value.trim();if(!info){alert(t("required"));return}saveOrder({id:"ALM-"+Date.now(),title:serviceName(currentService)+(services[currentService].subs?" · "+$("subcategory").value:""),date:new Date().toLocaleString(lang==="ar"?"ar-IQ":"en-US"),amount:$("requestAmount").value,info,notes:$("notes").value,status:"pending"});alert(t("sent"));showPage("orders");});
 $("sendWalletRequest").addEventListener("click",()=>{const amount=Number($("walletAmount").value),ref=$("walletReference").value.trim();if(!amount||amount<250||!ref){alert(t("required"));return}saveOrder({id:"ALM-"+Date.now(),title:t(walletAction),date:new Date().toLocaleString(lang==="ar"?"ar-IQ":"en-US"),amount:String(amount),info:$("walletMethod").value+" · "+ref,status:"pending"});$("walletModal").classList.add("hidden");$("walletModal").style.display="none";$("walletAmount").value="";$("walletReference").value="";alert(t("sent"));showPage("orders");});
-applyLang();if(sessionStorage.getItem("alam_demo_user"))showApp();else{$("year").textContent=new Date().getFullYear();$("langBtn").textContent=lang==="ar"?"English":"العربية";}
+applyLang();auth.onAuthStateChanged(user=>{if(user){sessionStorage.setItem("alam_demo_user",user.uid);showApp();}else{sessionStorage.removeItem("alam_demo_user");$("year").textContent=new Date().getFullYear();$("langBtn").textContent=lang==="ar"?"English":"العربية";}});
 </script>
 </body>
 </html>
