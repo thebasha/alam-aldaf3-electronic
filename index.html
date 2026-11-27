@@ -221,6 +221,10 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
     <div class="field"><label for="listingDescription">تفاصيل المنتج</label><textarea id="listingDescription" maxlength="1200" required></textarea></div>
     <div class="field"><label for="listingPrice">السعر بالدينار العراقي</label><input id="listingPrice" type="number" min="0" step="1000" required></div>
     <div class="field"><label for="listingQuantity">الكمية المتوفرة</label><input id="listingQuantity" type="number" min="1" max="99999" value="1" required></div>
+    <div class="field"><label><input id="listingShareLocation" type="checkbox"> إضافة موقعي إلى الإعلان</label></div>
+    <div class="field"><label for="listingLocationPrecision">خصوصية الموقع في هذا الإعلان</label><select id="listingLocationPrecision"><option value="exact">الموقع الدقيق</option><option value="approx">المنطقة التقريبية فقط</option></select></div>
+    <button class="secondary full" type="button" id="captureListingLocation">📍 تحديد موقعي للإعلان</button>
+    <p id="listingLocationState" class="muted" aria-live="polite">الموقع غير مضاف إلى الإعلان.</p>
     <div class="field"><label for="listingImage">صورة المنتج</label><input id="listingImage" type="file" accept="image/jpeg,image/png,image/webp" required></div>
     <button class="primary full" type="submit" id="publishListingBtn">نشر الإعلان</button><p id="listingSaveState" class="muted" aria-live="polite"></p>
    </form>
@@ -266,6 +270,10 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
    <div class="field"><label for="profileAvatarFile">الصورة الشخصية</label><input id="profileAvatarFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
    <div class="field"><label><input id="hideProfileEmail" type="checkbox" checked> إخفاء البريد الإلكتروني</label></div>
    <div class="field"><label><input id="hideProfilePhone" type="checkbox" checked> إخفاء رقم الهاتف</label></div>
+   <div class="section-head"><h3>خصوصية الموقع الجغرافي</h3></div>
+   <div class="field"><label><input id="locationSharingEnabled" type="checkbox"> تفعيل مشاركة موقعي مع إعلاناتي</label></div>
+   <div class="field"><label for="profileLocationPrecision">مستوى دقة الموقع</label><select id="profileLocationPrecision"><option value="exact">الموقع الدقيق</option><option value="approx">المنطقة التقريبية فقط</option></select></div>
+   <p class="muted">لن يُطلب موقعك إلا عند الضغط على تحديد موقعي وبعد موافقتك. يمكنك إيقاف المشاركة في أي وقت.</p>
    <p class="muted">البريد ورقم الهاتف لا يظهران للزوار في هذه النسخة. إعدادات الإخفاء تحفظ تفضيلاتك.</p>
    <button class="primary full" id="saveProfileBtn" type="submit">حفظ التعديلات</button>
    <p id="profileSaveState" class="muted" aria-live="polite"></p>
@@ -311,6 +319,8 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <img id="productDetailImage" alt="صورة المنتج" style="width:100%;max-height:260px;object-fit:contain;border-radius:14px;background:#061a35">
   <p id="productDetailDescription"></p><div class="rowitem"><strong>السعر</strong><strong id="productDetailPrice"></strong></div>
   <div class="rowitem" style="margin-top:10px"><strong>الكمية المتوفرة</strong><strong id="productDetailQuantity"></strong></div>
+  <p id="productDetailLocation" class="muted"></p>
+  <a id="productDetailMapLink" class="secondary full hidden" style="display:block;text-align:center;text-decoration:none;margin-top:10px;padding:12px;border-radius:12px" target="_blank" rel="noopener noreferrer">📍 عرض موقع الناشر على الخريطة</a>
  </div>
 </div>
 <div id="walletModal" class="hidden" style="position:fixed;inset:0;background:#07182dcc;z-index:10;display:grid;place-items:center;padding:18px">
@@ -420,6 +430,37 @@ const providerCatalog=[
  {name:"GS",alt:"GS",cat:"cards",icon:"GS"}
 ];
 function getLocalListings(){try{return JSON.parse(localStorage.getItem("alam_product_listings")||"[]")}catch{return []}}
+let pendingListingLocation=null;
+function getBrowserLocation(){
+ return new Promise((resolve,reject)=>{
+  if(!navigator.geolocation){reject(new Error("خدمة تحديد الموقع غير متاحة على هذا الجهاز."));return;}
+  navigator.geolocation.getCurrentPosition(
+   p=>resolve({lat:p.coords.latitude,lng:p.coords.longitude}),
+   e=>reject(new Error(e.code===1?"لم تسمح بالوصول إلى الموقع. فعّل الإذن من إعدادات المتصفح.":e.code===2?"تعذر تحديد الموقع حالياً.":"انتهت مهلة تحديد الموقع.")),
+   {enableHighAccuracy:true,timeout:15000,maximumAge:0}
+  );
+ });
+}
+function applyLocationPrecision(coords,precision){
+ if(precision==="approx")return {lat:Number(coords.lat.toFixed(2)),lng:Number(coords.lng.toFixed(2)),precision:"approx"};
+ return {lat:coords.lat,lng:coords.lng,precision:"exact"};
+}
+$("captureListingLocation").addEventListener("click",async()=>{
+ const state=$("listingLocationState"),btn=$("captureListingLocation");
+ if(!$("listingShareLocation").checked){state.textContent="فعّل خيار إضافة موقعي أولاً.";return;}
+ btn.disabled=true;state.textContent="جارٍ تحديد موقعك…";
+ try{const coords=await getBrowserLocation();pendingListingLocation=applyLocationPrecision(coords,$("listingLocationPrecision").value);state.textContent=pendingListingLocation.precision==="exact"?"تم تحديد موقعك الدقيق لهذا الإعلان.":"تم تحديد المنطقة التقريبية لهذا الإعلان.";}
+ catch(e){pendingListingLocation=null;state.textContent=e.message;}
+ finally{btn.disabled=false;}
+});
+$("listingShareLocation").addEventListener("change",e=>{
+ if(!e.target.checked){pendingListingLocation=null;$("listingLocationState").textContent="لن تتم مشاركة موقعك في هذا الإعلان.";}
+ else $("listingLocationState").textContent="اضغط «تحديد موقعي» لإضافته بعد موافقتك.";
+});
+$("listingLocationPrecision").addEventListener("change",()=>{pendingListingLocation=null;if($("listingShareLocation").checked)$("listingLocationState").textContent="تغير مستوى الدقة؛ أعد تحديد الموقع لتطبيق الاختيار الجديد.";});
+$("locationSharingEnabled").addEventListener("change",e=>{
+ if(!e.target.checked){$("listingShareLocation").checked=false;pendingListingLocation=null;$("listingLocationState").textContent="مشاركة الموقع متوقفة من إعدادات حسابك.";}
+});
 function renderStore(){
  const q=(($("storeSearch")&&$("storeSearch").value)||"").trim().toLowerCase();
  const providers=providerCatalog.filter(x=>(activeStoreCategory==="all"||x.cat===activeStoreCategory)&&(!q||(x.name+" "+x.alt).toLowerCase().includes(q)));
@@ -435,6 +476,12 @@ function showProductDetails(id){
  $("productDetailDescription").textContent=x.description;
  $("productDetailPrice").textContent=Number(x.price).toLocaleString("en-US")+" د.ع";
  $("productDetailQuantity").textContent=String(x.quantity);
+ const mapLink=$("productDetailMapLink"),locText=$("productDetailLocation");
+ if(x.location&&Number.isFinite(x.location.lat)&&Number.isFinite(x.location.lng)){
+  const url="https://www.google.com/maps?q="+encodeURIComponent(x.location.lat+","+x.location.lng);
+  mapLink.href=url;mapLink.classList.remove("hidden");
+  locText.textContent=x.location.precision==="exact"?"موقع الناشر الدقيق (بموافقته)":"موقع تقريبي للمنطقة فقط";
+ }else{mapLink.classList.add("hidden");mapLink.removeAttribute("href");locText.textContent="لم يشارك الناشر موقعه.";}
  $("productDetailModal").classList.remove("hidden");$("productDetailModal").style.display="grid";
 }
 $("closeProductDetail").addEventListener("click",()=>{$("productDetailModal").classList.add("hidden");$("productDetailModal").style.display="none";});
@@ -454,12 +501,12 @@ $("productListingForm").addEventListener("submit",async function(e){
  e.preventDefault();const btn=$("publishListingBtn"),state=$("listingSaveState");btn.disabled=true;state.textContent="جارٍ تجهيز الإعلان...";
  try{
   const image=await compressListingImage($("listingImage").files[0]);
-  const item={id:"PRD-"+Date.now(),uid:auth.currentUser?auth.currentUser.uid:"",category:$("listingCategory").value,title:$("listingTitle").value.trim(),description:$("listingDescription").value.trim(),price:Math.max(0,Math.trunc(Number($("listingPrice").value))),quantity:Math.max(1,Math.trunc(Number($("listingQuantity").value))),image,status:"pending",createdAt:new Date().toISOString()};
+  const item={id:"PRD-"+Date.now(),uid:auth.currentUser?auth.currentUser.uid:"",location:($("listingShareLocation").checked&&$("locationSharingEnabled").checked)?pendingListingLocation:null,category:$("listingCategory").value,title:$("listingTitle").value.trim(),description:$("listingDescription").value.trim(),price:Math.max(0,Math.trunc(Number($("listingPrice").value))),quantity:Math.max(1,Math.trunc(Number($("listingQuantity").value))),image,status:"pending",createdAt:new Date().toISOString()};
   if(!item.title||!item.description||!item.price||!item.quantity)throw new Error("أكمل جميع بيانات المنتج.");
   const all=getLocalListings();all.unshift(item);localStorage.setItem("alam_product_listings",JSON.stringify(all.slice(0,100)));renderStore();
-  try{if(!auth.currentUser)throw new Error("no-user");await db.collection("listings").add({uid:auth.currentUser.uid,section:item.category,title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});state.textContent="تم حفظ الإعلان وإرساله للإدارة للمراجعة.";}
+  try{if(!auth.currentUser)throw new Error("no-user");await db.collection("listings").add({uid:auth.currentUser.uid,section:item.category,title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,location:item.location||null,status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});state.textContent="تم حفظ الإعلان وإرساله للإدارة للمراجعة.";}
   catch(err){console.warn("Listing cloud sync:",err);state.textContent="تم حفظ الإعلان على هذا الجهاز فقط. لم تتم مزامنته مع الخادم؛ تحقق من قواعد Firestore.";}
-  $("productListingForm").reset();$("listingQuantity").value="1";
+  $("productListingForm").reset();pendingListingLocation=null;$("listingLocationState").textContent="الموقع غير مضاف إلى الإعلان.";$("listingQuantity").value="1";
  }catch(err){state.textContent=err.message||"تعذر حفظ الإعلان.";}
  finally{btn.disabled=false;}
 });
@@ -496,6 +543,8 @@ async function loadProfileEditor(){
   $("profileUsername").value=p.username||"";
   $("hideProfileEmail").checked=p.hideEmail!==false;$("hideProfilePhone").checked=p.hidePhone!==false;
   $("profileName").textContent=p.nickname||p.displayName||p.username||"حسابي";
+  $("locationSharingEnabled").checked=p.locationSharingEnabled===true;
+  $("profileLocationPrecision").value=p.locationPrecision==="approx"?"approx":"exact";
   $("profileAvatar").src=p.photoData||"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23dce5ed'/%3E%3Ccircle cx='50' cy='37' r='18' fill='%237b8da0'/%3E%3Cpath d='M15 95c3-24 17-35 35-35s32 11 35 35' fill='%237b8da0'/%3E%3C/svg%3E";
   $("profileSaveState").textContent="";
  }catch(e){console.error(e);$("profileSaveState").textContent="تعذر تحميل الملف الشخصي.";}
@@ -520,7 +569,7 @@ async function saveProfile(e){
    const [profileSnap,nameSnap]=await Promise.all([tx.get(userRef),tx.get(newNameRef)]);
    const oldName=profileSnap.exists?String(profileSnap.data().username||"").toLowerCase():"";
    if(nameSnap.exists&&nameSnap.data().uid!==user.uid)throw new Error("اسم المستخدم مستخدم بالفعل. اختر اسماً آخر.");
-   const patch={uid:user.uid,displayName:nickname,nickname,username,hideEmail:$("hideProfileEmail").checked,hidePhone:$("hideProfilePhone").checked,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+   const patch={uid:user.uid,displayName:nickname,nickname,username,hideEmail:$("hideProfileEmail").checked,hidePhone:$("hideProfilePhone").checked,locationSharingEnabled:$("locationSharingEnabled").checked,locationPrecision:$("profileLocationPrecision").value,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
    if(photoData)patch.photoData=photoData;if(!profileSnap.exists){patch.email=String(user.email||"");patch.createdAt=firebase.firestore.FieldValue.serverTimestamp();}
    tx.set(userRef,patch,{merge:true});tx.set(newNameRef,{uid:user.uid,username,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
    if(oldName&&oldName!==username)tx.delete(db.collection("usernames").doc(oldName));
