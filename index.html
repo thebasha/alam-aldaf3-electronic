@@ -79,8 +79,21 @@
  <section id="profile" class="page">
   <div class="profile"><div class="service-icon">👤</div><h3 id="profileName"></h3><p class="muted" data-i="customerAccount">حساب عميل</p><button class="secondary" id="logoutBtn" data-i="logout">تسجيل الخروج</button></div>
   <div class="section-head"><h3 data-i="support">الدعم الفني</h3></div><div class="panel"><p>07733661844</p><p class="muted" data-i="supportHint">اتصل بنا للاستفسار عن حالة الطلب.</p></div>
-  <div class="section-head"><h3 data-i="adminArea">منطقة الإدارة</h3></div><div class="panel"><p data-i="adminLocked">لوحة الإدارة مخصصة للحسابات التي تم التحقق من صلاحيتها على الخادم.</p><span class="badge" data-i="notAuthorized">غير متاحة لهذا الحساب</span></div>
+  <div class="section-head"><h3>منطقة الإدارة</h3></div><div class="panel"><p>لوحة الإدارة محمية بصلاحية المدير من Firebase.</p><button class="primary" id="openAdminBtn" type="button">فتح لوحة المدير</button><span id="adminAccessState" class="badge">جارٍ التحقق من الصلاحية</span></div>
  </section>
+<section id="adminDashboard" class="page">
+ <div class="rowitem"><h2>لوحة تحكم المدير</h2><button class="smalllink" id="adminBackBtn" type="button">رجوع</button></div>
+ <div class="grid">
+  <div class="panel"><small class="muted">إجمالي الطلبات</small><h2 id="adminOrdersCount">—</h2></div>
+  <div class="panel"><small class="muted">طلبات قيد المراجعة</small><h2 id="adminPendingCount">—</h2></div>
+  <div class="panel"><small class="muted">الإعلانات قيد المراجعة</small><h2 id="adminListingsCount">—</h2></div>
+ </div>
+ <div class="section-head"><h3>طلبات العملاء</h3><button class="secondary" id="refreshAdminBtn" type="button">تحديث</button></div>
+ <div id="adminOrdersList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
+ <div class="section-head"><h3>الإعلانات للمراجعة</h3></div>
+ <div id="adminListingsList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
+ <div class="notice" style="margin-top:14px">اعتماد الطلب هنا يغيّر حالته الإدارية فقط. لا يتم تنفيذ تحويل مالي أو شحن تلقائي. لا تعتمد أي عملية قبل التحقق من الدفع ومزود الخدمة.</div>
+</section>
 </main>
 <div id="walletModal" class="hidden" style="position:fixed;inset:0;background:#07182dcc;z-index:10;display:grid;place-items:center;padding:18px">
  <div class="formbox" style="width:min(440px,100%)"><div class="rowitem"><h3 id="walletModalTitle"></h3><button class="smalllink" id="closeModal">✕</button></div>
@@ -145,8 +158,48 @@ function resetInactivityTimer(){
  inactivityTimer=setTimeout(()=>{sessionStorage.removeItem("alam_demo_user");alert(lang==="ar"?"انتهت الجلسة بسبب عدم النشاط. سجّل الدخول مجدداً.":"Session expired due to inactivity. Please sign in again.");location.reload();},SESSION_IDLE_MS);
 }
 ["pointerdown","keydown","touchstart","scroll"].forEach(evt=>document.addEventListener(evt,resetInactivityTimer,{passive:true}));
-function showApp(){resetInactivityTimer();$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("nav").classList.remove("hidden");$("profileName").textContent=(auth.currentUser&&auth.currentUser.email)||"";applyLang();}
+async function showApp(){resetInactivityTimer();$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("nav").classList.remove("hidden");$("profileName").textContent=(auth.currentUser&&auth.currentUser.email)||"";applyLang();await checkAdminAccess();}
+async function checkAdminAccess(){
+ const btn=$("openAdminBtn"),state=$("adminAccessState");
+ if(!auth.currentUser){if(btn)btn.classList.add("hidden");return false;}
+ try{
+  const token=await auth.currentUser.getIdTokenResult(true);
+  const ok=token.claims.admin===true;
+  if(btn)btn.classList.toggle("hidden",!ok);
+  if(state){state.textContent=ok?"مدير معتمد":"حساب عميل";state.className=ok?"badge ok":"badge no";}
+  return ok;
+ }catch(e){console.error("Admin claim check:",e);if(btn)btn.classList.add("hidden");if(state){state.textContent="تعذر التحقق";state.className="badge no";}return false;}
+}
+async function loadAdminDashboard(){
+ const ok=await checkAdminAccess();if(!ok){alert("ليس لديك صلاحية المدير.");showPage("profile");return;}
+ showPage("adminDashboard");
+ $("adminOrdersList").innerHTML='<div class="panel empty">جارٍ تحميل الطلبات…</div>';
+ $("adminListingsList").innerHTML='<div class="panel empty">جارٍ تحميل الإعلانات…</div>';
+ try{
+  const [ordersSnap,listingsSnap]=await Promise.all([
+   db.collection("orders").orderBy("createdAt","desc").limit(100).get(),
+   db.collection("listings").orderBy("createdAt","desc").limit(100).get()
+  ]);
+  const orders=ordersSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const listings=listingsSnap.docs.map(d=>({id:d.id,...d.data()}));
+  $("adminOrdersCount").textContent=orders.length;
+  $("adminPendingCount").textContent=orders.filter(x=>x.status==="pending").length;
+  $("adminListingsCount").textContent=listings.filter(x=>x.status==="pending").length;
+  $("adminOrdersList").innerHTML=orders.length?orders.map(o=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(o.serviceId||"طلب")+'</strong><span class="badge">'+escapeHtml(o.status||"غير محدد")+'</span></div><p class="muted">العميل: '+escapeHtml(o.uid||"—")+' · المبلغ: '+escapeHtml(o.amount??"—")+' د.ع</p><p>'+escapeHtml(o.accountInfo||o.notes||"")+'</p><div class="rowitem"><button class="secondary" data-order-status="'+o.id+'" data-status="processing">قيد التنفيذ</button><button class="primary" data-order-status="'+o.id+'" data-status="completed">مكتمل</button><button class="danger" data-order-status="'+o.id+'" data-status="rejected">رفض</button></div></div>').join(""):'<div class="panel empty">لا توجد طلبات.</div>';
+  $("adminListingsList").innerHTML=listings.length?listings.map(x=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(x.title||"إعلان")+'</strong><span class="badge">'+escapeHtml(x.status||"—")+'</span></div><p class="muted">'+escapeHtml(x.section||"")+' · '+escapeHtml(x.city||"")+' · '+escapeHtml(x.priceIQD??"—")+' د.ع</p><p>'+escapeHtml(x.description||"")+'</p><div class="rowitem"><button class="primary" data-listing-status="'+x.id+'" data-status="approved">موافقة</button><button class="danger" data-listing-status="'+x.id+'" data-status="rejected">رفض</button></div></div>').join(""):'<div class="panel empty">لا توجد إعلانات.</div>';
+ }catch(e){console.error("Admin dashboard:",e);$("adminOrdersList").innerHTML='<div class="panel empty">تعذر تحميل البيانات. تحقق من نشر قواعد Firestore وصلاحية المدير.</div>'; $("adminListingsList").innerHTML="";}
+}
+
 function logout(){clearTimeout(inactivityTimer);auth.signOut().catch(console.error);sessionStorage.removeItem("alam_demo_user");$("appView").classList.add("hidden");$("nav").classList.add("hidden");$("loginView").classList.remove("hidden");}
+$("openAdminBtn").addEventListener("click",loadAdminDashboard);
+$("adminBackBtn").addEventListener("click",()=>showPage("profile"));
+$("refreshAdminBtn").addEventListener("click",loadAdminDashboard);
+document.addEventListener("click",async e=>{
+ const ob=e.target.closest("[data-order-status]");
+ if(ob){try{await db.collection("orders").doc(ob.dataset.orderStatus).update({status:ob.dataset.status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث الطلب. تحقق من قواعد Firestore.");}}
+ const lb=e.target.closest("[data-listing-status]");
+ if(lb){try{await db.collection("listings").doc(lb.dataset.listingStatus).update({status:lb.dataset.status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadAdminDashboard();}catch(err){console.error(err);alert("تعذر تحديث الإعلان. تحقق من قواعد Firestore.");}}
+});
 $("loginBtn").addEventListener("click",login);$("password").addEventListener("keydown",e=>{if(e.key==="Enter")login()});$("logoutBtn").addEventListener("click",logout);
 $("langBtn").addEventListener("click",()=>{lang=lang==="ar"?"en":"ar";localStorage.setItem("alam_lang",lang);applyLang();});
 document.addEventListener("click",e=>{const go=e.target.closest("[data-go]");if(go)showPage(go.dataset.go);const wa=e.target.closest("[data-wallet]");if(wa){walletAction=wa.dataset.wallet;$("walletModalTitle").textContent=walletAction==="deposit"?t("depositTitle"):t("withdrawTitle");$("walletModal").classList.remove("hidden");$("walletModal").style.display="grid";}});
