@@ -2,7 +2,7 @@ import { Capacitor } from '@capacitor/core';
 import { AdMob, AdmobConsentStatus, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
 
 let started = false;
-const TEST_BANNER_ANDROID = 'ca-app-pub-3940256099942544/6300978111';
+const BANNER_ANDROID = 'ca-app-pub-8770009560907706/7464182655';
 
 async function startAdMob() {
   if (started || !Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') return;
@@ -14,14 +14,14 @@ async function startAdMob() {
     if (!consent.canRequestAds) return;
     await AdMob.initialize();
     await AdMob.showBanner({
-      adId: TEST_BANNER_ANDROID,
+      adId: BANNER_ANDROID,
       adSize: BannerAdSize.ADAPTIVE_BANNER,
       position: BannerAdPosition.BOTTOM_CENTER,
       margin: 62,
       isTesting: true
     });
     started = true;
-    console.info('AdMob test banner initialized.');
+    console.info('AdMob banner initialized in test mode.');
   } catch (error) {
     console.warn('AdMob is not ready:', error);
   }
