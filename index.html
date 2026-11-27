@@ -216,7 +216,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <div class="store-grid" id="storeGrid"></div>
   <div class="panel" style="margin-top:16px"><h3>إضافة منتج أو إعلان جديد</h3>
    <form id="productListingForm">
-    <div class="field"><label for="listingCategory">القسم</label><select id="listingCategory" required><option value="phones">هواتف وإكسسوارات</option><option value="property">عقارات ومنازل</option><option value="vehicles">دراجات وسيارات</option><option value="pets">طيور الزينة والحيوانات الأليفة</option></select></div>
+    <div class="field"><label for="listingCategory">القسم</label><select id="listingCategory" required><option value="phones">هواتف وإكسسوارات</option><option value="property">عقارات ومنازل</option><option value="vehicles">دراجات وسيارات</option><option value="pets">طيور الزينة والحيوانات الأليفة</option><option value="other">منتجات وأغراض أخرى</option></select></div>
     <div class="field"><label for="listingTitle">اسم المنتج / عنوان الإعلان</label><input id="listingTitle" maxlength="90" required></div>
     <div class="field"><label for="listingDescription">تفاصيل المنتج</label><textarea id="listingDescription" maxlength="1200" required></textarea></div>
     <div class="field"><label for="listingPrice">السعر بالدينار العراقي</label><input id="listingPrice" type="number" min="0" step="1000" required></div>
@@ -396,7 +396,7 @@ const services=[
 let lang=localStorage.getItem("alam_lang")||"ar", currentService=0, walletAction="deposit";
 const $=id=>document.getElementById(id);
 const t=key=>translations[lang][key]||key;
-function applyLang(){document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";$("langBtn").textContent=lang==="ar"?"English":"العربية";document.querySelectorAll("[data-i]").forEach(el=>{const k=el.dataset.i;if(translations[lang][k])el.textContent=t(k)});renderServices();renderStore();renderOrders();$("year").textContent=new Date().getFullYear();$("username").placeholder=t("username");$("password").placeholder=t("password");}
+function applyLang(){document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";$("langBtn").textContent=lang==="ar"?"English":"العربية";document.querySelectorAll("[data-i]").forEach(el=>{const k=el.dataset.i;if(translations[lang][k])el.textContent=t(k)});renderServices();renderStore();loadApprovedListings();renderOrders();$("year").textContent=new Date().getFullYear();$("username").placeholder=t("username");$("password").placeholder=t("password");}
 function serviceName(i){return translations[lang].serviceNames[i]}
 function serviceDesc(i){return translations[lang].serviceDescs[i]}
 let activeStoreCategory="all";
@@ -473,17 +473,18 @@ $("listingLocationPrecision").addEventListener("change",()=>{pendingListingLocat
 $("locationSharingEnabled").addEventListener("change",e=>{
  if(!e.target.checked){$("listingShareLocation").checked=false;pendingListingLocation=null;$("listingLocationState").textContent="مشاركة الموقع متوقفة من إعدادات حسابك.";}
 });
+async function loadApprovedListings(){try{const snap=await db.collection("listings").where("status","==","approved").limit(100).get();window.__approvedListings=snap.docs.map(d=>{const x=d.data();return {id:d.id,uid:x.ownerUid||"",category:x.section||x.category||"other",title:x.title||"",description:x.description||"",price:Number(x.priceIQD||0),quantity:Number(x.quantity||1),image:x.imageData||"",location:x.location||null,status:x.status};}).filter(x=>x.image);renderStore();}catch(e){console.warn("Public listings unavailable:",e);}}
 function renderStore(){
  const q=(($("storeSearch")&&$("storeSearch").value)||"").trim().toLowerCase();
  const providers=providerCatalog.filter(x=>(activeStoreCategory==="all"||x.cat===activeStoreCategory)&&(!q||(x.name+" "+x.alt).toLowerCase().includes(q)));
  $("providerGrid").innerHTML=providers.length?providers.map(x=>'<div class="store-item"><div class="store-logo">'+escapeHtml(x.icon)+'</div><strong>'+escapeHtml(x.name)+'</strong><small>'+escapeHtml(x.alt)+'</small></div>').join(""):'<div class="store-empty">لا توجد نتائج مطابقة لبحثك.</div>';
  $("storeCount").textContent=providers.length+" مزود خدمة";
- const listings=getLocalListings().filter(x=>!q||(x.title+" "+x.description).toLowerCase().includes(q));
+ const localListings=getLocalListings();const cloudListings=window.__approvedListings||[];const listings=[...cloudListings,...localListings].filter((x,i,a)=>a.findIndex(y=>y.id===x.id)===i).filter(x=>!q||(x.title+" "+x.description).toLowerCase().includes(q));
  $("storeGrid").innerHTML=listings.length?listings.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:125px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · الكمية: '+Number(x.quantity)+'</small></button>').join(""):'<div class="store-empty">لا توجد إعلانات عملاء مطابقة حالياً.</div>';
  $("listingCount").textContent=listings.length+" إعلان";
 }
 function showProductDetails(id){
- const x=getLocalListings().find(p=>p.id===id);if(!x)return;
+ const x=[...(window.__approvedListings||[]),...getLocalListings()].find(p=>p.id===id);if(!x)return;
  $("productDetailTitle").textContent=x.title;$("productDetailImage").src=x.image;
  $("productDetailDescription").textContent=x.description;
  $("productDetailPrice").textContent=Number(x.price).toLocaleString("en-US")+" د.ع";
@@ -516,7 +517,7 @@ $("productListingForm").addEventListener("submit",async function(e){
   const item={id:"PRD-"+Date.now(),uid:auth.currentUser?auth.currentUser.uid:"",location:($("listingShareLocation").checked&&$("locationSharingEnabled").checked)?pendingListingLocation:null,category:$("listingCategory").value,title:$("listingTitle").value.trim(),description:$("listingDescription").value.trim(),price:Math.max(0,Math.trunc(Number($("listingPrice").value))),quantity:Math.max(1,Math.trunc(Number($("listingQuantity").value))),image,status:"pending",createdAt:new Date().toISOString()};
   if(!item.title||!item.description||!item.price||!item.quantity)throw new Error("أكمل جميع بيانات المنتج.");
   const all=getLocalListings();all.unshift(item);localStorage.setItem("alam_product_listings",JSON.stringify(all.slice(0,100)));renderStore();
-  try{if(!auth.currentUser)throw new Error("no-user");await db.collection("listings").add({uid:auth.currentUser.uid,section:item.category,title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,location:item.location||null,status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});state.textContent="تم حفظ الإعلان وإرساله للإدارة للمراجعة.";}
+  try{if(!auth.currentUser)throw new Error("no-user");await db.collection("listings").add({ownerUid:auth.currentUser.uid,section:item.category,category:item.category,title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,location:item.location||null,city:"",contact:"",imagePaths:[],status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});state.textContent="تم حفظ الإعلان وإرساله للإدارة للمراجعة.";}
   catch(err){console.warn("Listing cloud sync:",err);state.textContent="تم حفظ الإعلان على هذا الجهاز فقط. لم تتم مزامنته مع الخادم؛ تحقق من قواعد Firestore.";}
   $("productListingForm").reset();pendingListingLocation=null;$("listingLocationState").textContent="الموقع غير مضاف إلى الإعلان.";$("listingQuantity").value="1";
  }catch(err){state.textContent=err.message||"تعذر حفظ الإعلان.";}
