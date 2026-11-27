@@ -75,6 +75,20 @@ body:has(#appView:not(.hidden)) .muted{color:#adc2d9}
 @media(min-width:700px){body:has(#appView:not(.hidden)) .grid{grid-template-columns:repeat(4,minmax(0,1fr))}.home-showcase{min-height:180px}.showcase-orbit{font-size:100px}.showcase-copy{margin-right:125px}}
 @media(max-width:380px){.showcase-orbit{font-size:58px}.showcase-copy{margin-right:72px}.showcase-copy h2{font-size:19px}.home-promo strong{font-size:14px}}
 
+
+/* Compact four-item navigation and lighter mobile UI */
+.navinner{max-width:560px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));}
+.nav button{min-width:62px;gap:3px;padding:5px 8px;font-size:10px;}
+.nav button span{font-size:16px;line-height:18px;}
+.nav button b{font-size:10px;font-weight:600;}
+body:has(#appView:not(.hidden)) .service{min-height:112px;padding:10px 8px;}
+body:has(#appView:not(.hidden)) .service-icon{width:42px;height:42px;margin:0 auto 8px;border-radius:12px;font-size:21px;}
+body:has(#appView:not(.hidden)) .service strong{font-size:12px;}
+body:has(#appView:not(.hidden)) .grid{gap:9px;}
+button,.service,.panel{-webkit-tap-highlight-color:transparent;}
+button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important;}}
+
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -219,12 +233,11 @@ body:has(#appView:not(.hidden)) .muted{color:#adc2d9}
  <div class="field"><label data-i="phoneRef">رقم الهاتف أو مرجع العملية</label><input id="walletReference" maxlength="120"></div>
  <button class="primary full" id="sendWalletRequest" data-i="sendRequest">إرسال الطلب</button></div>
 </div>
-<nav id="nav" class="nav hidden"><div class="navinner">
- <button class="active" data-go="home" type="button" onclick="showPage('home')"><span>⌂</span><b data-i="home">الرئيسية</b></button>
- <button data-go="services"><span>▦</span><b data-i="services">الخدمات</b></button>
- <button data-go="wallet"><span>▣</span><b data-i="wallet">المحفظة</b></button>
- <button data-go="orders"><span>☷</span><b data-i="orders">طلباتي</b></button>
- <button data-go="profile" type="button" onclick="showPage('profile')"><span>♙</span><b data-i="profile">حسابي</b></button>
+<nav id="nav" class="nav hidden" aria-label="التنقل الرئيسي"><div class="navinner">
+ <button class="active" data-go="home" type="button"><span aria-hidden="true">⌂</span><b data-i="home">الرئيسية</b></button>
+ <button data-go="services" type="button"><span aria-hidden="true">▦</span><b data-i="services">الخدمات</b></button>
+ <button data-go="orders" type="button"><span aria-hidden="true">☷</span><b data-i="orders">طلباتي</b></button>
+ <button data-go="profile" type="button"><span aria-hidden="true">♙</span><b data-i="profile">حسابي</b></button>
 </div></nav>
 <div class="footer">© <span id="year"></span> Alam Electronic Payment</div>
 </div>
