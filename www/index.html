@@ -663,18 +663,18 @@ $("productListingForm").addEventListener("submit",async function(e){
  btn.disabled=true;state.textContent="جارٍ تجهيز الصورة وإرسال الإعلان…";
  try{
   const image=await compressListingImage($("listingImage").files[0]);
-  const item={id:"PRD-"+Date.now(),uid:auth.currentUser.uid,location:($("listingShareLocation").checked&&$("locationSharingEnabled").checked)?pendingListingLocation:null,category:$("listingCategory").value,title:$("listingTitle").value.trim(),description:$("listingDescription").value.trim(),price:Math.trunc(Number($("listingPrice").value)),quantity:Math.trunc(Number($("listingQuantity").value)),image,status:"pending",createdAt:new Date().toISOString()};
+  const item={id:"PRD-"+Date.now(),uid:auth.currentUser.uid,location:($("listingShareLocation").checked&&$("locationSharingEnabled").checked)?pendingListingLocation:null,category:$("listingCategory").value,title:$("listingTitle").value.trim(),description:$("listingDescription").value.trim(),price:Math.trunc(Number($("listingPrice").value)),quantity:Math.trunc(Number($("listingQuantity").value)),image,status:"approved",createdAt:new Date().toISOString()};
   if(!item.title||!item.description||!Number.isInteger(item.price)||item.price<=0||!Number.isInteger(item.quantity)||item.quantity<1)throw new Error("تحقق من العنوان والسعر والكمية؛ يجب أن يكون السعر أكبر من صفر.");
   let cloudSaved=false,cloudError=null;
   try{
-   await db.collection("listings").add({ownerUid:auth.currentUser.uid,section:normalizeListingCategory(item.category),category:normalizeListingCategory(item.category),title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,location:item.location||null,city:"",contact:"",imagePaths:[],status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+   await db.collection("listings").add({ownerUid:auth.currentUser.uid,section:normalizeListingCategory(item.category),category:normalizeListingCategory(item.category),title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,location:item.location||null,city:"",contact:"",imagePaths:[],status:"approved",createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
    cloudSaved=true;
   }catch(err){cloudError=err;console.error("Listing Firestore error:",err);}
   try{
    const all=getLocalListings();all.unshift(item);localStorage.setItem("alam_product_listings",JSON.stringify(all.slice(0,30)));renderStore();
   }catch(storageError){console.warn("Local listing cache:",storageError);}
   if(cloudSaved){
-   state.textContent="تم إرسال إعلانك إلى الإدارة بنجاح. سيظهر للآخرين بعد الموافقة.";
+   state.textContent="تم نشر إعلانك بنجاح وأصبح ظاهراً الآن في المتجر الرئيسي.";
    $("productListingForm").reset();pendingListingLocation=null;$("listingLocationState").textContent="الموقع غير مضاف إلى الإعلان.";$("listingQuantity").value="1";
   }else{
    const code=cloudError&&cloudError.code?cloudError.code:"unknown";
