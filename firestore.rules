@@ -80,7 +80,7 @@ service cloud.firestore {
       && request.resource.data.imageData is string
       && request.resource.data.imageData.size() <= 450000
       && (request.resource.data.location == null || request.resource.data.location is map)
-      && request.resource.data.status == 'pending'
+      && request.resource.data.status == 'approved'
       && request.resource.data.createdAt == request.time
       && request.resource.data.updatedAt == request.time;
     }
