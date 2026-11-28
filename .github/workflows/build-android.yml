@@ -22,8 +22,8 @@ jobs:
           const main = fs.readFileSync('index.html', 'utf8');
           const android = fs.readFileSync('www/index.html', 'utf8');
           if (main !== android) throw new Error('index.html and www/index.html are out of sync');
-          const scripts = [...main.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)]
-            .filter(match => !/\\bsrc\\s*=/.test(match[1]))
+          const scripts = [...main.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+            .filter(match => !/\bsrc\s*=/.test(match[1]))
             .map(match => match[2])
             .filter(source => source.trim());
           if (!scripts.length) throw new Error('No inline application scripts found');
