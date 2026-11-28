@@ -146,6 +146,60 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
 .home-category-panel{padding:12px;margin-bottom:10px}
 .home-add-product{display:inline-flex;align-items:center;margin-top:7px;padding:6px 10px;border:1px solid var(--line);border-radius:18px;background:#f2f7fa;font-size:11px}
 .home-category-panel .store-empty{padding:13px;font-size:12px}
+
+/* Compact category list layout for phone browsing */
+#home #homeProductCategories.grid,
+#services #allServices.grid{
+ display:grid;
+ grid-template-columns:minmax(0,1fr);
+ gap:7px;
+}
+#home #homeProductCategories .service,
+#services #allServices .service{
+ min-width:0;
+ min-height:58px;
+ padding:8px 10px;
+ display:flex;
+ flex-direction:row;
+ align-items:center;
+ justify-content:flex-start;
+ gap:10px;
+ text-align:right;
+ border-radius:12px;
+}
+#home #homeProductCategories .service-icon,
+#services #allServices .service-icon{
+ width:34px;
+ height:34px;
+ min-width:34px;
+ margin:0;
+ border-radius:9px;
+ font-size:17px;
+ line-height:1;
+}
+#home #homeProductCategories .service strong,
+#services #allServices .service strong{
+ font-size:12px;
+ line-height:1.35;
+ margin:0;
+ text-align:right;
+}
+#home #homeProductCategories .service small,
+#services #allServices .service small{
+ display:block;
+ font-size:10px;
+ line-height:1.35;
+ text-align:right;
+ margin-top:2px;
+}
+@media(min-width:760px){
+ #home #homeProductCategories.grid,
+ #services #allServices.grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+ }
+}
+
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
