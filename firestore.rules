@@ -55,7 +55,7 @@ service cloud.firestore {
         'status', 'createdAt', 'updatedAt'
       ])
       && request.resource.data.ownerUid == request.auth.uid
-      && request.resource.data.section in ['phones', 'vehicles', 'property', 'pets', 'other']
+      && request.resource.data.section in ['accessories', 'phones', 'cards', 'games', 'telecom', 'internet', 'property', 'vehicles', 'pets', 'other']
       && request.resource.data.category is string
       && request.resource.data.category.size() <= 60
       && request.resource.data.title is string
