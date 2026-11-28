@@ -218,6 +218,45 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
 #serviceListingCategories .service-icon{width:29px;height:29px;min-width:29px;font-size:15px;border-radius:8px}
 #homeMainTabs button{font-size:10px;padding:7px 10px}
 @media(min-width:700px){#adminDashboard>.grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+
+/* Compact welcome header, profile card and manager workspace */
+body:has(#appView:not(.hidden)) .top{padding:12px 14px 14px;border-radius:0 0 18px 18px}
+body:has(#appView:not(.hidden)) .toprow{gap:8px}
+body:has(#appView:not(.hidden)) .brand{gap:8px}
+body:has(#appView:not(.hidden)) .brand .logo{width:34px;height:34px;border-radius:10px;font-size:17px}
+body:has(#appView:not(.hidden)) .brand h1{font-size:14px;margin:0 0 2px}
+body:has(#appView:not(.hidden)) .brand small{font-size:9px}
+body:has(#appView:not(.hidden)) .lang{padding:6px 9px;border-radius:9px;font-size:11px}
+body:has(#appView:not(.hidden)) .welcome{margin-top:10px}
+body:has(#appView:not(.hidden)) .welcome h2{font-size:17px;margin-bottom:3px}
+body:has(#appView:not(.hidden)) .welcome p{font-size:10px;line-height:1.5}
+#profile>.profile{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:14px}
+#profile>.profile img{width:52px!important;height:52px!important;flex:0 0 52px}
+#profile>.profile h3{font-size:14px;margin:0 0 3px}
+#profile>.profile p{font-size:10px;margin:0}
+#profile>#logoutBtn{margin:9px 0 13px!important;padding:9px 12px;font-size:12px}
+#profile>.section-head{margin:13px 2px 8px}
+#profile>.section-head h3{font-size:14px}
+#profileForm{padding:11px;border-radius:14px}
+#profileForm .field{gap:5px;margin:8px 0}
+#profileForm .field label{font-size:11px}
+#profileForm .field input:not([type=checkbox]),#profileForm .field select,#profileForm .field textarea{padding:9px 10px;font-size:12px;border-radius:9px}
+#profileForm .field textarea{min-height:64px}
+#profileForm .primary{padding:10px;font-size:12px}
+#adminDashboard>.rowitem h2{font-size:17px;margin:8px 0}
+#adminDashboard .admin-toolbar{padding:6px;gap:5px;margin:8px 0 11px;background:#071b37;border-color:#167fc0}
+#adminDashboard .admin-toolbar button{padding:7px 10px;border-radius:9px;font-size:10px;background:#0b2b4b;color:#c5d8eb}
+#adminDashboard .admin-toolbar button.active{background:#ffd15d;color:#14243a}
+#adminDashboard .section-head{margin:13px 2px 8px}
+#adminDashboard .section-head h3{font-size:13px}
+#adminDashboard .order{padding:10px;border-radius:12px;margin-bottom:8px}
+#adminDashboard .order button{padding:8px 10px;font-size:10px;border-radius:9px}
+@media(max-width:380px){
+ body:has(#appView:not(.hidden)) .brand h1{font-size:12px}
+ body:has(#appView:not(.hidden)) .welcome h2{font-size:15px}
+ #adminDashboard>.grid .panel{padding:9px}
+ #adminDashboard>.grid .panel h2{font-size:18px}
+}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -402,7 +441,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
  <div class="grid">
   <div class="panel"><small class="muted">إجمالي الطلبات</small><h2 id="adminOrdersCount">—</h2></div>
   <div class="panel"><small class="muted">طلبات قيد المراجعة</small><h2 id="adminPendingCount">—</h2></div>
-  <div class="panel"><small class="muted">الإعلانات قيد المراجعة</small><h2 id="adminListingsCount">—</h2></div>
+  <div class="panel"><small class="muted">الإعلانات المنشورة</small><h2 id="adminListingsCount">—</h2></div>
   <div class="panel"><small class="muted">الطلبات المكتملة</small><h2 id="adminCompletedCount">—</h2></div>
   <div class="panel"><small class="muted">إجمالي الحسابات المسجلة</small><h2 id="adminUsersCount">—</h2></div>
  </div>
@@ -419,7 +458,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <div id="adminProductOrdersList" class="list"><div class="panel empty">جارٍ تحميل طلبات الشراء…</div></div>
  </div>
  <div id="adminListingsPanel" class="admin-panel-section hidden" data-admin-panel>
-  <div class="section-head"><h3>الإعلانات للمراجعة</h3></div>
+  <div class="section-head"><h3>جميع إعلانات المستخدمين · نشر مباشر</h3></div>
   <div id="adminListingsList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
  </div>
  <div id="adminUsersPanel" class="admin-panel-section hidden" data-admin-panel>
@@ -871,7 +910,7 @@ async function loadAdminDashboard(){
   const productOrders=productOrdersSnap.docs.map(d=>({id:d.id,...d.data()}));
   $("adminOrdersCount").textContent=orders.length;
   $("adminPendingCount").textContent=orders.filter(x=>x.status==="pending").length;
-  $("adminListingsCount").textContent=listings.filter(x=>x.status==="pending").length;
+  $("adminListingsCount").textContent=listings.filter(x=>x.status==="approved").length;
   $("adminCompletedCount").textContent=orders.filter(x=>x.status==="completed").length;
   $("adminUsersCount").textContent=users.length;
   $("adminOrdersList").innerHTML=orders.length?orders.map(o=>'<div class="order"><div class="rowitem"><strong>'+escapeHtml(o.serviceId||"طلب")+'</strong><span class="badge">'+escapeHtml(o.status||"غير محدد")+'</span></div><p class="muted">العميل: '+escapeHtml(o.uid||"—")+' · المبلغ: '+escapeHtml(o.amount??"—")+' د.ع</p><p>'+escapeHtml(o.accountInfo||o.notes||"")+'</p><div class="rowitem"><button class="secondary" data-order-status="'+o.id+'" data-status="processing">قيد التنفيذ</button><button class="primary" data-order-status="'+o.id+'" data-status="completed">مكتمل</button><button class="danger" data-order-status="'+o.id+'" data-status="rejected">رفض</button></div></div>').join(""):'<div class="panel empty">لا توجد طلبات.</div>';
