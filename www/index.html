@@ -257,6 +257,19 @@ body:has(#appView:not(.hidden)) .welcome p{font-size:10px;line-height:1.5}
  #adminDashboard>.grid .panel{padding:9px}
  #adminDashboard>.grid .panel h2{font-size:18px}
 }
+
+/* Tiny bottom support shortcut and AI access */
+.quick-tools{position:fixed;z-index:30;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:7px;align-items:center}
+.quick-tool,.quick-support>summary{width:42px;height:42px;border:1px solid #d9e3ed;border-radius:13px;background:#fff;color:#163653;box-shadow:0 4px 16px #102b4824;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;text-decoration:none;cursor:pointer;list-style:none}
+.quick-tool span,.quick-support>summary span{font-size:18px;line-height:20px}
+.quick-tool small,.quick-support>summary small{font-size:8px;font-weight:700;line-height:11px}
+.quick-tool.ai-tool{background:#102f50;color:#fff;border-color:#245579}
+.quick-support>summary::-webkit-details-marker{display:none}
+.quick-support{position:relative}
+.quick-support-menu{position:absolute;right:0;bottom:49px;width:min(245px,calc(100vw - 32px));padding:11px;background:#fff;border:1px solid #dce5ed;border-radius:13px;box-shadow:0 8px 28px #102b4830;display:grid;gap:8px}
+.quick-support-menu strong{font-size:12px;margin-bottom:2px}
+.quick-support-menu a{font-size:11px;color:#163653;text-decoration:none;padding:7px;border-radius:8px;background:#f4f7fa}
+@media(min-width:700px){.quick-tools{right:22px;bottom:28px}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -424,17 +437,7 @@ body:has(#appView:not(.hidden)) .welcome p{font-size:10px;line-height:1.5}
     <h4>عالم الدفع الإلكتروني</h4>
     <p class="muted">منصة للخدمات الإلكترونية والطلبات وخدمات العملاء.</p>
    </div>
-   <div class="section-head"><h3 data-i="support">الدعم الفني والتواصل</h3></div>
-   <div class="panel">
-    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
-     <a href="tel:07733661844" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px 8px;border:1px solid var(--line,#dce5ed);border-radius:14px;text-decoration:none;text-align:center"><span style="font-size:30px">📞</span><strong>اتصال مباشر</strong><small dir="ltr">07733661844</small></a>
-     <a href="https://www.facebook.com/share/1KUSvyqZHv/" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px 8px;border:1px solid var(--line,#dce5ed);border-radius:14px;text-decoration:none;text-align:center"><span style="font-size:30px">📘</span><strong>فيسبوك</strong><small>افتح صفحتنا</small></a>
-     <a href="https://wa.me/qr/AQ667FF66V7HF1" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px 8px;border:1px solid var(--line,#dce5ed);border-radius:14px;text-decoration:none;text-align:center"><span style="font-size:30px">💬</span><strong>واتساب</strong><small>محادثة مباشرة</small></a>
-     <a href="https://t.me/H5N8D" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px 8px;border:1px solid var(--line,#dce5ed);border-radius:14px;text-decoration:none;text-align:center"><span style="font-size:30px">✈️</span><strong>تليغرام</strong><small dir="ltr">@H5N8D</small></a>
-    </div>
-    <p class="muted" style="margin-top:14px">اضغط على أيقونة للتواصل معنا مباشرة.</p>
-   </div>
-  <div class="section-head"><h3>منطقة الإدارة</h3></div><div class="panel"><p>لوحة الإدارة محمية بصلاحية المدير من Firebase.</p><button class="primary" id="openAdminBtn" type="button">فتح لوحة المدير</button><span id="adminAccessState" class="badge">جارٍ التحقق من الصلاحية</span></div>
+   <div class="section-head"><h3>منطقة الإدارة</h3></div><div class="panel"><p>لوحة الإدارة محمية بصلاحية المدير من Firebase.</p><button class="primary" id="openAdminBtn" type="button">فتح لوحة المدير</button><span id="adminAccessState" class="badge">جارٍ التحقق من الصلاحية</span></div>
  </section>
 <section id="adminDashboard" class="page">
  <div class="rowitem"><h2>لوحة تحكم المدير</h2><button class="smalllink" id="adminBackBtn" type="button">رجوع</button></div>
@@ -514,6 +517,20 @@ body:has(#appView:not(.hidden)) .welcome p{font-size:10px;line-height:1.5}
  <button data-go="services" type="button"><span aria-hidden="true">▦</span><b data-i="services">الخدمات</b></button>
  <button data-go="cart" type="button"><span aria-hidden="true">🛒</span><b>طلباتي <small id="navCartCount">0</small></b></button>
 </div></nav>
+
+<div class="quick-tools" aria-label="أدوات مساعدة">
+ <a class="quick-tool ai-tool" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" aria-label="التحدث مع المساعد الذكي" title="المساعد الذكي"><span>✦</span><small>ذكاء</small></a>
+ <details class="quick-support">
+  <summary aria-label="الدعم الفني" title="الدعم الفني"><span>🎧</span><small>دعم</small></summary>
+  <div class="quick-support-menu">
+   <strong>الدعم الفني والتواصل</strong>
+   <a href="tel:07733661844">📞 اتصال مباشر · 07733661844</a>
+   <a href="https://wa.me/qr/AQ667FF66V7HF1" target="_blank" rel="noopener noreferrer">💬 واتساب</a>
+   <a href="https://www.facebook.com/share/1KUSvyqZHv/" target="_blank" rel="noopener noreferrer">📘 فيسبوك</a>
+   <a href="https://t.me/H5N8D" target="_blank" rel="noopener noreferrer">✈️ تليغرام</a>
+  </div>
+ </details>
+</div>
 <div class="footer">© <span id="year"></span> Alam Electronic Payment</div>
 </div>
 <script>
@@ -640,7 +657,7 @@ $("locationSharingEnabled").addEventListener("change",e=>{
  if(!e.target.checked){$("listingShareLocation").checked=false;pendingListingLocation=null;$("listingLocationState").textContent="مشاركة الموقع متوقفة من إعدادات حسابك.";}
 });
 let approvedListingsUnsubscribe=null;
-function loadApprovedListings(){try{if(approvedListingsUnsubscribe)approvedListingsUnsubscribe();const query=db.collection("listings").where("status","in",["approved","sold_out","sold"]).limit(150);approvedListingsUnsubscribe=query.onSnapshot(snap=>{window.__approvedListings=snap.docs.map(d=>{const x=d.data();const ts=x.createdAt&&typeof x.createdAt.toMillis==="function"?x.createdAt.toMillis():0;return {id:d.id,uid:x.ownerUid||"",category:normalizeListingCategory(x.section||x.category||"other"),title:x.title||"",description:x.description||"",price:Number(x.priceIQD||0),quantity:Number(x.quantity||1),image:x.imageData||"",location:x.location||null,status:x.status,createdAtMs:ts,city:x.city||""};}).filter(x=>x.image).sort((a,b)=>b.createdAtMs-a.createdAtMs);renderStore();renderHomeCustomerListings();renderCustomerCart();const stamp=$("listingsLastUpdated");if(stamp)stamp.textContent="آخر تحديث مباشر: "+new Date().toLocaleTimeString("ar-IQ");},e=>console.warn("Live listings unavailable:",e));}catch(e){console.warn("Public listings unavailable:",e);}}
+function loadApprovedListings(){try{if(approvedListingsUnsubscribe)approvedListingsUnsubscribe();const query=db.collection("listings").where("status","in",["approved","sold_out","sold"]).limit(150);approvedListingsUnsubscribe=query.onSnapshot(snap=>{window.__approvedListings=snap.docs.map(d=>{const x=d.data();const ts=x.createdAt&&typeof x.createdAt.toMillis==="function"?x.createdAt.toMillis():0;return {id:d.id,uid:x.ownerUid||"",category:normalizeListingCategory(x.section||x.category||"other"),title:x.title||"",description:x.description||"",price:Number(x.priceIQD||0),quantity:Number(x.quantity||1),image:x.imageData||"",location:x.location||null,status:x.status,createdAtMs:ts,city:x.city||""};}).filter(x=>x.image).sort((a,b)=>b.createdAtMs-a.createdAtMs);renderStore();renderHomeCustomerListings();renderCustomerCart();const stamp=$("listingsLastUpdated");if(stamp)stamp.textContent="آخر تحديث مباشر: "+new Date().toLocaleTimeString("ar-IQ");},e=>{console.error("Live listings unavailable:",e);const stamp=$("listingsLastUpdated");if(stamp)stamp.textContent="تعذر تحميل المنتجات من الخادم: "+(e.code||e.message||"تحقق من صلاحيات Firestore");});}catch(e){console.error("Public listings unavailable:",e);}}
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&auth.currentUser)loadApprovedListings();});
 
 function renderStore(){
@@ -768,14 +785,18 @@ $("productListingForm").addEventListener("submit",async function(e){
   if(!item.title||!item.description||!Number.isInteger(item.price)||item.price<=0||!Number.isInteger(item.quantity)||item.quantity<1)throw new Error("تحقق من العنوان والسعر والكمية؛ يجب أن يكون السعر أكبر من صفر.");
   let cloudSaved=false,cloudError=null;
   try{
-   await db.collection("listings").add({ownerUid:auth.currentUser.uid,section:normalizeListingCategory(item.category),category:normalizeListingCategory(item.category),title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,location:item.location||null,city:"",contact:"",imagePaths:[],status:"approved",createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+   const listingRef=await db.collection("listings").add({ownerUid:auth.currentUser.uid,section:normalizeListingCategory(item.category),category:normalizeListingCategory(item.category),title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,location:item.location||null,city:"",contact:"",imagePaths:[],status:"approved",createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+   item.id=listingRef.id;
    cloudSaved=true;
+   window.__approvedListings=window.__approvedListings||[];
+   window.__approvedListings=[{id:listingRef.id,uid:auth.currentUser.uid,category:normalizeListingCategory(item.category),title:item.title,description:item.description,price:item.price,quantity:item.quantity,image:item.image,location:item.location||null,status:"approved",createdAtMs:Date.now(),city:""},...window.__approvedListings.filter(x=>x.id!==listingRef.id)];
+   renderStore();renderHomeCustomerListings();
   }catch(err){cloudError=err;console.error("Listing Firestore error:",err);}
   try{
    const all=getLocalListings();all.unshift(item);localStorage.setItem("alam_product_listings",JSON.stringify(all.slice(0,30)));renderStore();
   }catch(storageError){console.warn("Local listing cache:",storageError);}
   if(cloudSaved){
-   state.textContent="تم نشر منتجك بنجاح وأصبح ظاهراً في القائمة الرئيسية."
+   state.textContent="تم نشر منتجك بنجاح وأصبح ظاهراً الآن في القائمة الرئيسية."
    $("productListingForm").reset();pendingListingLocation=null;$("listingQuantity").value="1";$("listingImagePreview").src="";$("listingImagePreview").classList.add("hidden");
   }else{
    const code=cloudError&&cloudError.code?cloudError.code:"unknown";
