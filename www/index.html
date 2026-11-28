@@ -539,13 +539,11 @@ $("locationSharingEnabled").addEventListener("change",e=>{
 });
 async function loadApprovedListings(){try{const snap=await db.collection("listings").where("status","in",["approved","sold_out","sold"]).limit(150).get();window.__approvedListings=snap.docs.map(d=>{const x=d.data();const ts=x.createdAt&&typeof x.createdAt.toMillis==="function"?x.createdAt.toMillis():0;return {id:d.id,uid:x.ownerUid||"",category:x.section||x.category||"other",title:x.title||"",description:x.description||"",price:Number(x.priceIQD||0),quantity:Number(x.quantity||1),image:x.imageData||"",location:x.location||null,status:x.status,createdAtMs:ts,city:x.city||""};}).filter(x=>x.image).sort((a,b)=>b.createdAtMs-a.createdAtMs);renderStore();renderHomeCustomerListings();renderCustomerCart();}catch(e){console.warn("Public listings unavailable:",e);}}
 function renderStore(){
- const q=(($("storeSearch")&&$("storeSearch").value)||"").trim().toLowerCase();
- const providers=providerCatalog.filter(x=>(activeStoreCategory==="all"||x.cat===activeStoreCategory)&&(!q||(x.name+" "+x.alt).toLowerCase().includes(q)));
- $("providerGrid").innerHTML=providers.length?providers.map(x=>'<div class="store-item"><div class="store-logo">'+escapeHtml(x.icon)+'</div><strong>'+escapeHtml(x.name)+'</strong><small>'+escapeHtml(x.alt)+'</small></div>').join(""):'<div class="store-empty">لا توجد نتائج مطابقة لبحثك.</div>';
- $("storeCount").textContent=providers.length+" مزود خدمة";
- const localListings=getLocalListings();const cloudListings=window.__approvedListings||[];const listings=[...cloudListings,...localListings].filter((x,i,a)=>a.findIndex(y=>y.id===x.id)===i).filter(x=>!q||(x.title+" "+x.description).toLowerCase().includes(q));
- $("storeGrid").innerHTML=listings.length?listings.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:125px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · '+(x.status==="sold_out"?"نفذت الكمية":x.status==="sold"?"مباع":"الكمية: "+Number(x.quantity))+'</small></button>').join(""):'<div class="store-empty">لا توجد إعلانات عملاء مطابقة حالياً.</div>';
- $("listingCount").textContent=listings.length+" إعلان";
+ // إخفاء جميع المنتجات ومزودي الخدمة من واجهة المتجر مؤقتاً دون حذف سجلات العملاء من Firestore.
+ $("providerGrid").innerHTML='<div class="store-empty">المتجر قيد إعادة التجهيز.</div>';
+ $("storeGrid").innerHTML='<div class="store-empty">لا توجد منتجات معروضة حالياً.</div>';
+ $("storeCount").textContent="0 مزود خدمة";
+ $("listingCount").textContent="0 إعلان";
  updateCartCount();
 }
 function cartStorageKey(){return "alam_customer_cart_"+(auth.currentUser?auth.currentUser.uid:"guest");}
