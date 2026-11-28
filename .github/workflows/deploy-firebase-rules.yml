@@ -27,6 +27,6 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-service-account.json" >> "$GITHUB_ENV"
       - name: Deploy Firestore and Storage rules
         env:
-          FIREBASE_PROJECT_ID: alam-aldaf3-electronic-92215
+          FIREBASE_PROJECT_ID: alam-aldaf3-electronic-922f5
         run: |
           firebase deploy --only firestore:rules,storage --project "$FIREBASE_PROJECT_ID" --non-interactive
