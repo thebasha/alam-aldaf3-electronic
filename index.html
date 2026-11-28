@@ -200,7 +200,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
  }
 }
 
-</style>
+\n/* User marketplace navigation cleanup */\n#store,#orders{display:none!important}\n#services #serviceListingCategories .service{min-height:108px}\n#publish .store-head p{line-height:1.8}\n#publish #listingImage{padding:12px;background:#f7fafc;border:1px dashed #9db4c8}\n#publish #listingImagePreview:not(.hidden){display:block}\n#cart .store-head{margin-bottom:14px}\n</style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -262,30 +262,30 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <div id="homeCustomerListings" class="list"><div class="panel empty">جارٍ تحميل إعلانات العملاء…</div></div>
 
  </section>
- <section id="store" class="page">
-  <div style="display:none" aria-hidden="true">
+ <section id="store" class="page" aria-hidden="true">
+  <div class="hidden" aria-hidden="true">
    <button id="openCustomerCart" type="button"></button><span id="customerCartCount">0</span>
    <input id="storeSearch" type="search">
    <span id="storeCount"></span><span id="listingCount"></span>
    <div id="providerGrid"></div><div id="storeGrid"></div>
   </div>
-  <iframe title="المتجر الرقمي الاحترافي" src="./premium-store.html" loading="lazy" style="display:block;width:100%;height:calc(100vh - 82px);min-height:680px;border:0;border-radius:16px;background:#071321" allow="clipboard-read; clipboard-write"></iframe>
+  <div class="panel empty">تم نقل تصفح المنتجات إلى الصفحة الرئيسية وأقسام الخدمات.</div>
  </section>
  <section id="publish" class="page">
   <div class="store-head"><h2>📦 نشر منتج جديد</h2><p>أدخل معلومات المنتج وأضف صورته. سيظهر المنتج للمستخدمين بعد حفظه على الخادم.</p></div>
   <div class="panel" style="margin-top:12px"><form id="productListingForm">
-   <div class="field"><label for="listingImage">صورة المنتج *</label><input id="listingImage" type="file" accept="image/jpeg,image/png,image/webp" required><img id="listingImagePreview" alt="معاينة صورة المنتج" class="hidden" style="width:100%;max-height:220px;object-fit:contain;border-radius:14px;margin-top:8px;background:#071b37"></div>
-   <div class="field"><label for="listingTitle">اسم المنتج *</label><input id="listingTitle" maxlength="90" required placeholder="مثال: هاتف سامسونغ أو بطاقة شحن"></div>
-   <div class="field"><label for="listingCategory">القسم *</label><select id="listingCategory" required><option value="accessories">الهواتف والإكسسوارات</option><option value="property">العقارات والمنازل</option><option value="vehicles">السيارات والدراجات</option><option value="pets">الطيور والحيوانات</option><option value="cards">البطاقات الإلكترونية والأرصدة</option><option value="games">الألعاب</option><option value="other">منتجات متنوعة</option></select></div>
-   <div class="field"><label for="listingDescription">تفاصيل المنتج *</label><textarea id="listingDescription" maxlength="1200" required placeholder="اكتب الحالة والمواصفات والتفاصيل المهمة…"></textarea></div>
-   <div class="field"><label for="listingPrice">السعر بالدينار العراقي *</label><input id="listingPrice" type="number" min="1" step="250" required placeholder="مثال: 25000"></div>
+   <div class="field"><label for="listingImage">1) صورة المنتج *</label><small class="muted">اختر صورة واضحة من هاتفك أو جهازك (JPG أو PNG أو WEBP).</small><input id="listingImage" type="file" accept="image/jpeg,image/png,image/webp" required><img id="listingImagePreview" alt="معاينة صورة المنتج" class="hidden" style="width:100%;max-height:220px;object-fit:contain;border-radius:14px;margin-top:8px;background:#071b37"></div>
+   <div class="field"><label for="listingTitle">2) اسم المنتج *</label><input id="listingTitle" maxlength="90" required placeholder="مثال: هاتف سامسونغ أو بطاقة شحن"></div>
+   <div class="field"><label for="listingCategory">3) اختر القسم المناسب *</label><select id="listingCategory" required><option value="accessories">الهواتف والإكسسوارات</option><option value="property">العقارات والمنازل</option><option value="vehicles">السيارات والدراجات</option><option value="pets">الطيور والحيوانات</option><option value="cards">البطاقات الإلكترونية والأرصدة</option><option value="games">الألعاب</option><option value="other">منتجات متنوعة</option></select></div>
+   <div class="field"><label for="listingDescription">4) تفاصيل المنتج *</label><textarea id="listingDescription" maxlength="1200" required placeholder="اكتب الحالة والمواصفات والتفاصيل المهمة…"></textarea></div>
+   <div class="field"><label for="listingPrice">5) السعر بالدينار العراقي *</label><input id="listingPrice" type="number" min="1" step="250" required placeholder="مثال: 25000"></div>
    <input id="listingQuantity" type="hidden" value="1">
    <div class="hidden" aria-hidden="true"><input id="listingShareLocation" type="checkbox"><select id="listingLocationPrecision"><option value="approx">تقريبي</option><option value="exact">دقيق</option></select><button id="captureListingLocation" type="button"></button><span id="listingLocationState"></span></div>
    <button class="primary full" type="submit" id="publishListingBtn">نشر المنتج</button><p id="listingSaveState" class="muted" aria-live="polite"></p>
   </form></div>
  </section>
  <section id="cart" class="page">
-  <div class="store-head"><h2>🛒 سلة الشراء</h2><p>اجمع المنتجات التي تريد شراءها في سلة خاصة بحسابك.</p></div>
+  <div class="store-head"><h2>🛒 طلباتي · سلة الشراء</h2><p>كل المنتجات التي أضفتها للشراء محفوظة في سلتك الخاصة بحسابك.</p></div>
   <div id="customerCartItems" class="list"><div class="panel empty">السلة فارغة.</div></div>
   <div class="field"><label for="cartBuyerContact">رقم هاتفك للتواصل بشأن الطلب</label><input id="cartBuyerContact" type="tel" maxlength="40" placeholder="07xxxxxxxxx" required></div>
   <div class="panel" style="margin-top:12px"><div class="rowitem"><strong>المجموع الكلي</strong><strong id="customerCartTotal">0 د.ع</strong></div>
@@ -295,7 +295,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <button class="secondary full" type="button" onclick="showPage('home')" style="margin-top:10px">متابعة تصفح المنتجات</button>
  </section>
  <section id="services" class="page">
-  <div class="section-head"><h3>أقسام المنتجات المنشورة</h3><span class="muted">اختر القسم لعرض منتجات المستخدمين</span></div>
+  <div class="store-head"><h2>📂 أقسام المنتجات</h2><p>اختر القسم الذي تبحث عنه لعرض المنتجات المنشورة من مستخدمي التطبيق.</p></div>
   <div class="grid" id="serviceListingCategories">
    <button class="service" type="button" data-service-listing-cat="accessories"><div class="service-icon">📱</div><strong>الهواتف والإكسسوارات</strong><small>هواتف، شواحن، سماعات وملحقات</small></button>
    <button class="service" type="button" data-service-listing-cat="cards"><div class="service-icon">💳</div><strong>البطاقات والأرصدة</strong><small>بطاقات رقمية وتعبئة</small></button>
@@ -305,8 +305,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
    <button class="service" type="button" data-service-listing-cat="pets"><div class="service-icon">🐦</div><strong>الطيور والحيوانات</strong><small>طيور زينة وحيوانات أليفة</small></button>
    <button class="service" type="button" data-service-listing-cat="other"><div class="service-icon">🛍️</div><strong>منتجات متنوعة</strong><small>أقسام ومنتجات أخرى</small></button>
   </div>
-  <div class="section-head"><h3>الخدمات الإلكترونية</h3><span class="muted">خدمات التطبيق والطلبات</span></div>
-  <div class="grid" id="allServices"></div>
+  <div class="hidden" aria-hidden="true"><div id="allServices"></div></div>
  </section>
  <section id="serviceDetail" class="page">
   <button class="smalllink" data-go="services" type="button" onclick="showPage('services')">← <span data-i="back">رجوع</span></button>
@@ -332,7 +331,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <div class="list" id="walletMethods"></div>
   <div class="notice" style="margin-top:12px" data-i="paymentNotice">زين كاش وماستركارد وسوبر كي تظهر كطرق مطلوبة، لكن الربط المالي الحقيقي يحتاج حسابات تاجر وواجهات رسمية من مزودي الخدمة.</div>
  </section>
- <section id="orders" class="page"><div class="section-head"><h3 data-i="myOrders">طلباتي</h3></div><div id="ordersList" class="list"></div></section>
+ <section id="orders" class="page" aria-hidden="true"><div class="section-head"><h3 data-i="myOrders">طلباتي السابقة</h3></div><div id="ordersList" class="list"></div></section>
  <section id="profile" class="page">
   <div class="profile"><img id="profileAvatar" alt="الصورة الشخصية" src="" style="width:92px;height:92px;border-radius:50%;object-fit:cover;background:#dce5ed"><h3 id="profileName"></h3><p class="muted" data-i="customerAccount">حساب عميل</p></div>
   <button class="danger full" id="logoutBtn" type="button" style="margin:14px 0 20px">↪ تسجيل الخروج</button>
@@ -442,7 +441,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
  <button data-go="profile" type="button"><span aria-hidden="true">♙</span><b data-i="profile">حسابي</b></button>
  <button class="active" data-go="home" type="button"><span aria-hidden="true">⌂</span><b>الرئيسية</b></button>
  <button data-go="services" type="button"><span aria-hidden="true">▦</span><b data-i="services">الخدمات</b></button>
- <button data-go="cart" type="button"><span aria-hidden="true">🛒</span><b>سلة الشراء <small id="navCartCount">0</small></b></button>
+ <button data-go="cart" type="button"><span aria-hidden="true">🛒</span><b>طلباتي <small id="navCartCount">0</small></b></button>
 </div></nav>
 <div class="footer">© <span id="year"></span> Alam Electronic Payment</div>
 </div>
