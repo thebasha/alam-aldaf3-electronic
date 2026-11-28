@@ -14,6 +14,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Validate web app scripts and Android copy
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const vm = require('vm');
+          const main = fs.readFileSync('index.html', 'utf8');
+          const android = fs.readFileSync('www/index.html', 'utf8');
+          if (main !== android) throw new Error('index.html and www/index.html are out of sync');
+          const scripts = [...main.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)]
+            .filter(match => !/\\bsrc\\s*=/.test(match[1]))
+            .map(match => match[2])
+            .filter(source => source.trim());
+          if (!scripts.length) throw new Error('No inline application scripts found');
+          scripts.forEach((source, index) => new vm.Script(source, { filename: 'index.html:inline-' + (index + 1) }));
+          console.log('Validated ' + scripts.length + ' inline scripts; Android web copy matches.');
+          NODE
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
