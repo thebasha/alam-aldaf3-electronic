@@ -641,7 +641,7 @@ function getLocalListings(){try{return JSON.parse(localStorage.getItem("alam_pro
   }
   localStorage.setItem("alam_product_listings",JSON.stringify(remaining.slice(0,30)));
   renderStore();renderHomeCustomerListings();await loadApprovedListings();
-  if(lastError){state.textContent="تعذرت مزامنة بعض الإعلانات ("+(lastError.code||"unknown")+"): "+(lastError.message||"تحقق من قواعد Firestore")."؛ بقيت بياناتها محفوظة على الجهاز.";}else{state.textContent=synced?"تمت مزامنة "+synced+" إعلان/إعلانات وأصبحت متاحة للجميع.":"لا توجد إعلانات معلّقة للمزامنة."}
+  if(lastError){state.textContent="تعذرت مزامنة بعض الإعلانات ("+(lastError.code||"unknown")+"): "+(lastError.message||"تحقق من قواعد Firestore")+"؛ بقيت بياناتها محفوظة على الجهاز.";}else{state.textContent=synced?"تمت مزامنة "+synced+" إعلان/إعلانات وأصبحت متاحة للجميع.":"لا توجد إعلانات معلّقة للمزامنة."}
   button.classList.toggle("hidden",remaining.every(x=>!(String(x.id||"").startsWith("PRD-")||x.syncPending===true)||x.uid!==auth.currentUser.uid));button.disabled=false;
  }
 let pendingListingLocation=null;
