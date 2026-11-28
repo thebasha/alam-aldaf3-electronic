@@ -21,6 +21,7 @@ service cloud.firestore {
       && (!('email' in request.resource.data) || request.resource.data.email is string)
       && (!('phone' in request.resource.data) || request.resource.data.phone is string)
       && (!('nickname' in request.resource.data) || (request.resource.data.nickname is string && request.resource.data.nickname.size() <= 60))
+        && (!('about' in request.resource.data) || (request.resource.data.about is string && request.resource.data.about.size() <= 500))
       && (!('username' in request.resource.data) || (request.resource.data.username is string && request.resource.data.username.matches('^[a-zA-Z0-9_ء-ي٠-٩]{3,20}$')))
       && (!('hideEmail' in request.resource.data) || request.resource.data.hideEmail is bool)
       && (!('hidePhone' in request.resource.data) || request.resource.data.hidePhone is bool)
@@ -89,7 +90,7 @@ service cloud.firestore {
       allow read: if owns(uid) || isAdmin();
       allow update: if (owns(uid)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'displayName', 'phone', 'nickname', 'username', 'hideEmail',
+          'displayName', 'phone', 'nickname', 'username', 'about', 'hideEmail',
           'hidePhone', 'photoData', 'locationSharingEnabled', 'locationPrecision', 'updatedAt'
         ])
         && request.resource.data.displayName is string
