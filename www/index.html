@@ -208,6 +208,8 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
    <button class="service" type="button" onclick="openCardWalletTopup()"><div class="service-icon">💳</div><strong>الشحن عبر البطاقة</strong><small>طلب إضافة رصيد للمحفظة باستخدام Mastercard</small></button>
    <button class="service" type="button" onclick="showPage('wallet')"><div class="service-icon">👛</div><strong>شحن محفظة التطبيق</strong><small>طلب تعبئة رصيد المحفظة</small></button>
   </div>
+  <div class="section-head"><h3>🛍️ أحدث منشورات العملاء</h3><button class="smalllink" type="button" onclick="showPage('customer-ads')">عرض جميع الإعلانات</button></div>
+  <div id="homeCustomerListingsPreview" class="list"><div class="panel empty">جارٍ تحميل منشورات العملاء…</div></div>
   <div class="section-head"><h3>📣 النشر والإعلان</h3><span class="muted">أضف منتجك ليظهر في القسم المناسب</span></div>
   <button class="service full" type="button" onclick="openPublishPage()" style="display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:13px;text-align:right;padding:13px;margin-bottom:14px"><div class="service-icon">📢</div><span><strong>إضافة منتج أو إعلان جديد</strong><small>ارفع صورة، اختر القسم، وانشر إعلانك</small></span><span style="margin-right:auto">＋</span></button>
   <button class="service full" type="button" onclick="showPage('customer-ads')" style="display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:13px;text-align:right;padding:13px;margin:12px 0"><div class="service-icon">🛍️</div><span><strong>إعلانات العملاء</strong><small>تصفح المنتجات والإعلانات حسب الأقسام وابحث بينها</small></span><span style="margin-right:auto">←</span></button>
@@ -406,6 +408,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
  <button data-go="profile" type="button"><span aria-hidden="true">♙</span><b data-i="profile">حسابي</b></button>
  <button class="active" data-go="home" type="button"><span aria-hidden="true">⌂</span><b>القائمة الرئيسية</b></button>
  <button data-go="services" type="button"><span aria-hidden="true">▦</span><b data-i="services">الخدمات</b></button>
+ <button data-go="customer-ads" type="button"><span aria-hidden="true">🛍️</span><b>إعلانات العملاء</b></button>
  <button data-go="store" type="button"><span aria-hidden="true">▣</span><b>المتجر</b></button>
  <button data-go="orders" type="button"><span aria-hidden="true">☷</span><b data-i="orders">الطلبات</b></button>
 </div></nav>
@@ -570,13 +573,21 @@ function renderCustomerCart(){
 let activeHomeListingCategory="all";
 function listingCategoryName(key){return ({phones:"📱 هواتف وإكسسوارات",property:"🏠 عقارات ومنازل",vehicles:"🚗 سيارات ودراجات",pets:"🐦 طيور الزينة والحيوانات الأليفة",other:"📦 منتجات وأغراض أخرى"})[key]||"📦 منتجات أخرى";}
 function renderHomeCustomerListings(){
- const root=$("homeCustomerListings");if(!root)return;
+ const root=$("homeCustomerListings"),preview=$("homeCustomerListingsPreview");
  const q=(($("homeListingSearch")&&$("homeListingSearch").value)||"").trim().toLocaleLowerCase("ar");
  const all=(window.__approvedListings||[]).filter(x=>x.image).slice().sort((a,b)=>(b.createdAtMs||0)-(a.createdAtMs||0));
  const listings=all.filter(x=>(activeHomeListingCategory==="all"||x.category===activeHomeListingCategory)&&(!q||[x.title,x.description,x.category,x.city].join(" ").toLocaleLowerCase("ar").includes(q)));
- if(!listings.length){root.innerHTML='<div class="panel empty">لا توجد منتجات مطابقة لبحثك حالياً.</div>';return;}
- const groups=activeHomeListingCategory==="all"?["phones","property","vehicles","pets","other"]:[activeHomeListingCategory];
- root.innerHTML=groups.map(key=>{const items=listings.filter(x=>x.category===key);return '<div class="panel home-category-panel"><div class="rowitem"><strong>'+listingCategoryName(key)+'</strong><span class="muted">'+items.length+' منتج</span></div><button class="smalllink home-add-product" type="button" data-home-add-cat="'+key+'">＋ إضافة منتج لهذا القسم</button><div class="store-grid" style="margin-top:10px">'+(items.length?items.slice(0,8).map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:105px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · '+(x.status==="sold_out"?"نفذت الكمية":x.status==="sold"?"مباع":"متوفر")+'</small></button>').join(""):'<div class="store-empty">لا توجد منتجات في هذا القسم بعد.</div>')+'</div></div>';}).join("");
+ if(root){
+  if(!listings.length){root.innerHTML='<div class="panel empty">لا توجد منتجات مطابقة لبحثك حالياً.</div>';}
+  else{
+   const groups=activeHomeListingCategory==="all"?["phones","property","vehicles","pets","other"]:[activeHomeListingCategory];
+   root.innerHTML=groups.map(key=>{const items=listings.filter(x=>x.category===key);return '<div class="panel home-category-panel"><div class="rowitem"><strong>'+listingCategoryName(key)+'</strong><span class="muted">'+items.length+' منتج</span></div><button class="smalllink home-add-product" type="button" data-home-add-cat="'+key+'">＋ إضافة منتج لهذا القسم</button><div class="store-grid" style="margin-top:10px">'+(items.length?items.slice(0,8).map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:105px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · '+(x.status==="sold_out"?"نفذت الكمية":x.status==="sold"?"مباع":"متوفر")+'</small></button>').join(""):'<div class="store-empty">لا توجد منتجات في هذا القسم بعد.</div>')+'</div></div>';}).join("");
+  }
+ }
+ if(preview){
+  const latest=all.slice(0,6);
+  preview.innerHTML=latest.length?'<div class="store-grid">'+latest.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:112px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+listingCategoryName(x.category)+' · '+Number(x.price).toLocaleString("en-US")+' د.ع</small></button>').join("")+'</div>':'<div class="panel empty">لا توجد منشورات معتمدة حالياً. ستظهر صور ومنشورات العملاء هنا بعد موافقة الإدارة.</div>';
+ }
 }
 let selectedProductForPurchase=null;
 function showProductDetails(id){
