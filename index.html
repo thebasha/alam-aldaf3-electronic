@@ -243,43 +243,14 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
 </div>
 <main id="appView" class="content hidden">
  <section id="home" class="page active">
-  <div class="home-showcase">
-   <div class="showcase-orbit" aria-hidden="true">🌐</div>
-   <div class="showcase-copy"><span class="showcase-kicker">♛ مكتب الباشا</span><h2>عالم الدفع الإلكتروني</h2><p>كل خدماتك في مكان واحد</p></div>
-   <div class="showcase-chips"><span>🎮 شحن الألعاب</span><span>📱 الرصيد</span><span>💳 المحفظة</span></div>
+  <div class="store-head"><h2>🛍️ منتجات المستخدمين</h2><p>تصفح المنتجات المنشورة من أعضاء التطبيق، واختر القسم أو ابحث عن المنتج الذي تريده.</p></div>
+  <button class="primary full" type="button" onclick="openPublishPage()" style="margin:0 0 12px">＋ نشر منتج جديد</button>
+  <div class="store-search"><input id="homeListingSearch" type="search" placeholder="ابحث عن منتج أو وصف..." autocomplete="off" aria-label="ابحث في منتجات المستخدمين"></div>
+  <div class="store-tabs home-listing-tabs" id="homeMainTabs" aria-label="أقسام المنتجات">
+   <button class="active" type="button" data-home-main-cat="all">الكل</button><button type="button" data-home-main-cat="accessories">الهواتف والإكسسوارات</button><button type="button" data-home-main-cat="cards">البطاقات والأرصدة</button><button type="button" data-home-main-cat="games">الألعاب</button><button type="button" data-home-main-cat="property">العقارات</button><button type="button" data-home-main-cat="vehicles">السيارات والدراجات</button><button type="button" data-home-main-cat="pets">الطيور والحيوانات</button><button type="button" data-home-main-cat="other">متنوع</button>
   </div>
-  <div class="home-promo"><div><strong>شحن الألعاب والرصيد</strong><span>بسهولة • أمان • متابعة للطلبات</span></div><div class="promo-pad">🎮</div></div>
-  <a href="./premium-store.html" class="service full" style="display:flex;align-items:center;gap:12px;text-decoration:none;margin:0 0 14px;padding:12px 14px;border:1px solid #d6a843;background:linear-gradient(110deg,#10243a,#1a3d58);color:#fff;border-radius:15px"><span class="service-icon" style="margin:0;background:#263d52">🎮</span><span><strong style="display:block">المتجر الرقمي الجديد</strong><small style="color:#d2dce7">ألعاب وبطاقات وهدايا وشحن إلكتروني</small></span><span style="margin-right:auto;color:#ffd15d">←</span></a>
-  <div class="balance">
-   <div class="balance-head"><span class="balance-label" data-i="walletBalance">رصيد المحفظة</span><span class="pill">IQD</span></div>
-   <div class="amount"><span id="balance">0</span> <span data-i="iqd">د.ع</span></div>
-   <button class="primary" data-go="wallet" data-i="addFunds" type="button" onclick="showPage('wallet')">طلب تعبئة الرصيد</button>
-  </div>
-  <div class="section-head"><h3 data-i="mainServices">الخدمات الرئيسية</h3><span class="muted" data-i="chooseService">اختر الخدمة</span></div>
-  <div class="grid" id="homeServices"></div>
-  <div class="section-head"><h3>🛍️ تسوق حسب القسم</h3><span class="muted">7 أقسام · تحديث مباشر</span></div>
-  <div class="grid marketplace-categories" id="homeProductCategories">
-   <button class="service" type="button" data-home-shop-cat="accessories"><div class="service-icon">📱</div><strong>الإكسسوارات والهواتف</strong><small>هواتف، شواحن، سماعات وملحقات</small></button>
-   <button class="service" type="button" data-home-shop-cat="property"><div class="service-icon">🏠</div><strong>المنازل والعقارات</strong><small>بيع وإيجار المنازل والأراضي</small></button>
-   <button class="service" type="button" data-home-shop-cat="vehicles"><div class="service-icon">🚗</div><strong>الدراجات والسيارات</strong><small>مركبات وقطع غيار وملحقات</small></button>
-   <button class="service" type="button" data-home-shop-cat="pets"><div class="service-icon">🐦</div><strong>الطيور والدواجن</strong><small>طيور زينة ودواجن ومستلزماتها</small></button>
-   <button class="service" type="button" data-home-shop-cat="cards"><div class="service-icon">💳</div><strong>البطاقات الإلكترونية والأرصدة</strong><small>بطاقات رقمية وتعبئة أرصدة</small></button>
-   <button class="service" type="button" data-home-shop-cat="games"><div class="service-icon">🎮</div><strong>الألعاب</strong><small>ألعاب وبطاقات وشحن الألعاب</small></button>
-   <button class="service" type="button" data-home-shop-cat="other"><div class="service-icon">🛍️</div><strong>قسم متنوع ومختلط</strong><small>كل المنتجات والخدمات الأخرى</small></button>
-  </div>
-  <div class="section-head"><h3>الدفع الإلكتروني والشحن</h3><span class="muted">خدمات المحفظة والبطاقات</span></div>
-  <div class="grid" id="homePayments">
-   <button class="service" type="button" onclick="showPage('wallet')"><div class="service-icon">💳</div><strong>الدفع الإلكتروني</strong><small>طرق الدفع والخدمات المالية</small></button>
-   <button class="service" type="button" onclick="openCardWalletTopup()"><div class="service-icon">💳</div><strong>الشحن عبر البطاقة</strong><small>طلب إضافة رصيد للمحفظة باستخدام Mastercard</small></button>
-   <button class="service" type="button" onclick="showPage('wallet')"><div class="service-icon">👛</div><strong>شحن محفظة التطبيق</strong><small>طلب تعبئة رصيد المحفظة</small></button>
-  </div>
-  <div class="section-head"><h3>🛍️ أحدث منشورات العملاء</h3><button class="smalllink" type="button" onclick="showPage('customer-ads')">عرض جميع الإعلانات</button></div>
-  <div id="homeCustomerListingsPreview" class="list"><div class="panel empty">جارٍ تحميل منشورات العملاء…</div></div>
-  <div class="section-head"><h3>📣 النشر والإعلان</h3><span class="muted">أضف منتجك ليظهر في القسم المناسب</span></div>
-  <button class="service full" type="button" onclick="openPublishPage()" style="display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:13px;text-align:right;padding:13px;margin-bottom:14px"><div class="service-icon">📢</div><span><strong>إضافة منتج أو إعلان جديد</strong><small>ارفع صورة، اختر القسم، وانشر إعلانك</small></span><span style="margin-right:auto">＋</span></button>
-  <button class="service full" type="button" onclick="showPage('customer-ads')" style="display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:13px;text-align:right;padding:13px;margin:12px 0"><div class="service-icon">🛍️</div><span><strong>إعلانات العملاء</strong><small>تصفح المنتجات والإعلانات حسب الأقسام وابحث بينها</small></span><span style="margin-right:auto">←</span></button>
-  <div class="section-head"><h3 data-i="recentOrders">آخر الطلبات</h3><button class="smalllink" data-go="orders" data-i="viewAll" type="button" onclick="showPage('orders')">عرض الكل</button></div>
-  <div id="recentList" class="list"></div>
+  <div id="homeCustomerListingsPreview" class="list"><div class="panel empty">جارٍ تحميل منتجات المستخدمين…</div></div>
+  <div class="hidden" aria-hidden="true"><div id="homeServices"></div><div id="homePayments"></div><div id="homeCustomerListings"></div><div id="recentList"></div></div>
  </section>
  <section id="customer-ads" class="page">
   <div class="store-head"><h2>🛍️ إعلانات العملاء</h2><p>تصفح المنتجات المعتمدة حسب القسم، مع تحديث مباشر عند نشر منتجات جديدة.</p><small id="listingsLastUpdated">متصل بالتحديث المباشر</small></div>
@@ -301,36 +272,40 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <iframe title="المتجر الرقمي الاحترافي" src="./premium-store.html" loading="lazy" style="display:block;width:100%;height:calc(100vh - 82px);min-height:680px;border:0;border-radius:16px;background:#071321" allow="clipboard-read; clipboard-write"></iframe>
  </section>
  <section id="publish" class="page">
-  <div class="store-head"><h2>📣 النشر والإعلان</h2><p>أضف منتجك أو إعلانك واختر القسم المناسب ليظهر ضمن إعلانات العملاء في القائمة الرئيسية بعد موافقة الإدارة.</p></div>
-  <div class="panel" style="margin-top:16px"><h3>إضافة منتج أو إعلان جديد</h3>
-   <form id="productListingForm">
-    <div class="field"><label for="listingCategory">القسم</label><select id="listingCategory" required><option value="accessories">الإكسسوارات والهواتف</option><option value="property">المنازل والعقارات</option><option value="vehicles">الدراجات والسيارات</option><option value="pets">الطيور والدواجن</option><option value="cards">البطاقات الإلكترونية والأرصدة</option><option value="games">الألعاب</option><option value="other">قسم متنوع ومختلط</option></select></div>
-    <div class="field"><label for="listingTitle">اسم المنتج / عنوان الإعلان</label><input id="listingTitle" maxlength="90" required></div>
-    <div class="field"><label for="listingDescription">تفاصيل المنتج</label><textarea id="listingDescription" maxlength="1200" required></textarea></div>
-    <div class="field"><label for="listingPrice">السعر بالدينار العراقي</label><input id="listingPrice" type="number" min="0" step="1000" required></div>
-    <div class="field"><label for="listingQuantity">الكمية المتوفرة</label><input id="listingQuantity" type="number" min="1" max="99999" value="1" required></div>
-    <div class="field"><label><input id="listingShareLocation" type="checkbox"> إضافة موقعي إلى الإعلان</label></div>
-    <div class="field"><label for="listingLocationPrecision">خصوصية الموقع في هذا الإعلان</label><select id="listingLocationPrecision"><option value="exact">الموقع الدقيق</option><option value="approx">المنطقة التقريبية فقط</option></select></div>
-    <button class="secondary full" type="button" id="captureListingLocation">📍 تحديد موقعي للإعلان</button>
-    <p id="listingLocationState" class="muted" aria-live="polite">الموقع غير مضاف إلى الإعلان.</p>
-    <div class="field"><label for="listingImage">صورة المنتج</label><input id="listingImage" type="file" accept="image/jpeg,image/png,image/webp" required></div>
-    <button class="primary full" type="submit" id="publishListingBtn">نشر الإعلان</button><p id="listingSaveState" class="muted" aria-live="polite"></p>
-   </form>
-  </div>
-
+  <div class="store-head"><h2>📦 نشر منتج جديد</h2><p>أدخل معلومات المنتج وأضف صورته. سيظهر المنتج للمستخدمين بعد حفظه على الخادم.</p></div>
+  <div class="panel" style="margin-top:12px"><form id="productListingForm">
+   <div class="field"><label for="listingImage">صورة المنتج *</label><input id="listingImage" type="file" accept="image/jpeg,image/png,image/webp" required><img id="listingImagePreview" alt="معاينة صورة المنتج" class="hidden" style="width:100%;max-height:220px;object-fit:contain;border-radius:14px;margin-top:8px;background:#071b37"></div>
+   <div class="field"><label for="listingTitle">اسم المنتج *</label><input id="listingTitle" maxlength="90" required placeholder="مثال: هاتف سامسونغ أو بطاقة شحن"></div>
+   <div class="field"><label for="listingCategory">القسم *</label><select id="listingCategory" required><option value="accessories">الهواتف والإكسسوارات</option><option value="property">العقارات والمنازل</option><option value="vehicles">السيارات والدراجات</option><option value="pets">الطيور والحيوانات</option><option value="cards">البطاقات الإلكترونية والأرصدة</option><option value="games">الألعاب</option><option value="other">منتجات متنوعة</option></select></div>
+   <div class="field"><label for="listingDescription">تفاصيل المنتج *</label><textarea id="listingDescription" maxlength="1200" required placeholder="اكتب الحالة والمواصفات والتفاصيل المهمة…"></textarea></div>
+   <div class="field"><label for="listingPrice">السعر بالدينار العراقي *</label><input id="listingPrice" type="number" min="1" step="250" required placeholder="مثال: 25000"></div>
+   <input id="listingQuantity" type="hidden" value="1">
+   <div class="hidden" aria-hidden="true"><input id="listingShareLocation" type="checkbox"><select id="listingLocationPrecision"><option value="approx">تقريبي</option><option value="exact">دقيق</option></select><button id="captureListingLocation" type="button"></button><span id="listingLocationState"></span></div>
+   <button class="primary full" type="submit" id="publishListingBtn">نشر المنتج</button><p id="listingSaveState" class="muted" aria-live="polite"></p>
+  </form></div>
  </section>
  <section id="cart" class="page">
-  <div class="store-head"><h2>🛒 سلة مشترياتي</h2><p>هذه السلة خاصة بحسابك ولا تظهر لبقية العملاء.</p></div>
+  <div class="store-head"><h2>🛒 سلة الشراء</h2><p>اجمع المنتجات التي تريد شراءها في سلة خاصة بحسابك.</p></div>
   <div id="customerCartItems" class="list"><div class="panel empty">السلة فارغة.</div></div>
   <div class="field"><label for="cartBuyerContact">رقم هاتفك للتواصل بشأن الطلب</label><input id="cartBuyerContact" type="tel" maxlength="40" placeholder="07xxxxxxxxx" required></div>
   <div class="panel" style="margin-top:12px"><div class="rowitem"><strong>المجموع الكلي</strong><strong id="customerCartTotal">0 د.ع</strong></div>
    <button id="checkoutCustomerCart" class="primary full" type="button" style="margin-top:12px">إرسال طلب شراء السلة</button>
    <p id="customerCartState" class="muted" aria-live="polite"></p>
   </div>
-  <button class="secondary full" type="button" onclick="showPage('store')" style="margin-top:10px">متابعة التسوق</button>
+  <button class="secondary full" type="button" onclick="showPage('home')" style="margin-top:10px">متابعة تصفح المنتجات</button>
  </section>
  <section id="services" class="page">
-  <div class="section-head"><h3>الأقسام الرئيسية</h3></div>
+  <div class="section-head"><h3>أقسام المنتجات المنشورة</h3><span class="muted">اختر القسم لعرض منتجات المستخدمين</span></div>
+  <div class="grid" id="serviceListingCategories">
+   <button class="service" type="button" data-service-listing-cat="accessories"><div class="service-icon">📱</div><strong>الهواتف والإكسسوارات</strong><small>هواتف، شواحن، سماعات وملحقات</small></button>
+   <button class="service" type="button" data-service-listing-cat="cards"><div class="service-icon">💳</div><strong>البطاقات والأرصدة</strong><small>بطاقات رقمية وتعبئة</small></button>
+   <button class="service" type="button" data-service-listing-cat="games"><div class="service-icon">🎮</div><strong>الألعاب</strong><small>ألعاب وبطاقات وشحن</small></button>
+   <button class="service" type="button" data-service-listing-cat="property"><div class="service-icon">🏠</div><strong>العقارات والمنازل</strong><small>بيع وإيجار</small></button>
+   <button class="service" type="button" data-service-listing-cat="vehicles"><div class="service-icon">🚗</div><strong>السيارات والدراجات</strong><small>مركبات وقطع غيار</small></button>
+   <button class="service" type="button" data-service-listing-cat="pets"><div class="service-icon">🐦</div><strong>الطيور والحيوانات</strong><small>طيور زينة وحيوانات أليفة</small></button>
+   <button class="service" type="button" data-service-listing-cat="other"><div class="service-icon">🛍️</div><strong>منتجات متنوعة</strong><small>أقسام ومنتجات أخرى</small></button>
+  </div>
+  <div class="section-head"><h3>الخدمات الإلكترونية</h3><span class="muted">خدمات التطبيق والطلبات</span></div>
   <div class="grid" id="allServices"></div>
  </section>
  <section id="serviceDetail" class="page">
@@ -465,11 +440,9 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
 </div>
 <nav id="nav" class="nav hidden" aria-label="التنقل الرئيسي"><div class="navinner">
  <button data-go="profile" type="button"><span aria-hidden="true">♙</span><b data-i="profile">حسابي</b></button>
- <button class="active" data-go="home" type="button"><span aria-hidden="true">⌂</span><b>القائمة الرئيسية</b></button>
+ <button class="active" data-go="home" type="button"><span aria-hidden="true">⌂</span><b>الرئيسية</b></button>
  <button data-go="services" type="button"><span aria-hidden="true">▦</span><b data-i="services">الخدمات</b></button>
- <button data-go="store" type="button"><span aria-hidden="true">▣</span><b>المتجر</b></button>
- <a href="./premium-store.html" style="display:grid;justify-items:center;gap:3px;padding:5px 7px;color:#ffd15d;text-decoration:none;font-size:10px;min-width:62px"><span aria-hidden="true" style="font-size:16px;line-height:18px">🎮</span><b style="font-size:10px;font-weight:600">المتجر الرقمي</b></a>
- <button data-go="orders" type="button"><span aria-hidden="true">☷</span><b data-i="orders">الطلبات</b></button>
+ <button data-go="cart" type="button"><span aria-hidden="true">🛒</span><b>سلة الشراء <small id="navCartCount">0</small></b></button>
 </div></nav>
 <div class="footer">© <span id="year"></span> Alam Electronic Payment</div>
 </div>
@@ -620,7 +593,7 @@ function addSelectedProductToCart(){
  else items.push({id:x.id,quantity:qty});
  saveCustomerCart(items);$("productPurchaseState").textContent="تمت إضافة المنتج إلى سلتك.";updateCartCount();
 }
-function updateCartCount(){const n=getCustomerCart().reduce((sum,x)=>sum+x.quantity,0);const el=$("customerCartCount");if(el)el.textContent=String(n);}
+function updateCartCount(){const n=getCustomerCart().reduce((sum,x)=>sum+x.quantity,0);const el=$("customerCartCount");if(el)el.textContent=String(n);const nav=$("navCartCount");if(nav)nav.textContent=String(n);}
 function renderCustomerCart(){
  const root=$("customerCartItems");if(!root)return;
  const items=getCustomerCart(),rows=items.map(item=>{const p=cartProduct(item.id);if(!p)return "";return '<div class="order"><div class="rowitem"><strong>'+escapeHtml(p.title)+'</strong><button class="danger" type="button" data-cart-remove="'+escapeHtml(p.id)+'">حذف</button></div><p class="muted">'+Number(p.price).toLocaleString("en-US")+' د.ع للقطعة · المتوفر '+Number(p.quantity)+'</p><div class="field"><label>الكمية</label><input type="number" min="1" max="'+Number(p.quantity)+'" value="'+item.quantity+'" data-cart-quantity="'+escapeHtml(p.id)+'"></div><strong>الإجمالي: '+(Number(p.price)*item.quantity).toLocaleString("en-US")+' د.ع</strong></div>';}).filter(Boolean);
@@ -644,7 +617,7 @@ function renderHomeCustomerListings(){
   }
  }
  if(preview){
-  const latest=all.slice(0,6);
+  const latest=listings;
   preview.innerHTML=latest.length?'<div class="store-grid">'+latest.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:112px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+listingCategoryName(x.category)+' · '+Number(x.price).toLocaleString("en-US")+' د.ع</small></button>').join("")+'</div>':'<div class="panel empty">لا توجد منشورات معتمدة حالياً. ستظهر صور ومنشورات العملاء هنا بعد موافقة الإدارة.</div>';
  }
 }
@@ -712,7 +685,8 @@ document.addEventListener("click",function(e){
  const item=e.target.closest("[data-product-id]");if(item){showProductDetails(item.dataset.productId);return;}
 });
 document.addEventListener("input",function(e){if(e.target&&e.target.id==="storeSearch")renderStore();if(e.target&&e.target.id==="homeListingSearch")renderHomeCustomerListings();});
-document.addEventListener("click",function(e){const add=e.target.closest("[data-home-add-cat]");if(add){if(!auth.currentUser){alert("سجّل الدخول أولاً لإضافة منتج.");return;}const category=add.dataset.homeAddCat;$("listingCategory").value=category;openPublishPage();return;}const shop=e.target.closest("[data-home-shop-cat]");if(shop){activeHomeListingCategory=shop.dataset.homeShopCat;document.querySelectorAll("[data-home-cat]").forEach(x=>x.classList.toggle("active",x.dataset.homeCat===activeHomeListingCategory));renderHomeCustomerListings();showPage("customer-ads");return;}const b=e.target.closest("[data-home-cat]");if(b){activeHomeListingCategory=b.dataset.homeCat;document.querySelectorAll("[data-home-cat]").forEach(x=>x.classList.toggle("active",x===b));renderHomeCustomerListings();}});
+document.addEventListener("click",function(e){const mainCat=e.target.closest("[data-home-main-cat]");if(mainCat){activeHomeListingCategory=mainCat.dataset.homeMainCat;document.querySelectorAll("[data-home-main-cat]").forEach(x=>x.classList.toggle("active",x===mainCat));document.querySelectorAll("[data-home-cat]").forEach(x=>x.classList.toggle("active",x.dataset.homeCat===activeHomeListingCategory));renderHomeCustomerListings();return;}const serviceCat=e.target.closest("[data-service-listing-cat]");if(serviceCat){activeHomeListingCategory=serviceCat.dataset.serviceListingCat;document.querySelectorAll("[data-home-main-cat]").forEach(x=>x.classList.toggle("active",x.dataset.homeMainCat===activeHomeListingCategory));renderHomeCustomerListings();showPage("home");return;}const add=e.target.closest("[data-home-add-cat]");if(add){if(!auth.currentUser){alert("سجّل الدخول أولاً لإضافة منتج.");return;}const category=add.dataset.homeAddCat;$("listingCategory").value=category;openPublishPage();return;}const shop=e.target.closest("[data-home-shop-cat]");if(shop){activeHomeListingCategory=shop.dataset.homeShopCat;document.querySelectorAll("[data-home-cat]").forEach(x=>x.classList.toggle("active",x.dataset.homeCat===activeHomeListingCategory));renderHomeCustomerListings();showPage("customer-ads");return;}const b=e.target.closest("[data-home-cat]");if(b){activeHomeListingCategory=b.dataset.homeCat;document.querySelectorAll("[data-home-cat]").forEach(x=>x.classList.toggle("active",x===b));renderHomeCustomerListings();}});
+$("listingImage").addEventListener("change",()=>{const file=$("listingImage").files[0],preview=$("listingImagePreview");if(!file){preview.src="";preview.classList.add("hidden");return;}const reader=new FileReader();reader.onload=()=>{preview.src=reader.result;preview.classList.remove("hidden");};reader.readAsDataURL(file);});
 $("productListingForm").addEventListener("submit",async function(e){
  e.preventDefault();
  const btn=$("publishListingBtn"),state=$("listingSaveState");
@@ -720,7 +694,7 @@ $("productListingForm").addEventListener("submit",async function(e){
  btn.disabled=true;state.textContent="جارٍ تجهيز الصورة وإرسال الإعلان…";
  try{
   const image=await compressListingImage($("listingImage").files[0]);
-  const item={id:"PRD-"+Date.now(),uid:auth.currentUser.uid,location:($("listingShareLocation").checked&&$("locationSharingEnabled").checked)?pendingListingLocation:null,category:$("listingCategory").value,title:$("listingTitle").value.trim(),description:$("listingDescription").value.trim(),price:Math.trunc(Number($("listingPrice").value)),quantity:Math.trunc(Number($("listingQuantity").value)),image,status:"approved",createdAt:new Date().toISOString()};
+  const item={id:"PRD-"+Date.now(),uid:auth.currentUser.uid,location:null,category:$("listingCategory").value,title:$("listingTitle").value.trim(),description:$("listingDescription").value.trim(),price:Math.trunc(Number($("listingPrice").value)),quantity:1,image,status:"approved",createdAt:new Date().toISOString()};
   if(!item.title||!item.description||!Number.isInteger(item.price)||item.price<=0||!Number.isInteger(item.quantity)||item.quantity<1)throw new Error("تحقق من العنوان والسعر والكمية؛ يجب أن يكون السعر أكبر من صفر.");
   let cloudSaved=false,cloudError=null;
   try{
@@ -731,8 +705,8 @@ $("productListingForm").addEventListener("submit",async function(e){
    const all=getLocalListings();all.unshift(item);localStorage.setItem("alam_product_listings",JSON.stringify(all.slice(0,30)));renderStore();
   }catch(storageError){console.warn("Local listing cache:",storageError);}
   if(cloudSaved){
-   state.textContent="تم نشر إعلانك بنجاح وأصبح ظاهراً الآن في المتجر الرئيسي.";
-   $("productListingForm").reset();pendingListingLocation=null;$("listingLocationState").textContent="الموقع غير مضاف إلى الإعلان.";$("listingQuantity").value="1";
+   state.textContent="تم نشر منتجك بنجاح وأصبح ظاهراً في القائمة الرئيسية."
+   $("productListingForm").reset();pendingListingLocation=null;$("listingQuantity").value="1";$("listingImagePreview").src="";$("listingImagePreview").classList.add("hidden");
   }else{
    const code=cloudError&&cloudError.code?cloudError.code:"unknown";
    const detail=cloudError&&cloudError.message?cloudError.message:"تعذر الاتصال بالخادم.";
@@ -744,7 +718,7 @@ $("productListingForm").addEventListener("submit",async function(e){
  }finally{btn.disabled=false;}
 });
 function renderServices(){
- const categoryIndices=[14,16,15,17];
+ const categoryIndices=services.map((_,i)=>i);
  const categoryTitle=i=>({14:"هواتف وإكسسوارات",16:"عقارات ومنازل",15:"دراجات وسيارات",17:"طيور الزينة والحيوانات الأليفة"})[i]||serviceName(i);
  const cards=categoryIndices.map(i=>'<button class="service" data-service="'+i+'"><div class="service-icon">'+services[i].icon+'</div><strong>'+categoryTitle(i)+'</strong><small>'+serviceDesc(i)+'</small></button>').join("");
  $("homeServices").innerHTML=cards;
@@ -754,7 +728,7 @@ function renderServices(){
 }
 function openCardWalletTopup(){walletAction="deposit";$("walletMethod").value="Mastercard";$("walletModalTitle").textContent="طلب شحن المحفظة عبر البطاقة";$("walletModal").classList.remove("hidden");$("walletModal").style.display="grid";}
 function openPublishPage(){if(!auth.currentUser){alert("سجّل الدخول أولاً لنشر منتج أو إعلان.");return;}showPage("publish");setTimeout(()=>{const f=$("productListingForm");if(f)f.scrollIntoView({behavior:"smooth",block:"start"});$("listingTitle").focus({preventScroll:true});},120);}
-function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));if(id==="cart")renderCustomerCart();window.scrollTo({top:0,behavior:"smooth"});}
+function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));if(id==="cart")renderCustomerCart();if(id==="home")renderHomeCustomerListings();window.scrollTo({top:0,behavior:"smooth"});}
 function openService(i){currentService=i;$("detailIcon").textContent=services[i].icon;$("detailTitle").textContent=serviceName(i);$("detailDesc").textContent=serviceDesc(i);const sub=services[i].subs;const sf=$("subcategoryField");const sel=$("subcategory");if(sub){sf.classList.remove("hidden");sel.innerHTML=sub[lang].map(x=>'<option value="'+escapeHtml(x)+'">'+escapeHtml(x)+'</option>').join("");}else{sf.classList.add("hidden");sel.innerHTML="<option value=\\\"-\\\">-</option>";}$("accountInfo").value="";$("requestAmount").value="";$("notes").value="";showPage("serviceDetail");}
 function getOrders(){try{return JSON.parse(localStorage.getItem("alam_orders")||"[]")}catch{return []}}
 async function saveOrder(o,serviceIdOverride){
