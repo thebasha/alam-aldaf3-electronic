@@ -625,6 +625,7 @@ const providerCatalog=[
  {name:"GS",alt:"GS",cat:"cards",icon:"GS"}
 ];
 function getLocalListings(){try{return JSON.parse(localStorage.getItem("alam_product_listings")||"[]")}catch{return []}}
+ function refreshPendingListingsButton(){const button=$("retryPendingListings");if(button)button.classList.toggle("hidden",!getLocalListings().some(x=>String(x.id||"").startsWith("PRD-")||x.syncPending===true));}
  function formatIQD(value){const amount=Number(value);return (Number.isFinite(amount)?Math.round(amount):0).toLocaleString("en-US")+" د.ع";}
  async function retryPendingListings(){
   const button=$("retryPendingListings"),state=$("listingSaveState");
@@ -639,7 +640,7 @@ function getLocalListings(){try{return JSON.parse(localStorage.getItem("alam_pro
     window.__approvedListings=window.__approvedListings||[];window.__approvedListings.unshift({id:ref.id,uid:auth.currentUser.uid,category:normalizeListingCategory(item.category),title:item.title,description:item.description,price:Number(item.price),quantity:Number(item.quantity)||1,image:item.image,location:item.location||null,status:"approved",createdAtMs:Date.now(),city:""});synced++;
    }catch(err){lastError=err;remaining.push(item);console.error("Retry pending listing:",err);}
   }
-  localStorage.setItem("alam_product_listings",JSON.stringify(remaining.slice(0,30)));
+  localStorage.setItem("alam_product_listings",JSON.stringify(remaining.slice(0,30)));refreshPendingListingsButton();
   renderStore();renderHomeCustomerListings();await loadApprovedListings();
   if(lastError){state.textContent="تعذرت مزامنة بعض الإعلانات ("+(lastError.code||"unknown")+"): "+(lastError.message||"تحقق من قواعد Firestore")+"؛ بقيت بياناتها محفوظة على الجهاز.";}else{state.textContent=synced?"تمت مزامنة "+synced+" إعلان/إعلانات وأصبحت متاحة للجميع.":"لا توجد إعلانات معلّقة للمزامنة."}
   button.classList.toggle("hidden",remaining.every(x=>!(String(x.id||"").startsWith("PRD-")||x.syncPending===true)||x.uid!==auth.currentUser.uid));button.disabled=false;
@@ -679,6 +680,7 @@ let approvedListingsUnsubscribe=null;
 function loadApprovedListings(){try{if(approvedListingsUnsubscribe)approvedListingsUnsubscribe();const query=db.collection("listings").where("status","in",["approved","sold_out","sold"]).limit(150);approvedListingsUnsubscribe=query.onSnapshot(snap=>{window.__approvedListings=snap.docs.map(d=>{const x=d.data();const ts=x.createdAt&&typeof x.createdAt.toMillis==="function"?x.createdAt.toMillis():0;return {id:d.id,uid:x.ownerUid||"",category:normalizeListingCategory(x.section||x.category||"other"),title:x.title||"",description:x.description||"",price:Number(x.priceIQD||0),quantity:Number(x.quantity||1),image:x.imageData||"",location:x.location||null,status:x.status,createdAtMs:ts,city:x.city||""};}).filter(x=>x.image).sort((a,b)=>b.createdAtMs-a.createdAtMs);renderStore();renderHomeCustomerListings();renderCustomerCart();const stamp=$("listingsLastUpdated");if(stamp)stamp.textContent="آخر تحديث مباشر: "+new Date().toLocaleTimeString("ar-IQ");},e=>{console.error("Live listings unavailable:",e);const stamp=$("listingsLastUpdated");if(stamp)stamp.textContent="تعذر تحميل المنتجات من الخادم: "+(e.code||e.message||"تحقق من صلاحيات Firestore");});}catch(e){console.error("Public listings unavailable:",e);}}
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&auth.currentUser)loadApprovedListings();});
  $("retryPendingListings").addEventListener("click",retryPendingListings);
+ refreshPendingListingsButton();
 
 function renderStore(){
  const all=(window.__approvedListings||[]).filter(x=>x.status==="approved");
@@ -813,10 +815,10 @@ $("productListingForm").addEventListener("submit",async function(e){
    renderStore();renderHomeCustomerListings();
   }catch(err){cloudError=err;console.error("Listing Firestore error:",err);}
   try{
-   const all=getLocalListings();if(!cloudSaved){item.syncPending=true;all.unshift(item);}else{const keep=all.filter(x=>x.id!==item.id);localStorage.setItem("alam_product_listings",JSON.stringify(keep.slice(0,30)));}if(!cloudSaved)localStorage.setItem("alam_product_listings",JSON.stringify(all.slice(0,30)));renderStore();
+   const all=getLocalListings();if(!cloudSaved){item.syncPending=true;all.unshift(item);}else{const keep=all.filter(x=>x.id!==item.id);localStorage.setItem("alam_product_listings",JSON.stringify(keep.slice(0,30)));}if(!cloudSaved)localStorage.setItem("alam_product_listings",JSON.stringify(all.slice(0,30)));refreshPendingListingsButton();renderStore();
   }catch(storageError){console.warn("Local listing cache:",storageError);}
   if(cloudSaved){
-   state.textContent="تم نشر منتجك بنجاح وأصبح ظاهراً الآن في القائمة الرئيسية."; $("retryPendingListings").classList.add("hidden")
+   state.textContent="تم نشر منتجك بنجاح وأصبح ظاهراً الآن في القائمة الرئيسية."; refreshPendingListingsButton()
    $("productListingForm").reset();pendingListingLocation=null;$("listingQuantity").value="1";$("listingImagePreview").src="";$("listingImagePreview").classList.add("hidden");
   }else{
    const code=cloudError&&cloudError.code?cloudError.code:"unknown";
