@@ -138,7 +138,7 @@ const t=translations[lang],phone=$("phone").value.trim(),pkg=$("package").value.
 if(!pkg){alert(t.packageMissing);return;}
 const lines=[t.waIntro,t.product+": "+selected.name,t.pack+": "+pkg,t.account+": "+(account||t.notSet),t.contact+": "+phone,t.confirm];
 window.open("https://wa.me/9647733661844?text="+encodeURIComponent(lines.join("\n")),"_blank","noopener");
-});
+},true);
 apply();
 })();
 </script>
