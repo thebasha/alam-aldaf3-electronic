@@ -35,8 +35,10 @@ service cloud.firestore {
       ])
       && request.resource.data.uid == request.auth.uid
       && request.resource.data.serviceId in [
-        'games', 'apps', 'google', 'apple', 'mobile', 'zain', 'master',
-        'earnings', 'repair', 'phones', 'vehicles', 'property', 'wallet'
+        'payment-services', 'digital-cards', 'entertainment-games',
+        'telecom', 'digital-services', 'games', 'apps', 'google',
+        'apple', 'mobile', 'zain', 'master', 'earnings', 'repair',
+        'phones', 'vehicles', 'property', 'pets', 'wallet'
       ]
       && request.resource.data.accountInfo is string
       && request.resource.data.accountInfo.size() > 0
