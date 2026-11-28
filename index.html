@@ -210,14 +210,19 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   </div>
   <div class="section-head"><h3>📣 النشر والإعلان</h3><span class="muted">أضف منتجك ليظهر في القسم المناسب</span></div>
   <button class="service full" type="button" onclick="openPublishPage()" style="display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:13px;text-align:right;padding:13px;margin-bottom:14px"><div class="service-icon">📢</div><span><strong>إضافة منتج أو إعلان جديد</strong><small>ارفع صورة، اختر القسم، وانشر إعلانك</small></span><span style="margin-right:auto">＋</span></button>
+  <button class="service full" type="button" onclick="showPage('customer-ads')" style="display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:13px;text-align:right;padding:13px;margin:12px 0"><div class="service-icon">🛍️</div><span><strong>إعلانات العملاء</strong><small>تصفح المنتجات والإعلانات حسب الأقسام وابحث بينها</small></span><span style="margin-right:auto">←</span></button>
+  <div class="section-head"><h3 data-i="recentOrders">آخر الطلبات</h3><button class="smalllink" data-go="orders" data-i="viewAll" type="button" onclick="showPage('orders')">عرض الكل</button></div>
+  <div id="recentList" class="list"></div>
+ </section>
+ <section id="customer-ads" class="page">
+  <div class="store-head"><h2>🛍️ إعلانات العملاء</h2><p>تصفح إعلانات ومنتجات العملاء حسب القسم وابحث عن المنتج الذي تريده.</p></div>
   <div class="section-head"><h3>🛍️ إعلانات العملاء حسب الأقسام</h3><button class="smalllink" type="button" onclick="showPage('store')">عرض السوق</button></div>
   <div class="store-search"><input id="homeListingSearch" type="search" placeholder="ابحث عن أي منتج أو إعلان..." autocomplete="off" aria-label="ابحث في إعلانات العملاء"></div>
   <div class="store-tabs home-listing-tabs" id="homeListingTabs" aria-label="أقسام إعلانات العملاء">
    <button class="active" type="button" data-home-cat="all">الكل</button><button type="button" data-home-cat="phones">هواتف وإكسسوارات</button><button type="button" data-home-cat="property">عقارات</button><button type="button" data-home-cat="vehicles">سيارات ودراجات</button><button type="button" data-home-cat="pets">طيور وحيوانات</button><button type="button" data-home-cat="other">أخرى</button>
   </div>
   <div id="homeCustomerListings" class="list"><div class="panel empty">جارٍ تحميل إعلانات العملاء…</div></div>
-  <div class="section-head"><h3 data-i="recentOrders">آخر الطلبات</h3><button class="smalllink" data-go="orders" data-i="viewAll" type="button" onclick="showPage('orders')">عرض الكل</button></div>
-  <div id="recentList" class="list"></div>
+
  </section>
  <section id="store" class="page">
   <div class="store-head"><h2>السوق الإلكتروني</h2><p>إعلانات المنتجات مع السعر والكمية والصورة والتفاصيل</p></div>
