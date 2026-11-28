@@ -227,22 +227,13 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
 
  </section>
  <section id="store" class="page">
-  <div class="store-head"><h2>السوق الإلكتروني</h2><p>إعلانات المنتجات مع السعر والكمية والصورة والتفاصيل</p></div>
-  <div class="rowitem" style="margin:12px 0"><span class="muted">سلة مشترياتك الخاصة</span><button class="primary" id="openCustomerCart" type="button">🛒 السلة (<span id="customerCartCount">0</span>)</button></div>
-  
-  <div class="store-search"><input id="storeSearch" type="search" placeholder="ابحث عن بطاقة..." autocomplete="off" aria-label="ابحث عن بطاقة"></div>
-  <div class="store-subtitle"><h3>مزودو الخدمة</h3><span class="store-count" id="storeCount"></span></div>
-  <div class="store-tabs" id="storeTabs" aria-label="تصنيفات البطاقات والخدمات">
-   <button class="active" type="button" data-store-cat="all">للجميع</button>
-   <button type="button" data-store-cat="entertainment">ترفيه</button>
-   <button type="button" data-store-cat="games">ألعاب</button>
-   <button type="button" data-store-cat="telecom">اتصالات</button>
-   <button type="button" data-store-cat="internet">إنترنت</button>
-   <button type="button" data-store-cat="cards">بطاقات إلكترونية</button>
+  <div class="store-head"><h2>السوق الإلكتروني</h2><p>المتجر قيد إعادة التصميم.</p></div>
+  <div style="display:none" aria-hidden="true">
+   <button id="openCustomerCart" type="button"></button><span id="customerCartCount">0</span>
+   <input id="storeSearch" type="search">
+   <span id="storeCount"></span><span id="listingCount"></span>
+   <div id="providerGrid"></div><div id="storeGrid"></div>
   </div>
-  <div class="store-grid" id="providerGrid"></div>
-  <div class="store-subtitle"><h3>إعلانات العملاء</h3><span class="store-count" id="listingCount"></span></div>
-  <div class="store-grid" id="storeGrid"></div>
  </section>
  <section id="publish" class="page">
   <div class="store-head"><h2>📣 النشر والإعلان</h2><p>أضف منتجك أو إعلانك واختر القسم المناسب ليظهر ضمن إعلانات العملاء في القائمة الرئيسية بعد موافقة الإدارة.</p></div>
