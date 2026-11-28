@@ -25,8 +25,8 @@ jobs:
           test -n "$FIREBASE_SERVICE_ACCOUNT" || (echo "Missing FIREBASE_SERVICE_ACCOUNT repository secret" && exit 1)
           printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-service-account.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-service-account.json" >> "$GITHUB_ENV"
-      - name: Deploy Firestore and Storage rules
+      - name: Deploy Firestore rules
         env:
           FIREBASE_PROJECT_ID: alam-aldaf3-electronic-922f5
         run: |
-          firebase deploy --only firestore:rules,storage --project "$FIREBASE_PROJECT_ID" --non-interactive
+          firebase deploy --only firestore:rules --project "$FIREBASE_PROJECT_ID" --non-interactive
