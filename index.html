@@ -202,18 +202,15 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   </div>
   <div class="section-head"><h3 data-i="mainServices">الخدمات الرئيسية</h3><span class="muted" data-i="chooseService">اختر الخدمة</span></div>
   <div class="grid" id="homeServices"></div>
-  <div class="section-head"><h3>🛍️ تسوق حسب القسم</h3><span class="muted">اضغط لعرض المنتجات</span></div>
-  <div class="grid" id="homeProductCategories">
-   <button class="service" type="button" data-home-shop-cat="accessories"><div class="service-icon">🎧</div><strong>إكسسوارات</strong><small>شواحن، سماعات، أغلفة وغيرها</small></button>
-   <button class="service" type="button" data-home-shop-cat="phones"><div class="service-icon">📱</div><strong>الهواتف</strong><small>هواتف وأجهزة ذكية</small></button>
-   <button class="service" type="button" data-home-shop-cat="cards"><div class="service-icon">💳</div><strong>البطاقات الإلكترونية</strong><small>بطاقات وشحن رقمي</small></button>
-   <button class="service" type="button" data-home-shop-cat="games"><div class="service-icon">🎮</div><strong>الألعاب</strong><small>منتجات وخدمات الألعاب</small></button>
-   <button class="service" type="button" data-home-shop-cat="telecom"><div class="service-icon">📞</div><strong>الاتصالات</strong><small>خطوط وخدمات اتصال</small></button>
-   <button class="service" type="button" data-home-shop-cat="internet"><div class="service-icon">🌐</div><strong>الإنترنت</strong><small>أجهزة وباقات الإنترنت</small></button>
-   <button class="service" type="button" data-home-shop-cat="pets"><div class="service-icon">🐦</div><strong>الطيور والحيوانات</strong><small>طيور الزينة والحيوانات الأليفة</small></button>
-   <button class="service" type="button" data-home-shop-cat="vehicles"><div class="service-icon">🚗</div><strong>السيارات والدراجات</strong><small>مركبات وملحقاتها</small></button>
-   <button class="service" type="button" data-home-shop-cat="property"><div class="service-icon">🏠</div><strong>العقارات</strong><small>عقارات ومنازل</small></button>
-   <button class="service" type="button" data-home-shop-cat="other"><div class="service-icon">📦</div><strong>أقسام أخرى</strong><small>منتجات متنوعة</small></button>
+  <div class="section-head"><h3>🛍️ تسوق حسب القسم</h3><span class="muted">7 أقسام · تحديث مباشر</span></div>
+  <div class="grid marketplace-categories" id="homeProductCategories">
+   <button class="service" type="button" data-home-shop-cat="accessories"><div class="service-icon">📱</div><strong>الإكسسوارات والهواتف</strong><small>هواتف، شواحن، سماعات وملحقات</small></button>
+   <button class="service" type="button" data-home-shop-cat="property"><div class="service-icon">🏠</div><strong>المنازل والعقارات</strong><small>بيع وإيجار المنازل والأراضي</small></button>
+   <button class="service" type="button" data-home-shop-cat="vehicles"><div class="service-icon">🚗</div><strong>الدراجات والسيارات</strong><small>مركبات وقطع غيار وملحقات</small></button>
+   <button class="service" type="button" data-home-shop-cat="pets"><div class="service-icon">🐦</div><strong>الطيور والدواجن</strong><small>طيور زينة ودواجن ومستلزماتها</small></button>
+   <button class="service" type="button" data-home-shop-cat="cards"><div class="service-icon">💳</div><strong>البطاقات الإلكترونية والأرصدة</strong><small>بطاقات رقمية وتعبئة أرصدة</small></button>
+   <button class="service" type="button" data-home-shop-cat="games"><div class="service-icon">🎮</div><strong>الألعاب</strong><small>ألعاب وبطاقات وشحن الألعاب</small></button>
+   <button class="service" type="button" data-home-shop-cat="other"><div class="service-icon">🛍️</div><strong>قسم متنوع ومختلط</strong><small>كل المنتجات والخدمات الأخرى</small></button>
   </div>
   <div class="section-head"><h3>الدفع الإلكتروني والشحن</h3><span class="muted">خدمات المحفظة والبطاقات</span></div>
   <div class="grid" id="homePayments">
@@ -230,7 +227,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <div id="recentList" class="list"></div>
  </section>
  <section id="customer-ads" class="page">
-  <div class="store-head"><h2>🛍️ إعلانات العملاء</h2><p>تصفح إعلانات ومنتجات العملاء حسب القسم وابحث عن المنتج الذي تريده.</p></div>
+  <div class="store-head"><h2>🛍️ إعلانات العملاء</h2><p>تصفح المنتجات المعتمدة حسب القسم، مع تحديث مباشر عند نشر منتجات جديدة.</p><small id="listingsLastUpdated">متصل بالتحديث المباشر</small></div>
   <div class="section-head"><h3>🛍️ إعلانات العملاء حسب الأقسام</h3><button class="smalllink" type="button" onclick="showPage('store')">عرض السوق</button></div>
   <div class="store-search"><input id="homeListingSearch" type="search" placeholder="ابحث عن أي منتج أو إعلان..." autocomplete="off" aria-label="ابحث في إعلانات العملاء"></div>
   <div class="store-tabs home-listing-tabs" id="homeListingTabs" aria-label="أقسام إعلانات العملاء">
@@ -251,7 +248,7 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <div class="store-head"><h2>📣 النشر والإعلان</h2><p>أضف منتجك أو إعلانك واختر القسم المناسب ليظهر ضمن إعلانات العملاء في القائمة الرئيسية بعد موافقة الإدارة.</p></div>
   <div class="panel" style="margin-top:16px"><h3>إضافة منتج أو إعلان جديد</h3>
    <form id="productListingForm">
-    <div class="field"><label for="listingCategory">القسم</label><select id="listingCategory" required><option value="accessories">إكسسوارات الهواتف</option><option value="phones">الهواتف والأجهزة</option><option value="cards">البطاقات الإلكترونية</option><option value="games">الألعاب</option><option value="telecom">الاتصالات</option><option value="internet">الإنترنت</option><option value="property">عقارات ومنازل</option><option value="vehicles">دراجات وسيارات</option><option value="pets">طيور الزينة والحيوانات الأليفة</option><option value="other">منتجات وأغراض أخرى</option></select></div>
+    <div class="field"><label for="listingCategory">القسم</label><select id="listingCategory" required><option value="accessories">الإكسسوارات والهواتف</option><option value="property">المنازل والعقارات</option><option value="vehicles">الدراجات والسيارات</option><option value="pets">الطيور والدواجن</option><option value="cards">البطاقات الإلكترونية والأرصدة</option><option value="games">الألعاب</option><option value="other">قسم متنوع ومختلط</option></select></div>
     <div class="field"><label for="listingTitle">اسم المنتج / عنوان الإعلان</label><input id="listingTitle" maxlength="90" required></div>
     <div class="field"><label for="listingDescription">تفاصيل المنتج</label><textarea id="listingDescription" maxlength="1200" required></textarea></div>
     <div class="field"><label for="listingPrice">السعر بالدينار العراقي</label><input id="listingPrice" type="number" min="0" step="1000" required></div>
@@ -310,7 +307,10 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <button class="danger full" id="logoutBtn" type="button" style="margin:14px 0 20px">↪ تسجيل الخروج</button>
   <div class="section-head"><h3>تعديل الملف الشخصي</h3></div>
   <form id="profileForm" class="panel">
-   <div class="field"><label for="profileNickname">الاسم المستعار</label><input id="profileNickname" maxlength="60" placeholder="اكتب الاسم الذي يظهر للآخرين"></div>
+   <div class="field"><label for="profileNickname">اسم المستخدم الظاهر</label><input id="profileNickname" maxlength="60" placeholder="اكتب اسمك"></div>
+   <div class="field"><label for="profilePhone">رقم الهاتف</label><input id="profilePhone" type="tel" maxlength="40" placeholder="07xxxxxxxxx" autocomplete="tel"></div>
+   <div class="field"><label for="profileEmail">البريد الإلكتروني</label><input id="profileEmail" type="email" maxlength="120" autocomplete="email" placeholder="example@email.com"></div>
+   <div class="field"><label for="profileAbout">معلومات عن المستخدم (اختياري)</label><textarea id="profileAbout" maxlength="500" placeholder="اكتب نبذة مختصرة عنك أو عن نشاطك"></textarea></div>
    <div class="field"><label for="profileUsername">اسم المستخدم (بدون مسافات)</label><input id="profileUsername" maxlength="20" pattern="[A-Za-z0-9_ء-ي٠-٩]{3,20}" placeholder="username أو اسم_مستخدم" autocomplete="username"></div>
    <div class="field"><label for="profileAvatarFile">الصورة الشخصية</label><input id="profileAvatarFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
    <div class="field"><label><input id="hideProfileEmail" type="checkbox" checked> إخفاء البريد الإلكتروني</label></div>
@@ -539,14 +539,15 @@ $("listingLocationPrecision").addEventListener("change",()=>{pendingListingLocat
 $("locationSharingEnabled").addEventListener("change",e=>{
  if(!e.target.checked){$("listingShareLocation").checked=false;pendingListingLocation=null;$("listingLocationState").textContent="مشاركة الموقع متوقفة من إعدادات حسابك.";}
 });
-async function loadApprovedListings(){try{const snap=await db.collection("listings").where("status","in",["approved","sold_out","sold"]).limit(150).get();window.__approvedListings=snap.docs.map(d=>{const x=d.data();const ts=x.createdAt&&typeof x.createdAt.toMillis==="function"?x.createdAt.toMillis():0;return {id:d.id,uid:x.ownerUid||"",category:x.section||x.category||"other",title:x.title||"",description:x.description||"",price:Number(x.priceIQD||0),quantity:Number(x.quantity||1),image:x.imageData||"",location:x.location||null,status:x.status,createdAtMs:ts,city:x.city||""};}).filter(x=>x.image).sort((a,b)=>b.createdAtMs-a.createdAtMs);renderStore();renderHomeCustomerListings();renderCustomerCart();}catch(e){console.warn("Public listings unavailable:",e);}}
+let approvedListingsUnsubscribe=null;
+function loadApprovedListings(){try{if(approvedListingsUnsubscribe)approvedListingsUnsubscribe();const query=db.collection("listings").where("status","in",["approved","sold_out","sold"]).limit(150);approvedListingsUnsubscribe=query.onSnapshot(snap=>{window.__approvedListings=snap.docs.map(d=>{const x=d.data();const ts=x.createdAt&&typeof x.createdAt.toMillis==="function"?x.createdAt.toMillis():0;return {id:d.id,uid:x.ownerUid||"",category:normalizeListingCategory(x.section||x.category||"other"),title:x.title||"",description:x.description||"",price:Number(x.priceIQD||0),quantity:Number(x.quantity||1),image:x.imageData||"",location:x.location||null,status:x.status,createdAtMs:ts,city:x.city||""};}).filter(x=>x.image).sort((a,b)=>b.createdAtMs-a.createdAtMs);renderStore();renderHomeCustomerListings();renderCustomerCart();const stamp=$("listingsLastUpdated");if(stamp)stamp.textContent="آخر تحديث مباشر: "+new Date().toLocaleTimeString("ar-IQ");},e=>console.warn("Live listings unavailable:",e));}catch(e){console.warn("Public listings unavailable:",e);}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&auth.currentUser)loadApprovedListings();});
+
 function renderStore(){
- // إخفاء جميع المنتجات ومزودي الخدمة من واجهة المتجر مؤقتاً دون حذف سجلات العملاء من Firestore.
- $("providerGrid").innerHTML='<div class="store-empty">المتجر قيد إعادة التجهيز.</div>';
- $("storeGrid").innerHTML='<div class="store-empty">لا توجد منتجات معروضة حالياً.</div>';
- $("storeCount").textContent="0 مزود خدمة";
- $("listingCount").textContent="0 إعلان";
- updateCartCount();
+ const all=(window.__approvedListings||[]).filter(x=>x.status==="approved");
+ $("providerGrid").innerHTML='<div class="store-empty">منتجات العملاء المعتمدة تظهر هنا مباشرة.</div>';
+ $("storeGrid").innerHTML=all.length?'<div class="store-grid">'+all.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:130px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · المتوفر '+Number(x.quantity)+'</small></button>').join("")+'</div>':'<div class="store-empty">لا توجد منتجات معروضة حالياً.</div>';
+ $("storeCount").textContent="";$("listingCount").textContent=String(all.length)+" منتج";updateCartCount();
 }
 function cartStorageKey(){return "alam_customer_cart_"+(auth.currentUser?auth.currentUser.uid:"guest");}
 function getCustomerCart(){try{return JSON.parse(localStorage.getItem(cartStorageKey())||"[]").filter(x=>x&&typeof x.id==="string"&&Number.isInteger(x.quantity)&&x.quantity>0);}catch{return [];}}
@@ -571,16 +572,17 @@ function renderCustomerCart(){
  $("customerCartTotal").textContent=total.toLocaleString("en-US")+" د.ع";updateCartCount();
 }
 let activeHomeListingCategory="all";
-function listingCategoryName(key){return ({accessories:"🎧 إكسسوارات الهواتف",phones:"📱 الهواتف والأجهزة",cards:"💳 البطاقات الإلكترونية",games:"🎮 الألعاب",telecom:"📞 الاتصالات",internet:"🌐 الإنترنت",property:"🏠 عقارات ومنازل",vehicles:"🚗 سيارات ودراجات",pets:"🐦 طيور الزينة والحيوانات الأليفة",other:"📦 منتجات وأغراض أخرى"})[key]||"📦 منتجات أخرى";}
+function normalizeListingCategory(key){return ({phones:"accessories",telecom:"cards",internet:"cards"})[key]||key||"other";}
+function listingCategoryName(key){return ({accessories:"📱 الإكسسوارات والهواتف",cards:"💳 البطاقات الإلكترونية والأرصدة",games:"🎮 الألعاب",property:"🏠 المنازل والعقارات",vehicles:"🚗 الدراجات والسيارات",pets:"🐦 الطيور والدواجن",other:"🛍️ قسم متنوع ومختلط"})[normalizeListingCategory(key)]||"🛍️ قسم متنوع ومختلط";}
 function renderHomeCustomerListings(){
  const root=$("homeCustomerListings"),preview=$("homeCustomerListingsPreview");
  const q=(($("homeListingSearch")&&$("homeListingSearch").value)||"").trim().toLocaleLowerCase("ar");
  const all=(window.__approvedListings||[]).filter(x=>x.image).slice().sort((a,b)=>(b.createdAtMs||0)-(a.createdAtMs||0));
- const listings=all.filter(x=>(activeHomeListingCategory==="all"||x.category===activeHomeListingCategory)&&(!q||[x.title,x.description,x.category,x.city].join(" ").toLocaleLowerCase("ar").includes(q)));
+ const listings=all.filter(x=>(activeHomeListingCategory==="all"||normalizeListingCategory(x.category)===normalizeListingCategory(activeHomeListingCategory))&&(!q||[x.title,x.description,x.category,x.city].join(" ").toLocaleLowerCase("ar").includes(q)));
  if(root){
   if(!listings.length){root.innerHTML='<div class="panel empty">لا توجد منتجات مطابقة لبحثك حالياً.</div>';}
   else{
-   const groups=activeHomeListingCategory==="all"?["accessories","phones","cards","games","telecom","internet","property","vehicles","pets","other"]:[activeHomeListingCategory];
+   const groups=activeHomeListingCategory==="all"?["accessories","property","vehicles","pets","cards","games","other"]:[normalizeListingCategory(activeHomeListingCategory)];
    root.innerHTML=groups.map(key=>{const items=listings.filter(x=>x.category===key);return '<div class="panel home-category-panel"><div class="rowitem"><strong>'+listingCategoryName(key)+'</strong><span class="muted">'+items.length+' منتج</span></div><button class="smalllink home-add-product" type="button" data-home-add-cat="'+key+'">＋ إضافة منتج لهذا القسم</button><div class="store-grid" style="margin-top:10px">'+(items.length?items.slice(0,8).map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:105px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · '+(x.status==="sold_out"?"نفذت الكمية":x.status==="sold"?"مباع":"متوفر")+'</small></button>').join(""):'<div class="store-empty">لا توجد منتجات في هذا القسم بعد.</div>')+'</div></div>';}).join("");
   }
  }
@@ -665,7 +667,7 @@ $("productListingForm").addEventListener("submit",async function(e){
   if(!item.title||!item.description||!Number.isInteger(item.price)||item.price<=0||!Number.isInteger(item.quantity)||item.quantity<1)throw new Error("تحقق من العنوان والسعر والكمية؛ يجب أن يكون السعر أكبر من صفر.");
   let cloudSaved=false,cloudError=null;
   try{
-   await db.collection("listings").add({ownerUid:auth.currentUser.uid,section:item.category,category:item.category,title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,location:item.location||null,city:"",contact:"",imagePaths:[],status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+   await db.collection("listings").add({ownerUid:auth.currentUser.uid,section:normalizeListingCategory(item.category),category:normalizeListingCategory(item.category),title:item.title,description:item.description,priceIQD:item.price,quantity:item.quantity,imageData:item.image,location:item.location||null,city:"",contact:"",imagePaths:[],status:"pending",createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
    cloudSaved=true;
   }catch(err){cloudError=err;console.error("Listing Firestore error:",err);}
   try{
@@ -725,6 +727,7 @@ async function loadProfileEditor(){
  try{const snap=await db.collection("users").doc(user.uid).get();const p=snap.exists?snap.data():{};
   $("profileNickname").value=p.nickname||p.displayName||user.displayName||"";
   $("profileUsername").value=p.username||"";
+  $("profilePhone").value=p.phone||"";$("profileEmail").value=user.email||p.email||"";$("profileAbout").value=p.about||"";
   $("hideProfileEmail").checked=p.hideEmail!==false;$("hideProfilePhone").checked=p.hidePhone!==false;
   $("profileName").textContent=p.nickname||p.displayName||p.username||"حسابي";
   $("locationSharingEnabled").checked=p.locationSharingEnabled===true;
@@ -743,7 +746,7 @@ async function compressProfileImage(file){
 }
 async function saveProfile(e){
  e.preventDefault();const user=auth.currentUser;if(!user)return;
- const nickname=$("profileNickname").value.trim(),username=$("profileUsername").value.trim().toLowerCase();
+ const nickname=$("profileNickname").value.trim(),username=$("profileUsername").value.trim().toLowerCase(),phone=$("profilePhone").value.trim(),about=$("profileAbout").value.trim(),email=$("profileEmail").value.trim();
  if(!nickname||nickname.length>60){alert("أدخل اسماً مستعاراً من 1 إلى 60 حرفاً.");return;}
  if(!/^[a-z0-9_ء-ي٠-٩]{3,20}$/i.test(username)){alert("اسم المستخدم يجب أن يكون من 3 إلى 20 حرفاً، بالعربية أو الإنجليزية أو الأرقام أو _");return;}
  const btn=$("saveProfileBtn");btn.disabled=true;$("profileSaveState").textContent="جارٍ حفظ التعديلات…";
@@ -753,12 +756,12 @@ async function saveProfile(e){
    const [profileSnap,nameSnap]=await Promise.all([tx.get(userRef),tx.get(newNameRef)]);
    const oldName=profileSnap.exists?String(profileSnap.data().username||"").toLowerCase():"";
    if(nameSnap.exists&&nameSnap.data().uid!==user.uid)throw new Error("اسم المستخدم مستخدم بالفعل. اختر اسماً آخر.");
-   const patch={uid:user.uid,displayName:nickname,nickname,username,hideEmail:$("hideProfileEmail").checked,hidePhone:$("hideProfilePhone").checked,locationSharingEnabled:$("locationSharingEnabled").checked,locationPrecision:$("profileLocationPrecision").value,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+   const patch={uid:user.uid,displayName:nickname,nickname,username,phone,about,hideEmail:$("hideProfileEmail").checked,hidePhone:$("hideProfilePhone").checked,locationSharingEnabled:$("locationSharingEnabled").checked,locationPrecision:$("profileLocationPrecision").value,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
    if(photoData)patch.photoData=photoData;if(!profileSnap.exists){patch.email=String(user.email||"");patch.createdAt=firebase.firestore.FieldValue.serverTimestamp();}
    tx.set(userRef,patch,{merge:true});tx.set(newNameRef,{uid:user.uid,username,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
    if(oldName&&oldName!==username)tx.delete(db.collection("usernames").doc(oldName));
   });
-  $("profileName").textContent=nickname;if(photoData)$("profileAvatar").src=photoData;$("profileSaveState").textContent="تم حفظ الملف الشخصي بنجاح.";$("profileAvatarFile").value="";
+  $("profileName").textContent=nickname;if(photoData)$("profileAvatar").src=photoData;$("profileAvatarFile").value="";if(email&&email!==String(user.email||"")){try{await user.updateEmail(email);await user.sendEmailVerification();$("profileSaveState").textContent="تم حفظ الملف الشخصي وإرسال رسالة تحقق إلى البريد الجديد.";}catch(emailErr){console.warn("Email update requires recent authentication:",emailErr);$("profileSaveState").textContent="تم حفظ بقية الملف الشخصي. لتغيير البريد سجّل الخروج ثم ادخل مجدداً وأعد المحاولة.";}}else{$("profileSaveState").textContent="تم حفظ الملف الشخصي بنجاح.";}
  }catch(err){console.error(err);$("profileSaveState").textContent=err.message||"تعذر حفظ الملف الشخصي.";}
  finally{btn.disabled=false;}
 }
