@@ -48,12 +48,12 @@ $("filters").addEventListener("click",e=>{const b=e.target.closest("[data-cat]")
 $("search").addEventListener("input",render);
 $("products").addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(!b)return;selected=items.find(x=>x.id===b.dataset.id);$("modalTitle").textContent=selected.name;$("productInfo").textContent=selected.desc+" · السعر والتوفر يؤكدان عند التواصل."; $("modal").classList.add("open");$("package").focus();});
 $("close").addEventListener("click",()=>$("modal").classList.remove("open"));$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("open");});
-$("orderForm").addEventListener("submit",e=>{e.preventDefault();if(!selected)return;const phone=$("phone").value.trim(),pkg=$("package").value.trim(),account=$("account").value.trim();const message="السلام عليكم، أريد طلب من متجر عالم الدفع الإلكتروني:%0Aالمنتج: "+encodeURIComponent(selected.name)+"%0Aالباقة: "+encodeURIComponent(pkg)+"%0Aمعرّف الحساب: "+encodeURIComponent(account||"غير محدد")+"%0Aرقم التواصل: "+encodeURIComponent(phone)+"%0Aيرجى تأكيد السعر والتوفر وطريقة الدفع.";window.open("https://wa.me/9647733661844?text="+message,"_blank","noopener");});
+$("orderForm").addEventListener("submit",e=>{e.preventDefault();});
 $("year").textContent=new Date().getFullYear();render();
 </script>
 <script>
 (()=>{
-let lang="ar";
+let lang=localStorage.getItem("alam_lang")||"ar";
 const $=id=>document.getElementById(id);
 const translations={
 en:{
@@ -126,7 +126,7 @@ const list=items.filter(x=>(category==="all"||x.cat===category)&&(!q||(x.name+" 
 $("count").textContent=list.length+" "+t.service;
 $("products").innerHTML=list.length?list.map(x=>'<button class="product" type="button" data-id="'+x.id+'"><span class="ico">'+x.icon+'</span><strong>'+x.name+'</strong><small>'+(lang==="en"?(t.descs[x.id]||x.desc):x.desc)+'</small><span class="tag">'+t.order+'</span></button>').join(""):'<div class="empty">'+t.empty+'</div>';
 };
-$("langToggle").addEventListener("click",()=>{lang=lang==="ar"?"en":"ar";apply();});
+$("langToggle").addEventListener("click",()=>{lang=lang==="ar"?"en":"ar";localStorage.setItem("alam_lang",lang);apply();});
 $("filters").addEventListener("click",()=>{const t=translations[lang],b=document.querySelector("[data-cat].active");$("sectionTitle").textContent=b&&b.dataset.cat!=="all"?b.textContent:t.heading;});
 const oldProductInfo=$("products").onclick;
 $("products").addEventListener("click",()=>{
