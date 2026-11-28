@@ -683,7 +683,7 @@ document.addEventListener("visibilitychange",()=>{if(document.visibilityState===
 function renderStore(){
  const all=(window.__approvedListings||[]).filter(x=>x.status==="approved");
  $("providerGrid").innerHTML='<div class="store-empty">منتجات العملاء المعتمدة تظهر هنا مباشرة.</div>';
- $("storeGrid").innerHTML=all.length?'<div class="store-grid">'+all.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:130px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+Number(x.price).toLocaleString("en-US")+' د.ع · المتوفر '+Number(x.quantity)+'</small></button>').join("")+'</div>':'<div class="store-empty">لا توجد منتجات معروضة حالياً.</div>';
+ $("storeGrid").innerHTML=all.length?'<div class="store-grid">'+all.map(x=>'<button class="store-item" type="button" data-product-id="'+escapeHtml(x.id)+'"><img src="'+escapeHtml(x.image)+'" alt="" style="width:100%;height:130px;object-fit:cover;border-radius:12px"><strong>'+escapeHtml(x.title)+'</strong><small>'+formatIQD(x.price)+' · المتوفر '+Number(x.quantity)+'</small></button>').join("")+'</div>':'<div class="store-empty">لا توجد منتجات معروضة حالياً.</div>';
  $("storeCount").textContent="";$("listingCount").textContent=String(all.length)+" منتج";updateCartCount();
 }
 function cartStorageKey(){return "alam_customer_cart_"+(auth.currentUser?auth.currentUser.uid:"guest");}
@@ -703,7 +703,7 @@ function addSelectedProductToCart(){
 function updateCartCount(){const n=getCustomerCart().reduce((sum,x)=>sum+x.quantity,0);const el=$("customerCartCount");if(el)el.textContent=String(n);const nav=$("navCartCount");if(nav)nav.textContent=String(n);}
 function renderCustomerCart(){
  const root=$("customerCartItems");if(!root)return;
- const items=getCustomerCart(),rows=items.map(item=>{const p=cartProduct(item.id);if(!p)return "";return '<div class="order"><div class="rowitem"><strong>'+escapeHtml(p.title)+'</strong><button class="danger" type="button" data-cart-remove="'+escapeHtml(p.id)+'">حذف</button></div><p class="muted">'+Number(p.price).toLocaleString("en-US")+' د.ع للقطعة · المتوفر '+Number(p.quantity)+'</p><div class="field"><label>الكمية</label><input type="number" min="1" max="'+Number(p.quantity)+'" value="'+item.quantity+'" data-cart-quantity="'+escapeHtml(p.id)+'"></div><strong>الإجمالي: '+(Number(p.price)*item.quantity).toLocaleString("en-US")+' د.ع</strong></div>';}).filter(Boolean);
+ const items=getCustomerCart(),rows=items.map(item=>{const p=cartProduct(item.id);if(!p)return "";return '<div class="order"><div class="rowitem"><strong>'+escapeHtml(p.title)+'</strong><button class="danger" type="button" data-cart-remove="'+escapeHtml(p.id)+'">حذف</button></div><p class="muted">'+formatIQD(p.price)+' للقطعة · المتوفر '+Number(p.quantity)+'</p><div class="field"><label>الكمية</label><input type="number" min="1" max="'+Number(p.quantity)+'" value="'+item.quantity+'" data-cart-quantity="'+escapeHtml(p.id)+'"></div><strong>الإجمالي: '+(Number(p.price)*item.quantity).toLocaleString("en-US")+' د.ع</strong></div>';}).filter(Boolean);
  root.innerHTML=rows.length?rows.join(""):'<div class="panel empty">سلتك فارغة أو أن بعض المنتجات لم تعد متاحة.</div>';
  const total=items.reduce((sum,item)=>{const p=cartProduct(item.id);return sum+(p?Number(p.price)*item.quantity:0);},0);
  $("customerCartTotal").textContent=formatIQD(total);updateCartCount();
