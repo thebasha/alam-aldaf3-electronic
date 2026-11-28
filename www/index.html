@@ -200,7 +200,25 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
  }
 }
 
-\n/* User marketplace navigation cleanup */\n#store,#orders{display:none!important}\n#services #serviceListingCategories .service{min-height:108px}\n#publish .store-head p{line-height:1.8}\n#publish #listingImage{padding:12px;background:#f7fafc;border:1px dashed #9db4c8}\n#publish #listingImagePreview:not(.hidden){display:block}\n#cart .store-head{margin-bottom:14px}\n</style>
+\n/* User marketplace navigation cleanup */\n#store,#orders{display:none!important}\n#services #serviceListingCategories .service{min-height:108px}\n#publish .store-head p{line-height:1.8}\n#publish #listingImage{padding:12px;background:#f7fafc;border:1px dashed #9db4c8}\n#publish #listingImagePreview:not(.hidden){display:block}\n#cart .store-head{margin-bottom:14px}\n
+/* Compact admin dashboard and primary navigation */
+.admin-toolbar{position:sticky;top:0;z-index:4;display:flex;gap:7px;overflow-x:auto;padding:8px;margin:10px 0 14px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 5px 16px #102b480a;scrollbar-width:thin}
+.admin-toolbar button{flex:0 0 auto;white-space:nowrap;padding:9px 13px;border-radius:10px;background:#f1f5f9;color:#526276;font-size:12px;font-weight:700}
+.admin-toolbar button.active{background:var(--navy);color:#fff}
+.admin-panel-section{min-width:0}
+#adminDashboard>.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#adminDashboard>.grid .panel{padding:11px;border-radius:12px}
+#adminDashboard>.grid .panel small{font-size:10px}
+#adminDashboard>.grid .panel h2{font-size:21px;margin:5px 0 0}
+.navinner{padding:4px 5px calc(4px + env(safe-area-inset-bottom));gap:2px}
+.nav button{gap:2px;padding:3px 7px;font-size:9px;min-width:56px}
+.nav button span{font-size:15px;line-height:17px}
+.nav button b{font-size:9px;font-weight:600}
+.nav button small{font-size:8px}
+#serviceListingCategories .service-icon{width:29px;height:29px;min-width:29px;font-size:15px;border-radius:8px}
+#homeMainTabs button{font-size:10px;padding:7px 10px}
+@media(min-width:700px){#adminDashboard>.grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+</style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -388,16 +406,30 @@ button:focus-visible{outline:2px solid #20b8c5;outline-offset:2px;}
   <div class="panel"><small class="muted">الطلبات المكتملة</small><h2 id="adminCompletedCount">—</h2></div>
   <div class="panel"><small class="muted">إجمالي الحسابات المسجلة</small><h2 id="adminUsersCount">—</h2></div>
  </div>
- <div class="section-head"><h3>طلبات العملاء</h3><button class="secondary" id="refreshAdminBtn" type="button">تحديث</button></div>
- <div id="adminOrdersList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
- <div class="section-head"><h3>طلبات شراء المنتجات</h3></div>
- <div id="adminProductOrdersList" class="list"><div class="panel empty">جارٍ تحميل طلبات الشراء…</div></div>
- <div class="section-head"><h3>الإعلانات للمراجعة</h3></div>
- <div id="adminListingsList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
- <div class="section-head"><h3>العملاء المسجلون</h3></div>
- <div id="adminUsersList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
- <div class="section-head"><h3>اقتراحات وشكاوى المستخدمين</h3></div>
- <div id="adminFeedbackList" class="list"><div class="panel empty">جارٍ تحميل الرسائل…</div></div>
+ <div class="admin-toolbar" role="tablist" aria-label="أقسام لوحة المدير">
+  <button type="button" class="active" data-admin-tab="adminRequestsPanel">📋 الطلبات</button>
+  <button type="button" data-admin-tab="adminListingsPanel">🛍️ الإعلانات</button>
+  <button type="button" data-admin-tab="adminUsersPanel">👥 العملاء</button>
+  <button type="button" data-admin-tab="adminFeedbackPanel">✉️ الرسائل</button>
+ </div>
+ <div id="adminRequestsPanel" class="admin-panel-section" data-admin-panel>
+  <div class="section-head"><h3>طلبات العملاء</h3><button class="secondary" id="refreshAdminBtn" type="button">تحديث</button></div>
+  <div id="adminOrdersList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
+  <div class="section-head"><h3>طلبات شراء المنتجات</h3></div>
+  <div id="adminProductOrdersList" class="list"><div class="panel empty">جارٍ تحميل طلبات الشراء…</div></div>
+ </div>
+ <div id="adminListingsPanel" class="admin-panel-section hidden" data-admin-panel>
+  <div class="section-head"><h3>الإعلانات للمراجعة</h3></div>
+  <div id="adminListingsList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
+ </div>
+ <div id="adminUsersPanel" class="admin-panel-section hidden" data-admin-panel>
+  <div class="section-head"><h3>العملاء المسجلون</h3></div>
+  <div id="adminUsersList" class="list"><div class="panel empty">جارٍ التحميل…</div></div>
+ </div>
+ <div id="adminFeedbackPanel" class="admin-panel-section hidden" data-admin-panel>
+  <div class="section-head"><h3>اقتراحات وشكاوى المستخدمين</h3></div>
+  <div id="adminFeedbackList" class="list"><div class="panel empty">جارٍ تحميل الرسائل…</div></div>
+ </div>
  <div class="notice" style="margin-top:14px">اعتماد الطلب هنا يغيّر حالته الإدارية فقط. لا يتم تنفيذ تحويل مالي أو شحن تلقائي. لا تعتمد أي عملية قبل التحقق من الدفع ومزود الخدمة.</div>
 </section>
 </main>
@@ -870,7 +902,14 @@ async function loadMyFeedback(){
 }
 $("feedbackForm").addEventListener("submit",submitFeedback);
 $("refreshFeedbackBtn").addEventListener("click",loadMyFeedback);
-$("profileForm").addEventListener("submit",saveProfile);$("profileAvatarFile").addEventListener("change",async()=>{try{const f=$("profileAvatarFile").files[0];if(f)$("profileAvatar").src=await compressProfileImage(f);}catch(e){alert(e.message);$("profileAvatarFile").value="";}});$("openAdminBtn").addEventListener("click",loadAdminDashboard);
+$("profileForm").addEventListener("submit",saveProfile);$("profileAvatarFile").addEventListener("change",async()=>{try{const f=$("profileAvatarFile").files[0];if(f)$("profileAvatar").src=await compressProfileImage(f);}catch(e){alert(e.message);$("profileAvatarFile").value="";}});document.querySelectorAll("[data-admin-tab]").forEach(function(tab){
+ tab.addEventListener("click",function(){
+  const target=tab.dataset.adminTab;
+  document.querySelectorAll("[data-admin-tab]").forEach(function(x){x.classList.toggle("active",x===tab);x.setAttribute("aria-selected",x===tab?"true":"false");});
+  document.querySelectorAll("[data-admin-panel]").forEach(function(panel){panel.classList.toggle("hidden",panel.id!==target);});
+ });
+});
+$("openAdminBtn").addEventListener("click",loadAdminDashboard);
 $("adminBackBtn").addEventListener("click",()=>showPage("profile"));
 $("refreshAdminBtn").addEventListener("click",loadAdminDashboard);
 $("closeAdminEditListing").addEventListener("click",()=>$("adminEditListingModal").classList.add("hidden"));
